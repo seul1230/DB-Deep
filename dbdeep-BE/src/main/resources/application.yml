@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: dbdeep-BE
+  config:
+    import:
+      - classpath:application-mysql.yml
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  jackson:
+    time-zone: Asia/Seoul
