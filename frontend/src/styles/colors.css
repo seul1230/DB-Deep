@@ -1,0 +1,13 @@
+:root {
+    --primary-dark-blue: #4333C7;   /* 진한 파랑 */
+    --primary-mid-blue: #9192F4;    /* 중간 파랑 */
+    --primary-light-blue: #E0E7FF;  /* 옅은 파랑 */
+    --sidebar-bg: #F6F9FB;          /* 사이드바 배경 */
+    --icon-blue: #353E80;           /* 아이콘 */
+    --gray-text: #9CA3AF;           /* 회색 글씨 */
+    --light-gray: #DBDBDB;          /* 옅은 회색 */
+    --red-alert: #EF4444;           /* 빨강 */
+    --yellow: #FCF3C6;              /* yellow */
+    --icon-blue-hover: #272e5e;
+  }
+  
