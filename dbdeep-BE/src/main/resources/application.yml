@@ -3,7 +3,8 @@ spring:
     name: dbdeep-BE
   config:
     import:
-      - classpath:application-mysql.yml
+      - application-mysql.yml
+      - optional:file:.env[.properties]
   servlet:
     multipart:
       max-file-size: 50MB
