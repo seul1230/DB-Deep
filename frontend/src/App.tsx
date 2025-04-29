@@ -1,25 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// @ 대신 상대경로로 수정
+const LoginPage = lazy(() => import("./pages/LoginPage"));
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Suspense fallback={<div>로딩 중...</div>}>
+        <Routes>
+          {/* 루트 경로에 로그인 페이지 연결 */}
+          <Route path="/" element={<LoginPage />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
   );
 }
 
