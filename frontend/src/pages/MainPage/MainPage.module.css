@@ -1,0 +1,79 @@
+.MainPage-container {
+    padding: 160px 60px 60px;
+    background-color: #fff;
+    margin-left: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.2s ease;
+  }
+  
+  .MainPage-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 36px;
+    text-align: center;
+  }
+  
+  .MainPage-input {
+    display: block;
+    margin: 0 0 40px 0;
+    width: 100%;
+    max-width: 480px;
+    box-sizing: border-box;
+    min-height: 48px;
+    resize: none;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    outline: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: height 0.2s ease;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 768px) {
+    .MainPage-input {
+      width: 90%;
+      font-size: 15px;
+    }
+  }
+  
+  .MainPage-list {
+    list-style: none;
+    padding: 0;
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .MainPage-listItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--light-gray);
+    color: var(--gray-text);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-width: max-content;
+    column-gap: 48px;
+  }
+  
+  .MainPage-listItem:hover {
+    background-color: #f5f6fa;
+  }
+  
+  .MainPage-listItem span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 480px;
+    display: inline-block;
+  }
