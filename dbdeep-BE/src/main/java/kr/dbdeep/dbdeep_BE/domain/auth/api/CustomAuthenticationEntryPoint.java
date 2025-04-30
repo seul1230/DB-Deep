@@ -1,5 +1,7 @@
 package kr.dbdeep.dbdeep_BE.domain.auth.api;
 
+import static kr.dbdeep.dbdeep_BE.global.config.properties.SecurityWhitelist.PERMIT_ALL;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +16,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
+        String path = request.getRequestURI();
+        if (isWhitelisted(path)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         // 인증되지 않은 사용자에 대한 응답
         ObjectMapper objectMapper = new ObjectMapper();
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -21,6 +29,14 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setCharacterEncoding("utf-8");
         response.getWriter().write(objectMapper.writeValueAsString(
                 new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "다시 로그인 해주세요")));
+    }
+
+    private boolean isWhitelisted(String path) {
+        return PERMIT_ALL.stream().anyMatch(pattern -> path.matches(patternToRegex(pattern)));
+    }
+
+    private String patternToRegex(String pattern) {
+        return pattern.replace("**", ".*");
     }
 }
 

@@ -1,5 +1,7 @@
 package kr.dbdeep.dbdeep_BE.global.config;
 
+import static kr.dbdeep.dbdeep_BE.global.config.properties.SecurityWhitelist.PERMIT_ALL;
+
 import java.util.List;
 import kr.dbdeep.dbdeep_BE.domain.auth.api.CustomAuthenticationEntryPoint;
 import kr.dbdeep.dbdeep_BE.domain.auth.application.JwtProvider;
@@ -50,7 +52,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 설정 추가
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll() // 로그인/회원가입 등 공개 API
+                        .requestMatchers(PERMIT_ALL.toArray(new String[0])).permitAll() // 로그인/회원가입 등 공개 API
                         .anyRequest().authenticated()            // 그 외는 인증 필요
                 ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new AuthExceptionHandlerFilter(), JwtAuthenticationFilter.class);
