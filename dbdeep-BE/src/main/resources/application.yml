@@ -11,3 +11,6 @@ spring:
       max-request-size: 50MB
   jackson:
     time-zone: Asia/Seoul
+
+jwt:
+  secretKey: ${JWT_SECRET}
