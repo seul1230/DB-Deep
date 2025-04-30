@@ -14,3 +14,11 @@ spring:
 
 jwt:
   secretKey: ${JWT_SECRET}
+
+cors:
+  allowed-origins:
+    - http://localhost:5173
+    - https://k12s104.p.ssafy.io
+    - https://dbdeep.kr
+    - http://k12s104.p.ssafy.io
+    - http://dbdeep.kr
