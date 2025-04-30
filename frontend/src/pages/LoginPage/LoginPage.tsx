@@ -3,17 +3,39 @@ import styles from "./LoginPage.module.css";
 import loginLeftImage from "@/assets/LoginLeftSide.png";
 import { FiEye, FiEyeOff, FiMail, FiLock } from "react-icons/fi";
 import TempPasswordModal from "@/features/auth/components/TempPasswordModal/TempPasswordModal";
+import { AxiosError } from "axios";
+import { useLogin } from "@/features/auth/hooks/useLogin";
 
 const LoginPage: React.FC = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState<boolean>(false); // << 추가해야 함
-    const [showModal, setShowModal] = useState(false);
-    const [isClosing, setIsClosing] = useState(false);    
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState<boolean>(false); // << 추가해야 함
+  const [showModal, setShowModal] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);    
+  const loginMutation = useLogin();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`로그인 시도: ${email}`);
+    loginMutation.mutate(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          alert(data.message);
+        },
+        onError: (error: AxiosError) => {
+          const status = error?.response?.status;
+          if (status === 400) {
+            alert("요청이 잘못되었습니다.");
+          } else if (status === 401) {
+            alert("이메일 또는 비밀번호가 올바르지 않습니다.");
+          } else if (status === 500) {
+            alert("서버 오류가 발생했습니다.");
+          } else {
+            alert("네트워크 오류가 발생했습니다.");
+          }
+        },
+      }
+    );
   };
 
   const togglePasswordVisibility = () => {
@@ -64,7 +86,7 @@ const LoginPage: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className={styles["LoginPage-input"]}
-                    placeholder="example.dbdeep.com"
+                    placeholder="example@dbdeep.com"
                     required
                   />
                 </div>
@@ -96,8 +118,12 @@ const LoginPage: React.FC = () => {
                 </div>
               </div>
 
-              <button type="submit" className={styles["LoginPage-button"]}>
-                로그인
+              <button
+                type="submit"
+                className={styles["LoginPage-button"]}
+                disabled={loginMutation.isPending}
+              >
+                {loginMutation.isPending ? "로딩 중..." : "로그인"}
               </button>
 
               <p className={styles["LoginPage-forgot"]}>

@@ -155,7 +155,7 @@
   }
   
   .LoginPage-forgotLink:hover {
-    color: var(--primary-dark-blue);
+    color: var(--icon-blue);
     text-decoration: underline;
   }  
   
