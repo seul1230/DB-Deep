@@ -49,7 +49,7 @@ const Sidebar: React.FC = () => {
                     right: -2,
                     width: 7,
                     height: 7,
-                    backgroundColor: "#f44336",
+                    backgroundColor: "var(--red-alert)",
                     borderRadius: "50%",
                     border: "2px solid white",
                   }}

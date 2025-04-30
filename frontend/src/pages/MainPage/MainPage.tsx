@@ -49,7 +49,7 @@ const MainPage: React.FC = () => {
         {recommendedQuestions.map((question, idx) => (
           <li key={idx} className={styles["MainPage-listItem"]}>
             <span>{question}</span>
-            <FiPlus size={16} color="#3b3b90" />
+            <FiPlus size={16} color="var(--icon-blue)" />
           </li>
         ))}
       </ul>
