@@ -5,6 +5,7 @@ import { FiEye, FiEyeOff, FiMail, FiLock } from "react-icons/fi";
 import { lazy, Suspense } from "react";
 import { AxiosError } from "axios";
 import { useLogin } from "@/features/auth/hooks/useLogin";
+import { useNavigate } from "react-router-dom";
 
 const TempPasswordModal = lazy(() => import("@/features/auth/components/TempPasswordModal/TempPasswordModal"));
 
@@ -15,16 +16,15 @@ const LoginPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [isClosing, setIsClosing] = useState(false);    
   const loginMutation = useLogin();
-
-  
+  const navigate = useNavigate();  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     loginMutation.mutate(
       { email, password },
       {
-        onSuccess: (data) => {
-          alert(data.message);
+        onSuccess: () => {
+          navigate("/main"); 
         },
         onError: (error: AxiosError) => {
           const status = error?.response?.status;

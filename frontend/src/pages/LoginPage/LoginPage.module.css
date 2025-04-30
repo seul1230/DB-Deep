@@ -81,12 +81,13 @@
   }
   
   .LoginPage-inputWrapper {
-    display: flex;
-    align-items: center;
+    background-color: var(--background-color);
     border: 1px solid var(--icon-blue);
     border-radius: 8px;
     padding: 10px;
-    transition: border 0.3s ease;
+    display: flex;
+    align-items: center;
+    transition: border 0.3s ease, background-color 0.3s ease;
   }
   
   .LoginPage-icon {
@@ -100,6 +101,13 @@
     font-size: 14px;
     border: none;
     outline: none;
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+
+  .LoginPage-input::placeholder {
+    color: var(--gray-text);
+    opacity: 1;
   }
   
   .LoginPage-eyeButton {
