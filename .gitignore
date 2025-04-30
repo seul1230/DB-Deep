@@ -1,0 +1,165 @@
+# ===================================
+# OS 별 무시 항목
+# ===================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ===================================
+# 공통 IDE/에디터
+# ===================================
+
+# VSCode
+.vscode/
+
+# IntelliJ IDEA / JetBrains
+.idea/
+*.iml
+*.iws
+out/
+*.ipr
+
+# ===================================
+# Python 관련
+# ===================================
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+pytestdebug.log
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Type checker
+.pyre/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# Pylint
+.pylint.d/
+
+# Pyre
+.pyre/
+
+# C extensions
+*.so
+
+# ===================================
+# Java 관련
+# ===================================
+
+# Class files
+*.class
+
+# Package files
+*.jar
+*.war
+*.ear
+
+# Build directories
+target/
+build/
+out/
+
+# Gradle
+.gradle/
+build/
+
+# Maven
+log/
+logs/
+dependency-reduced-pom.xml
+release.properties
+
+# Eclipse (추가로 사용하는 경우)
+.project
+.classpath
+.settings/
+bin/
+
+# ===================================
+# 로그, 환경, 기타
+# ===================================
+
+*.log
+*.tmp
+*.swp
+*.bak
+*.old
+*.orig
+*.rej
+*~.nib
+*.pid
+*.seed
+*.pid.lock
+*.sublime-workspace
+*.sublime-project
+
+# Ignore backup files
+*~
+*.bak
+
+# ===================================
+# Git 관련 (추가 캐시)
+# ===================================
+
+.gitignore
+!.gitignore
+
