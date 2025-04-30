@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.util.AntPathMatcher;
 
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
@@ -31,12 +32,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "다시 로그인 해주세요")));
     }
 
-    private boolean isWhitelisted(String path) {
-        return PERMIT_ALL.stream().anyMatch(pattern -> path.matches(patternToRegex(pattern)));
-    }
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
-    private String patternToRegex(String pattern) {
-        return pattern.replace("**", ".*");
+    private boolean isWhitelisted(String path) {
+        return PERMIT_ALL.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 }
 
