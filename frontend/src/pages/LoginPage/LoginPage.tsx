@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import styles from "./LoginPage.module.css";
-import loginLeftImage from "@/assets/LoginLeftSide.png";
+import loginLeftImage from "../../assets/LoginLeftSide.png";
 import { FiEye, FiEyeOff, FiMail, FiLock } from "react-icons/fi";
 
 const LoginPage: React.FC = () => {
