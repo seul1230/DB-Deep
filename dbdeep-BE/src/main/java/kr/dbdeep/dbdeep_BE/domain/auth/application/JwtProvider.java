@@ -13,14 +13,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
+import kr.dbdeep.dbdeep_BE.domain.auth.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Service;
 
 @Service
 public class JwtProvider {
@@ -74,15 +73,17 @@ public class JwtProvider {
     }
 
     public Authentication getAuthentication(String accessToken) {
-        // 토큰 복호화
         Claims claims = parseClaims(accessToken);
-        // claim에서 권한 정보 가져오기 / claim : 토큰을 복호화 한 것. 유저/토큰의 정보가 들어있음
+
         Collection<? extends GrantedAuthority> authorities =
                 Arrays.stream(claims.get("auth").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
-        // UserDetails 객체를 만들어서 Authentication 리턴 / Authentication :
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+
+        Integer memberId = Integer.parseInt(claims.getSubject());
+
+        CustomUserDetails principal = new CustomUserDetails(memberId, "anonymous", null, authorities);
+
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
