@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "./LoginPage.module.css";
-import loginLeftImage from "@/assets/LoginLeftSide.png";
+import loginLeftImage from "../../assets/LoginLeftSide.png";
 import { FiEye, FiEyeOff, FiMail, FiLock } from "react-icons/fi";
 import { lazy, Suspense } from "react";
 import { AxiosError } from "axios";
