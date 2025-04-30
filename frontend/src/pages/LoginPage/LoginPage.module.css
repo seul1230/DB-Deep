@@ -24,7 +24,7 @@
   .LoginPage-left {
     flex: 1 1 50%;
     position: relative;
-    background-color: var(--sidebar-bg);
+    background-color: white;
     overflow: hidden;
     transition: all 0.4s ease;
   }
@@ -83,7 +83,7 @@
   .LoginPage-inputWrapper {
     display: flex;
     align-items: center;
-    border: 1px solid var(--primary-dark-blue);
+    border: 1px solid var(--icon-blue);
     border-radius: 8px;
     padding: 10px;
     transition: border 0.3s ease;
@@ -138,6 +138,27 @@
     transition: color 0.3s;
   }
   
+  .LoginPage-modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  /* '비밀번호를 잊어버리셨나요?' hover 효과 */
+  .LoginPage-forgotLink {
+    cursor: pointer;
+    transition: color 0.3s, text-decoration 0.3s;
+  }
+  
+  .LoginPage-forgotLink:hover {
+    color: var(--icon-blue);
+    text-decoration: underline;
+  }  
+  
   @media (max-width: 960px) {
     .LoginPage-left {
       display: none;
@@ -149,5 +170,49 @@
       height: 100%;
       background-color: #fff;
     }
+  }
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes modalFadeOut {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+  
+  .fadeIn {
+    animation: modalFadeIn 0.3s forwards;
+  }
+  
+  .fadeOut {
+    animation: modalFadeOut 0.3s forwards;
+  }
+  
+  .LoginPage-modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .LoginPage-modalContent {
+    animation: modalFadeIn 0.3s ease-out;
   }
   
