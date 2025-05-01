@@ -6,8 +6,9 @@ import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatMessageListResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatRoomListResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.application.ChatMessageService;
 import kr.dbdeep.dbdeep_BE.domain.chat.application.ChatRoomService;
+import kr.dbdeep.dbdeep_BE.global.response.JSONResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,5 +39,11 @@ public class ChatController {
     public ResponseEntity<?> findChatMessagesById(@PathVariable String chatId) {
         ChatMessageListResponse response = chatMessageService.findByChatRoomId(chatId);
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{chatRoomId}")
+    public JSONResponse<Void> deleteChatRoomById(@PathVariable String chatRoomId) {
+        chatRoomService.deleteById(chatRoomId);
+        return JSONResponse.onSuccess();
     }
 }
