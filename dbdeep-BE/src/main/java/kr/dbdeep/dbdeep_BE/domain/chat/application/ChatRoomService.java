@@ -9,8 +9,10 @@ import kr.dbdeep.dbdeep_BE.domain.chat.infrastructure.ChatRoomRepository;
 import kr.dbdeep.dbdeep_BE.global.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ChatRoomService {
 
@@ -26,6 +28,18 @@ public class ChatRoomService {
     public ChatRoom findById(String chatRoomId) {
         return chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ChatRoomNotFoundException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+    }
+
+    @Transactional
+    public void deleteById(String chatRoomId) {
+        ChatRoom chatRoom = findById(chatRoomId);
+        chatRoom.delete();
+    }
+
+    @Transactional
+    public void updateTitle(String chatRoomId, String title) {
+        ChatRoom chatRoom = findById(chatRoomId);
+        chatRoom.updateTitle(title);
     }
 
 }

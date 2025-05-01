@@ -14,6 +14,11 @@ spring:
   mvc:
     servlet:
       path: /api
+  data:
+    elasticsearch:
+      repositories:
+        enabled: true
+      uris: http://localhost:9200
 jwt:
   secretKey: ${JWT_SECRET}
 

@@ -64,6 +64,15 @@ dependencies {
 
     // Firebase Admin SDK
     implementation 'com.google.firebase:firebase-admin:9.2.0'
+
+    // elasticsearch
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+//    implementation 'org.elasticsearch:elasticsearch:7.17.10'
+
+    implementation("co.elastic.clients:elasticsearch-java:8.13.0") // 최신 버전 기준
+    implementation("jakarta.json:jakarta.json-api:2.1.1")           // JSON 바인딩용
+    implementation("org.glassfish:jakarta.json:2.0.1")
+
 }
 
 tasks.named('test') {
