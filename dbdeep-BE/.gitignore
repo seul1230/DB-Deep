@@ -60,3 +60,5 @@ Thumbs.db
 *.log
 *.bak
 *.tmp
+
+src/main/resources/*.json

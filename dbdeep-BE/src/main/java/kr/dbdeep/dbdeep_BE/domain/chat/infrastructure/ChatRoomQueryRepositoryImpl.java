@@ -17,14 +17,15 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public ChatRoomListResponse findChatRoomsByCursor(Integer memberId, LocalDateTime cursor, int pageSize) {
+    public ChatRoomListResponse findByCursor(Integer memberId, LocalDateTime cursor, int pageSize) {
         QChatRoom chatRoom = QChatRoom.chatRoom;
 
         List<ChatRoom> results = queryFactory
                 .selectFrom(chatRoom)
                 .where(
                         chatRoom.memberId.eq(memberId),
-                        cursor != null ? chatRoom.lastMessageAt.lt(cursor) : null
+                        cursor != null ? chatRoom.lastMessageAt.lt(cursor) : null,
+                        chatRoom.deletedAt.isNull()
                 )
                 .orderBy(chatRoom.lastMessageAt.desc())
                 .limit(pageSize + 1)

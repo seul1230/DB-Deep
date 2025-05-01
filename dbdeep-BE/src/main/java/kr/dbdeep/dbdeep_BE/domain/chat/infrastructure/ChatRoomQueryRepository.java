@@ -4,5 +4,5 @@ import java.time.LocalDateTime;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatRoomListResponse;
 
 public interface ChatRoomQueryRepository {
-    ChatRoomListResponse findChatRoomsByCursor(Integer memberId, LocalDateTime cursor, int pageSize);
+    ChatRoomListResponse findByCursor(Integer memberId, LocalDateTime cursor, int pageSize);
 }

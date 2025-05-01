@@ -50,10 +50,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter)
             throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS 설정 추가
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(PERMIT_ALL.toArray(new String[0])).permitAll() // 로그인/회원가입 등 공개 API
+                        .requestMatchers(PERMIT_ALL.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()            // 그 외는 인증 필요
                 ).addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new AuthExceptionHandlerFilter(), JwtAuthenticationFilter.class);
