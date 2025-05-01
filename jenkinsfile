@@ -5,18 +5,18 @@ pipeline {
         REGION = 'asia-northeast3'
         SERVICE = 'dbdeep-da'
         IMAGE = "gcr.io/${GCP_PROJECT}/${SERVICE}"
-        GCLOUD_KEY = credentials('gcp-service-account-json') // Jenkins에 등록한 키
+        GCLOUD_KEY = credentials('gcp-service-account-json') // Jenkins에 등록한 GCP 키
     }
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'DA-dev', url: 'https://lab.ssafy.com/s12-final/S12P31S104', credentialsId: 'gitlab_api'
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${IMAGE}","dbdeep-DA/")
+                    docker.build("${IMAGE}", "dbdeep-DA/")
                 }
             }
         }
