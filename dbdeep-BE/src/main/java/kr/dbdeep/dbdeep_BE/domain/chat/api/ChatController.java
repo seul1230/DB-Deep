@@ -30,13 +30,13 @@ public class ChatController {
         if (cursor != null && !cursor.isBlank()) {
             parsedCursor = LocalDateTime.parse(cursor);
         }
-        ChatRoomListResponse chatRoomListResponse = chatRoomService.findChatRooms(memberId, parsedCursor, size);
+        ChatRoomListResponse chatRoomListResponse = chatRoomService.find(memberId, parsedCursor, size);
         return ResponseEntity.ok(chatRoomListResponse);
     }
 
     @GetMapping("/{chatId}")
     public ResponseEntity<?> findChatMessagesById(@PathVariable String chatId) {
-        ChatMessageListResponse response = chatMessageService.getMessagesByChatRoomId(chatId);
+        ChatMessageListResponse response = chatMessageService.findByChatRoomId(chatId);
         return ResponseEntity.ok(response);
     }
 }

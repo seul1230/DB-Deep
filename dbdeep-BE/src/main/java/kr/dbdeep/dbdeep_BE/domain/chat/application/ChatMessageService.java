@@ -15,8 +15,8 @@ public class ChatMessageService {
     private final ChatRoomService chatRoomService;
     private final ChatMessageRepository chatMessageRepository;
 
-    public ChatMessageListResponse getMessagesByChatRoomId(String chatRoomId) {
-        ChatRoom chatRoom = chatRoomService.findChatRoomById(chatRoomId);
+    public ChatMessageListResponse findByChatRoomId(String chatRoomId) {
+        ChatRoom chatRoom = chatRoomService.findById(chatRoomId);
         List<ChatMessage> messages = chatMessageRepository.findRecentMessagesByChatRoomId(chatRoomId);
 
         return ChatMessageListResponse.from(chatRoom, messages);

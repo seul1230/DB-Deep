@@ -2,7 +2,6 @@ package kr.dbdeep.dbdeep_BE.global.code;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import lombok.Getter;
@@ -24,7 +23,9 @@ public enum ErrorCode {
     INVALID_SIGN_IN(4040, HttpStatus.NOT_FOUND, "이메일 혹은 비밀번호가 틀립니다"),
     EXPIRED_TOKEN(4010, UNAUTHORIZED, "만료된 토큰입니다"),
     INVALID_TOKEN(4010, UNAUTHORIZED, "유효하지 않은 토큰입니다"),
-    ;
+
+    // 채팅 에러
+    CHAT_ROOM_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 채팅방입니다");
 
     private final int code;
     private final HttpStatus httpStatus;
