@@ -34,4 +34,8 @@ public class ChatRoom extends BaseTimeEntity {
         this.deletedAt = LocalDateTime.now();
     }
 
+    public void updateTitle(String title) {
+        this.chatroomName = title;
+    }
+
 }

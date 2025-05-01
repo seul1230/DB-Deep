@@ -4,13 +4,16 @@ import java.time.LocalDateTime;
 import kr.dbdeep.dbdeep_BE.domain.auth.annotation.CurrentMemberId;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatMessageListResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatRoomListResponse;
+import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.UpdateChatRoomTitleRequest;
 import kr.dbdeep.dbdeep_BE.domain.chat.application.ChatMessageService;
 import kr.dbdeep.dbdeep_BE.domain.chat.application.ChatRoomService;
 import kr.dbdeep.dbdeep_BE.global.response.JSONResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,4 +49,12 @@ public class ChatController {
         chatRoomService.deleteById(chatRoomId);
         return JSONResponse.onSuccess();
     }
+
+    @PatchMapping("/{chatRoomId}/title")
+    public JSONResponse<Void> updateChatRoomTitle(@PathVariable String chatRoomId,
+                                                  @RequestBody UpdateChatRoomTitleRequest request) {
+        chatRoomService.updateTitle(chatRoomId, request.getTitle());
+        return JSONResponse.onSuccess();
+    }
+
 }

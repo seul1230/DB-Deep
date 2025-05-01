@@ -36,4 +36,10 @@ public class ChatRoomService {
         chatRoom.delete();
     }
 
+    @Transactional
+    public void updateTitle(String chatRoomId, String title) {
+        ChatRoom chatRoom = findById(chatRoomId);
+        chatRoom.updateTitle(title);
+    }
+
 }
