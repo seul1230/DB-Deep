@@ -3,6 +3,8 @@ package kr.dbdeep.dbdeep_BE.domain.chat.api;
 import java.time.LocalDateTime;
 import java.util.List;
 import kr.dbdeep.dbdeep_BE.domain.auth.annotation.CurrentMemberId;
+import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.AllowShareChatRequest;
+import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.AllowShareChatResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatMessageListResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatRoomListResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ShareChatRequest;
@@ -79,4 +81,13 @@ public class ChatController {
         chatShareService.share(memberId, request.getTargets(), request.getChatId());
         return JSONResponse.onSuccess();
     }
+
+    @PostMapping("/share/allow")
+    public JSONResponse<AllowShareChatResponse> handleShareResponse(@RequestBody AllowShareChatRequest request,
+                                                                    @CurrentMemberId Integer memberId) {
+        AllowShareChatResponse response =
+                chatShareService.handleShareResponse(memberId, request.getNotificationId(), request.getAccepted());
+        return JSONResponse.onSuccess(response);
+    }
+
 }
