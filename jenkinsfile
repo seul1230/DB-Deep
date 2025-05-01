@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+    environment {
+        GCP_PROJECT = 'dbdeep-458113'
+        REGION = 'asia-northeast3'
+        SERVICE = 'dbdeep-da'
+        IMAGE = "gcr.io/${GCP_PROJECT}/${SERVICE}"
+        GCLOUD_KEY = credentials('gcp-service-account-json') // Jenkins에 등록한 키
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE}","dbdeep-DA/")
+                }
+            }
+        }
+        stage('Authenticate with GCP') {
+            steps {
+                sh '''
+                  echo "$GCLOUD_KEY" > key.json
+                  gcloud auth activate-service-account --key-file=key.json
+                  gcloud config set project $GCP_PROJECT
+                  gcloud auth configure-docker
+                '''
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                sh "docker push ${IMAGE}"
+            }
+        }
+        stage('Deploy to Cloud Run') {
+            steps {
+                sh """
+                  gcloud run deploy $SERVICE \
+                    --image ${IMAGE} \
+                    --platform managed \
+                    --region ${REGION} \
+                    --allow-unauthenticated
+                """
+            }
+        }
+    }
+}
