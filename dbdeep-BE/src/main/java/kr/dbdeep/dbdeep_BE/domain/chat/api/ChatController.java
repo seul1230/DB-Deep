@@ -24,21 +24,21 @@ public class ChatController {
     private final ChatRoomService chatRoomService;
 
     @GetMapping
-    public ResponseEntity<ChatRoomListResponse> findChatRooms(@CurrentMemberId Integer memberId,
-                                                              @RequestParam(required = false, defaultValue = "30") Integer size,
-                                                              @RequestParam(required = false) String cursor) {
+    public JSONResponse<ChatRoomListResponse> findChatRooms(@CurrentMemberId Integer memberId,
+                                                            @RequestParam(required = false, defaultValue = "30") Integer size,
+                                                            @RequestParam(required = false) String cursor) {
         LocalDateTime parsedCursor = null;
         if (cursor != null && !cursor.isBlank()) {
             parsedCursor = LocalDateTime.parse(cursor);
         }
         ChatRoomListResponse chatRoomListResponse = chatRoomService.find(memberId, parsedCursor, size);
-        return ResponseEntity.ok(chatRoomListResponse);
+        return JSONResponse.onSuccess(chatRoomListResponse);
     }
 
-    @GetMapping("/{chatId}")
-    public ResponseEntity<?> findChatMessagesById(@PathVariable String chatId) {
-        ChatMessageListResponse response = chatMessageService.findByChatRoomId(chatId);
-        return ResponseEntity.ok(response);
+    @GetMapping("/{chatRoomId}")
+    public JSONResponse<ChatMessageListResponse> findChatMessagesById(@PathVariable String chatRoomId) {
+        ChatMessageListResponse response = chatMessageService.findByChatRoomId(chatRoomId);
+        return JSONResponse.onSuccess(response);
     }
 
     @DeleteMapping("/{chatRoomId}")
