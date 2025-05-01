@@ -25,7 +25,10 @@ public enum ErrorCode {
     INVALID_TOKEN(4010, UNAUTHORIZED, "유효하지 않은 토큰입니다"),
 
     // 채팅 에러
-    CHAT_ROOM_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 채팅방입니다");
+    CHAT_ROOM_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 채팅방입니다"),
+
+    // 멤버 에러
+    MEMBER__NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 유저입니다");
 
     private final int code;
     private final HttpStatus httpStatus;
