@@ -24,7 +24,8 @@ public class ChatRoomQueryRepositoryImpl implements ChatRoomQueryRepository {
                 .selectFrom(chatRoom)
                 .where(
                         chatRoom.memberId.eq(memberId),
-                        cursor != null ? chatRoom.lastMessageAt.lt(cursor) : null
+                        cursor != null ? chatRoom.lastMessageAt.lt(cursor) : null,
+                        chatRoom.deletedAt.isNull()
                 )
                 .orderBy(chatRoom.lastMessageAt.desc())
                 .limit(pageSize + 1)
