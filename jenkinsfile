@@ -4,7 +4,8 @@ pipeline {
         GCP_PROJECT = 'dbdeep-458113'
         REGION = 'asia-northeast3'
         SERVICE = 'dbdeep-da'
-        IMAGE = "gcr.io/${GCP_PROJECT}/${SERVICE}"
+        REPO = 'dbdeep-da-repo' // Artifact Registry 이름
+        IMAGE = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
     }
     stages {
         stage('Checkout') {
@@ -27,7 +28,7 @@ pipeline {
                     sh '''
                       gcloud auth activate-service-account --key-file=$GCP_KEY
                       gcloud config set project $GCP_PROJECT
-                      gcloud auth configure-docker
+                      gcloud auth configure-docker asia-northeast3-docker.pkg.dev
                     '''
                 }
             }
