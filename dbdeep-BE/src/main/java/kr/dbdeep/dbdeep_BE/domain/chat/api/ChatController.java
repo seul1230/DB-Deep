@@ -1,12 +1,15 @@
 package kr.dbdeep.dbdeep_BE.domain.chat.api;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import kr.dbdeep.dbdeep_BE.domain.auth.annotation.CurrentMemberId;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatMessageListResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatRoomListResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.UpdateChatRoomTitleRequest;
 import kr.dbdeep.dbdeep_BE.domain.chat.application.ChatMessageService;
 import kr.dbdeep.dbdeep_BE.domain.chat.application.ChatRoomService;
+import kr.dbdeep.dbdeep_BE.domain.chat.infrastructure.elasticsearch.ChatMessageSearchService;
+import kr.dbdeep.dbdeep_BE.domain.chat.infrastructure.elasticsearch.ChatRoomSearchResultResponse;
 import kr.dbdeep.dbdeep_BE.global.response.JSONResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +28,7 @@ public class ChatController {
 
     private final ChatMessageService chatMessageService;
     private final ChatRoomService chatRoomService;
+    private final ChatMessageSearchService chatMessageSearchService;
 
     @GetMapping
     public JSONResponse<ChatRoomListResponse> findChatRooms(@CurrentMemberId Integer memberId,
@@ -57,4 +61,11 @@ public class ChatController {
         return JSONResponse.onSuccess();
     }
 
+    @GetMapping("/search")
+    public JSONResponse<?> searchByKeyword(@CurrentMemberId Integer memberId,
+                                           @RequestParam String keyword) {
+        List<ChatRoomSearchResultResponse> response = chatMessageSearchService.findLatestUserMessagesByKeyword(
+                memberId, keyword);
+        return JSONResponse.onSuccess(response);
+    }
 }
