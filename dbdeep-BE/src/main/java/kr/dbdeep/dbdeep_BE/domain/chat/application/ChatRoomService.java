@@ -42,4 +42,9 @@ public class ChatRoomService {
         chatRoom.updateTitle(title);
     }
 
+    @Transactional
+    public void save(ChatRoom chatRoom) {
+        chatRoomRepository.save(chatRoom);
+    }
+
 }

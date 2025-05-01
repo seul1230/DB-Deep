@@ -1,13 +1,25 @@
 package kr.dbdeep.dbdeep_BE.domain.member.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import kr.dbdeep.dbdeep_BE.global.entity.BaseTimeEntity;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "member")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,9 +33,12 @@ public class Member extends BaseTimeEntity {
     @Column(name = "position_id")
     private Integer positionId = 1;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = false)
     @Builder.Default
-    @Column(name = "department_id")
-    private Integer departmentId = 1;
+    private Department department = Department.builder().id(1).build();
+
+    private String name;
 
     @Column(nullable = false, length = 255)
     private String email;
