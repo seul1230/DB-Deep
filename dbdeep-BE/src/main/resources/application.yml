@@ -17,8 +17,11 @@ spring:
   data:
     elasticsearch:
       repositories:
+        bootstrap-mode: lazy
         enabled: true
-      uris: http://localhost:9200
+      client:
+#        uris: http://localhost:9200 # 로컬 테스트 용
+        uris: http://elasticsearch:9200 # 배포 용
 jwt:
   secretKey: ${JWT_SECRET}
 
