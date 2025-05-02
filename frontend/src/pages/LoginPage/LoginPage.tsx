@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import styles from "./LoginPage.module.css";
 import loginLeftImage from "../../assets/LoginLeftSide.png";
 import { FiEye, FiEyeOff, FiMail, FiLock } from "react-icons/fi";
-import TempPasswordModal from "@/features/auth/components/TempPasswordModal/TempPasswordModal";
+import { lazy, Suspense } from "react";
 import { AxiosError } from "axios";
 import { useLogin } from "@/features/auth/hooks/useLogin";
+import { useNavigate } from "react-router-dom";
+
+const TempPasswordModal = lazy(() => import("@/features/auth/components/TempPasswordModal/TempPasswordModal"));
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -13,14 +16,15 @@ const LoginPage: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [isClosing, setIsClosing] = useState(false);    
   const loginMutation = useLogin();
+  const navigate = useNavigate();  
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     loginMutation.mutate(
       { email, password },
       {
-        onSuccess: (data) => {
-          alert(data.message);
+        onSuccess: () => {
+          navigate("/main"); 
         },
         onError: (error: AxiosError) => {
           const status = error?.response?.status;
@@ -148,11 +152,13 @@ const LoginPage: React.FC = () => {
           onClick={closeModal}
         >
           <div className={styles["LoginPage-modalContent"]} onClick={(e) => e.stopPropagation()}>
-            <TempPasswordModal
-              onClose={closeModal}
-              onSend={(email) => console.log("이메일 전송:", email)}
-              onVerifyCode={(code) => console.log("인증번호 검증:", code)}
-            />
+            <Suspense>
+              <TempPasswordModal
+                onClose={closeModal}
+                onSend={(email) => console.log("이메일 전송:", email)}
+                onVerifyCode={(code) => console.log("인증번호 검증:", code)}
+              />
+            </Suspense>
           </div>
         </div>
       )}

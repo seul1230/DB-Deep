@@ -1,7 +1,9 @@
 import React from "react";
-import logo from "../../../assets/logo.png";
+import logoLight from "@/assets/logo.png";
+import logoDark from "@/assets/logo-dark.png";
 import styles from "./Logo.module.css";
 import { useNavigate } from "react-router-dom";
+import { useThemeStore } from "@/shared/store/themeStore";
 
 interface LogoProps {
   to?: string;
@@ -10,10 +12,12 @@ interface LogoProps {
 
 const Logo: React.FC<LogoProps> = ({ to = "/main", className = "" }) => {
   const navigate = useNavigate();
+  const { theme } = useThemeStore();
+  const logoSrc = theme === "dark" ? logoDark : logoLight;
 
   return (
     <img
-      src={logo}
+      src={logoSrc}
       alt="DB Deep Logo"
       className={`${styles["Logo"]} ${className}`}
       onClick={() => navigate(to)}
