@@ -9,13 +9,13 @@ services:
       - ELASTICSEARCH_HEAP_SIZE=512m
     ports:
       - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - esdata:/bitnami/elasticsearch
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9200/"]
-      interval: 10s
-      timeout:  5s
-      retries: 5
     networks:
       - esnet
 
@@ -37,15 +37,18 @@ services:
       context: ./dbdeep-BE
     env_file:
       - dbdeep-BE/.env
-    environment:
-      - FIRESTORE_CREDENTIAL_LOCATION=/credentials/key.json
     ports:
       - "8081:8080"
+    environment:
+      - FIRESTORE_CREDENTIAL_LOCATION=/credentials/key.json
     depends_on:
       elasticsearch:
         condition: service_healthy
       kibana:
         condition: service_started
+    restart: on-failure
+    networks:
+      - esnet
 
 volumes:
   esdata:
