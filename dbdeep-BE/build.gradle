@@ -73,9 +73,9 @@ dependencies {
     // Firestore SDK Protobuf
     implementation 'com.google.protobuf:protobuf-java:3.23.4'
 
-    implementation("co.elastic.clients:elasticsearch-java:8.13.0") // 최신 버전 기준
-    implementation("jakarta.json:jakarta.json-api:2.1.1")           // JSON 바인딩용
-    implementation("org.glassfish:jakarta.json:2.0.1")
+//    implementation("co.elastic.clients:elasticsearch-java:8.13.0") // 최신 버전 기준
+//    implementation("jakarta.json:jakarta.json-api:2.1.1")           // JSON 바인딩용
+//    implementation("org.glassfish:jakarta.json:2.0.1")
 
 }
 

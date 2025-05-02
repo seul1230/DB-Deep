@@ -18,6 +18,8 @@ spring:
     uris: ${ES_URI:http://elasticsearch:9200}
     connection-timeout: 5s
     socket-timeout: 5s
+    client:
+      type: rest-high-level
 
   data:
     elasticsearch:
