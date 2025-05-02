@@ -1,0 +1,36 @@
+.RecommendedList-list {
+    list-style: none;
+    padding: 0;
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .RecommendedList-listItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--light-gray);
+    color: var(--gray-text);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-width: max-content;
+    column-gap: 48px;
+  }
+  
+  .RecommendedList-listItem:hover {
+    background-color: #f5f6fa;
+  }
+  
+  .RecommendedList-listItem span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 480px;
+    display: inline-block;
+  }
+  

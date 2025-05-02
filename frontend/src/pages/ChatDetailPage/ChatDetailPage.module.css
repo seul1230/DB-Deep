@@ -1,0 +1,74 @@
+.chatDetailPage-outer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--background-color);
+}
+
+.chatDetailPage-scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+.chatDetailPage-chatBox {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ✅ Typewriter 텍스트 안에서 마크다운 요소 */
+.chatDetailPage-paragraph {
+  margin-bottom: 0.75rem;
+}
+
+.chatDetailPage-heading {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.chatDetailPage-hr {
+  border: 0;
+  border-top: 1px solid var(--light-gray);
+  margin: 0.5rem 0; /* 위아래 여백 좁힘 */
+}
+
+/* ✅ 차트 삽입 placeholder */
+.chatDetailPage-chartPlaceholder {
+  padding: 1rem;
+  background: var(--primary-mid-blue);
+  color: white;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 0.75rem 0;
+  transition: background 0.2s;
+  font-size: 0.9rem;
+}
+
+.chatDetailPage-chartPlaceholder:hover {
+  background: var(--primary-dark-blue);
+}
+
+/* ✅ 입력창 wrapper */
+.chatDetailPage-inputWrapper {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--background-color);
+  box-sizing: border-box;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center; /* 👉 가운데 정렬 */
+}
+
+/* ✅ 입력창 안쪽 박스 */
+.chatDetailPage-inputInner {
+  width: 100%;
+  max-width: 720px;
+}

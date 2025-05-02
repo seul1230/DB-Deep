@@ -7,6 +7,7 @@ import ProtectedRoute from "./ProtectedRoute";
 const LoginPage = lazy(() => import("../pages/LoginPage/LoginPage"));
 const MainPage = lazy(() => import("../pages/MainPage/MainPage"));
 const ChangePasswordPage = lazy(() => import("../pages/ChangePasswordPage/ChangePasswordPage"))
+const ChatDetailPage = lazy(() => import("../pages/ChatDetailPage/ChatDetailPage"))
 
 const Router = () => {
   const isLoggedOut = useAuth((state) => state.isLoggedOut);
@@ -29,6 +30,7 @@ const Router = () => {
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="/main" element={<MainPage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
+        <Route path="/chat/:chatId" element={<ChatDetailPage />} />
         {/* 여기에 더 추가 가능 */}
       </Route>
     </Routes>
