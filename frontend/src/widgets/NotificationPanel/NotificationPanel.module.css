@@ -1,0 +1,64 @@
+.NotificationPanel {
+    position: absolute;
+    top: 80px;
+    left: 100px;
+    width: 320px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    padding: 16px;
+    z-index: 2000;
+  }
+  
+  .NotificationPanel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  
+  .NotificationPanel-badge {
+    background-color: #e63946;
+    color: white;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+  }
+  
+  .NotificationPanel-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .NotificationPanel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .NotificationPanel-item {
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f8f9fa;
+    font-size: 14px;
+    position: relative;
+  }
+  
+  .NotificationPanel-item.read {
+    opacity: 0.4;
+  }
+  
+  .NotificationPanel-time {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 12px;
+    color: gray;
+  }
+  

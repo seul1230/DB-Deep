@@ -13,6 +13,7 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [hasNotification, setHasNotification] = useState(false); // 실제는 API에서 받아올 값
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // 로그인 페이지에서는 사이드바 숨기기
   if (location.pathname === "/login") {
@@ -25,6 +26,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
+    <>
     <aside className={styles["Sidebar-wrapper"]}>
       <div className={styles["Sidebar-top"]}>
         <img
@@ -38,24 +40,24 @@ const Sidebar: React.FC = () => {
       </div>
       <nav className={styles["Sidebar-nav"]}>
         <ul>
-          <li>
-            <div style={{ position: "relative" }}>
-              <FiBell size={20} className={styles["Sidebar-icon"]} />
-              {hasNotification && (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: -2,
-                    right: -2,
-                    width: 7,
-                    height: 7,
-                    backgroundColor: "var(--red-alert)",
-                    borderRadius: "50%",
-                    border: "2px solid white",
-                  }}
-                />
-              )}
-            </div>
+        <li onClick={() => setShowNotifications((prev) => !prev)}>
+              <div style={{ position: "relative" }}>
+                <FiBell size={20} className={styles["Sidebar-icon"]} />
+                {hasNotification && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: -2,
+                      right: -2,
+                      width: 7,
+                      height: 7,
+                      backgroundColor: "var(--red-alert)",
+                      borderRadius: "50%",
+                      border: "2px solid white",
+                    }}
+                  />
+                )}
+              </div>
             </li>
           <li><FiSearch size={20} className={styles["Sidebar-icon"]}/></li>
           <li><FiPlusSquare size={20} className={styles["Sidebar-icon"]}/></li>
@@ -80,6 +82,11 @@ const Sidebar: React.FC = () => {
         </label>
       </div>
     </aside>
+
+    {showNotifications && (
+      <NotificationPanel onClose={() => setShowNotifications(false)} />
+    )}
+    </>
   );
 };
 
