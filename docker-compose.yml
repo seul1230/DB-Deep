@@ -35,12 +35,13 @@ services:
   dbdeep-app:
     build:
       context: ./dbdeep-BE
-    env_file:
-      - dbdeep-BE/.env
     ports:
       - "8081:8080"
     environment:
       - FIRESTORE_CREDENTIAL_LOCATION=/credentials/key.json
+      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - SPRING_DATA_ELASTICSEARCH_REPOSITORIES_BOOTSTRAP_MODE=lazy
+      - SPRING_DATA_ELASTICSEARCH_REPOSITORIES_FAIL_FAST=false
     depends_on:
       elasticsearch:
         condition: service_healthy
