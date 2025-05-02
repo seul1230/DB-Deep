@@ -19,7 +19,7 @@ const Sidebar: React.FC = () => {
   const { clearTokens } = useAuth();
 
   const [showOverlay, setShowOverlay] = useState(false);
-  const { openNotification, hasNotification  } = usePanelStore();
+  const { openNotification, hasNotification, toggleNotification } = usePanelStore();
 
   useEffect(() => {
     document.body.classList.toggle("dark", theme === "dark");
@@ -68,7 +68,7 @@ const Sidebar: React.FC = () => {
               <FiBell
                 size={20}
                 className={styles["Sidebar-icon"]}
-                onClick={openNotification}
+                onClick={toggleNotification}
                 style={{ cursor: "pointer" }}
               />
               {hasNotification && (

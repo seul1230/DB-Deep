@@ -5,6 +5,7 @@ interface PanelState {
   hasNotification: boolean;
   openNotification: () => void;
   closeNotification: () => void;
+  toggleNotification: () => void;
   setHasNotification: (has: boolean) => void;
 }
 
@@ -14,4 +15,5 @@ export const usePanelStore = create<PanelState>((set) => ({
   openNotification: () => set({ isNotificationOpen: true }),
   closeNotification: () => set({ isNotificationOpen: false }),
   setHasNotification: (has) => set({ hasNotification: has }),
+  toggleNotification: () => set((state) => ({ isNotificationOpen: !state.isNotificationOpen })),
 }));
