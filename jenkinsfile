@@ -42,13 +42,13 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
                     sh '''
-                        echo "$ENV_VARS" > env_vars.env
+                        echo "$ENV_VARS" > env_vars.json
                         gcloud run deploy $SERVICE \
                         --image ${IMAGE} \
                         --platform managed \
                         --region ${REGION} \
                         --allow-unauthenticated \
-                        --env-vars-file=env_vars.env
+                        --env-vars-file=env_vars.json
                     '''
                 }
             }
