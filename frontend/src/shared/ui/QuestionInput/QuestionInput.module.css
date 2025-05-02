@@ -1,0 +1,27 @@
+.QuestionInput-input {
+    display: block;
+    margin: 0 0 40px 0;
+    width: 100%;
+    max-width: 480px;
+    box-sizing: border-box;
+    min-height: 48px;
+    resize: none;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    outline: none;
+    box-shadow: 0 2px 4px var(--modal-overlay-bg);
+    transition: height 0.2s ease;
+    overflow-y: auto;
+  }
+  
+  @media (max-width: 768px) {
+    .QuestionInput-input {
+      width: 90%;
+      font-size: 15px;
+    }
+  }
+  

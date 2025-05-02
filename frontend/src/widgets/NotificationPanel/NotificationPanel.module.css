@@ -1,64 +1,80 @@
 .NotificationPanel {
-    position: absolute;
-    top: 80px;
-    left: 100px;
-    width: 320px;
-    background: #fff;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-    border-radius: 12px;
-    padding: 16px;
-    z-index: 2000;
-  }
-  
-  .NotificationPanel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
-    margin-bottom: 12px;
-  }
-  
-  .NotificationPanel-badge {
-    background-color: #e63946;
-    color: white;
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 999px;
-    margin-left: 6px;
-  }
-  
-  .NotificationPanel-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .NotificationPanel-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .NotificationPanel-item {
-    display: flex;
-    gap: 10px;
-    padding: 12px;
-    border-radius: 8px;
-    background: #f8f9fa;
-    font-size: 14px;
-    position: relative;
-  }
-  
-  .NotificationPanel-item.read {
-    opacity: 0.4;
-  }
-  
-  .NotificationPanel-time {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 12px;
-    color: gray;
-  }
-  
+  position: absolute;
+  top: 0;
+  left: 100%; /* Sidebar의 우측에 붙음 */
+  width: 320px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  box-shadow: 4px 0 12px var(--modal-overlay-bg);
+  border-left: 1px solid var(--light-gray);
+  z-index: 3000;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.NotificationPanel.open {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.NotificationPanel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.NotificationPanel-badge {
+  background-color: var(--red-alert);
+  color: var(--sidebar-bg);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+
+.NotificationPanel-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.NotificationPanel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: calc(100vh - 60px);
+  padding-right: 4px;
+}
+
+.NotificationPanel-item {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--background-color);
+  font-size: 14px;
+  position: relative;
+  color: var(--text-color);
+}
+
+.NotificationPanel-item.read {
+  opacity: 0.4;
+}
+
+.NotificationPanel-time {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+  color: var(--gray-text);
+}

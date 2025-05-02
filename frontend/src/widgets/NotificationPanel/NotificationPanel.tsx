@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./NotificationPanel.module.css";
 import { FiBell } from "react-icons/fi";
+import { usePanelStore } from "@/shared/store/usePanelStore";
 
 const notifications = [
   { id: 1, user: "이승우", message: "‘분기별 성과 보고서’", time: "10분 전", read: false },
@@ -12,24 +13,21 @@ const notifications = [
 ];
 
 interface Props {
-  onClose: () => void;
+  isOpen: boolean;
 }
 
-const NotificationPanel: React.FC<Props> = ({ onClose }) => {
+const NotificationPanel: React.FC<Props> = ({ isOpen }) => {
+  const { closeNotification } = usePanelStore();
+
   return (
-    <div className={styles["NotificationPanel"]}>
+    <div className={`${styles["NotificationPanel"]} ${isOpen ? styles["open"] : ""}`}>
       <div className={styles["NotificationPanel-header"]}>
-        <span>알림 <span className={styles["NotificationPanel-badge"]}>3</span></span>
-        <button onClick={onClose} className={styles["NotificationPanel-close"]}>×</button>
+        <span>알림</span>
+        <button onClick={closeNotification} className={styles["NotificationPanel-close"]}>×</button>
       </div>
       <div className={styles["NotificationPanel-list"]}>
         {notifications.map((n) => (
-          <div
-            key={n.id}
-            className={`${styles["NotificationPanel-item"]} ${
-              n.read ? styles["read"] : ""
-            }`}
-          >
+          <div key={n.id} className={styles["NotificationPanel-item"]}>
             <FiBell size={14} />
             <div>
               <strong>공유 알림</strong>
