@@ -8,19 +8,20 @@ import defaultProfileImage from "@/assets/default-profile.jpg";
 import { useThemeStore } from "@/shared/store/themeStore";
 import ProfileOverlay from "../ProfileOverlay/ProfileOverlay";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { usePanelStore } from "@/shared/store/usePanelStore"; //
+import NotificationPanel from "@/widgets/NotificationPanel/NotificationPanel";
 
-const profileImageUrl: string | null = null; // API 연동 시 변경
+const profileImageUrl: string | null = null;
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const hasNotification = false; // 실제 API로 대체 예정
   const { theme, toggleTheme } = useThemeStore();
   const { clearTokens } = useAuth();
 
   const [showOverlay, setShowOverlay] = useState(false);
+  const { openNotification, isNotificationOpen, hasNotification  } = usePanelStore();
 
-  // 다크모드 클래스 body에 반영
   useEffect(() => {
     document.body.classList.toggle("dark", theme === "dark");
   }, [theme]);
@@ -60,11 +61,17 @@ const Sidebar: React.FC = () => {
           />
         )}
       </div>
+
       <nav className={styles["Sidebar-nav"]}>
         <ul>
           <li>
             <div style={{ position: "relative" }}>
-              <FiBell size={20} className={styles["Sidebar-icon"]} />
+              <FiBell
+                size={20}
+                className={styles["Sidebar-icon"]}
+                onClick={openNotification}
+                style={{ cursor: "pointer" }}
+              />
               {hasNotification && (
                 <span
                   style={{
@@ -80,6 +87,7 @@ const Sidebar: React.FC = () => {
                 />
               )}
             </div>
+            <NotificationPanel isOpen={isNotificationOpen} />
           </li>
           <li><FiSearch size={20} className={styles["Sidebar-icon"]} /></li>
           <li><FiPlusSquare size={20} className={styles["Sidebar-icon"]} /></li>
