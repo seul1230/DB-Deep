@@ -1,0 +1,61 @@
+.chatBubbleDBDeep-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 8px 0;
+    position: relative;
+  }
+  
+  .chatBubbleDBDeep-header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 4px;
+  }
+  
+  .chatBubbleDBDeep-menuButton {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--gray-text);
+  }
+  
+  .chatBubbleDBDeep-menu {
+    position: absolute;
+    top: 24px;
+    right: 0;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--light-gray);
+    border-radius: 0.5rem;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chatBubbleDBDeep-menu button {
+    padding: 0.5rem 1rem;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: var(--text-color);
+  }
+  
+  .chatBubbleDBDeep-menu button:hover {
+    background-color: var(--primary-light-blue);
+  }
+  
+  .chatBubbleDBDeep-bubble {
+    max-width: 70%;
+    background-color: var(--primary-light-blue);
+    color: var(--text-color);
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    border-top-left-radius: 0.2rem;
+    word-break: break-word;
+    font-size: 0.95rem;
+  }
+  

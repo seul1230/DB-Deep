@@ -1,0 +1,47 @@
+.chatDetailPage-container {
+    background-color: var(--background-color);
+  }
+  
+  .chatDetailPage-chatBox {
+    padding: 1rem;
+    background-color: var(--primary-light-blue);
+    border-radius: 1rem;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  .chatDetailPage-typewriter {
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1.6;
+  }
+  
+  .chatDetailPage-paragraph {
+    margin-bottom: 1rem;
+  }
+  
+  .chatDetailPage-heading {
+    font-size: 1.25rem;
+    margin: 1rem 0 0.5rem;
+  }
+  
+  .chatDetailPage-hr {
+    border: 0;
+    border-top: 1px solid var(--light-gray);
+    margin: 1rem 0;
+  }
+  
+  .chatDetailPage-chartPlaceholder {
+    padding: 1rem;
+    background: var(--primary-mid-blue);
+    color: white;
+    text-align: center;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin: 1rem 0;
+    transition: background 0.2s;
+  }
+  
+  .chatDetailPage-chartPlaceholder:hover {
+    background: var(--primary-dark-blue);
+  }
+  
