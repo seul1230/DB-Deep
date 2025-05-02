@@ -40,13 +40,17 @@ pipeline {
         }
         stage('Deploy to Cloud Run') {
             steps {
-                sh """
-                  gcloud run deploy $SERVICE \
-                    --image ${IMAGE} \
-                    --platform managed \
-                    --region ${REGION} \
-                    --allow-unauthenticated
-                """
+                withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
+                    sh '''
+                        echo "$ENV_VARS" > env_vars.env
+                        gcloud run deploy $SERVICE \
+                        --image ${IMAGE} \
+                        --platform managed \
+                        --region ${REGION} \
+                        --allow-unauthenticated \
+                        --env-vars-file=env_vars.env
+                    '''
+                }
             }
         }
     }
