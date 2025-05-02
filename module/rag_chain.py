@@ -12,18 +12,10 @@ from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
 from langchain_pinecone import PineconeVectorStore
 
-from utils.sql_utils import is_hr_team
+from module.sql_utils import is_hr_team
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 load_dotenv()
-
-
-class InsightRequest(BaseModel):
-    question: str
-    chart_spec: dict
-    data: list  # list of dicts (DataFrame to_dict(orient="records"))
-    chat_history: str | None = None
-    user_department: str | None = None
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 # ----------------------------
 # 프롬프트 생성 함수
@@ -85,7 +77,7 @@ def get_prompt(user_department):
 
     return final_prompt
 
-def get_prompt_for_insight(request: InsightRequest):
+def get_prompt_for_insight(request):
     prompt = f"""
     당신은 데이터 분석가이며, 비전문가가 이해하기 쉽게 시각화 차트를 해석하고 인사이트를 전달하는 역할을 합니다.
 
@@ -164,140 +156,3 @@ def set_rag_chain(question, user_department, pc):
 
     return rag_chain.invoke(question)
 
-
-# import os
-# import logging
-# from dotenv import load_dotenv
-
-# from langchain_google_genai import ChatGoogleGenerativeAI
-# from langchain_core.runnables import RunnablePassthrough, RunnableLambda
-# from langchain_core.output_parsers import StrOutputParser
-# from langchain.retrievers import ContextualCompressionRetriever
-# from langchain.retrievers.document_compressors import CrossEncoderReranker
-# from langchain_community.cross_encoders import HuggingFaceCrossEncoder
-
-# from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
-# from langchain_pinecone import PineconeVectorStore
-
-# logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-# load_dotenv()
-
-
-# # ----------------------------
-# # 인사팀 여부 판별 함수
-# # ----------------------------
-# def is_hr_team(department: str) -> bool:
-#     return department.strip() == "인사팀"
-
-
-# # ----------------------------
-# # 프롬프트 생성 함수 (팀에 따라 내용 조정)
-# # ----------------------------
-# def get_prompt(user_department):
-#     logging.info("🧱 프롬프트 생성 중...")
-
-#     base_template = """
-# 당신은 데이터 전문가입니다. 아래의 규칙을 참고하여 사용자의 질문에 답하기 위한 SQL 쿼리를 작성하세요.
-
-# # 규칙:
-
-# 1. 모든 팀은 temp_dataset에 포함된 테이블(card_members, card_sales, card_credit 등)에 접근할 수 있습니다.
-# 2. 단, hr_dataset 내 테이블(position, salary 등)은 인사팀만 접근할 수 있습니다. {hr_rule}
-# 3. 질문자가 제공한 질문은 일상어일 수 있습니다. 이 질문을 이해하고, 관련 테이블/컬럼을 분석하여 가장 적절한 SQL을 작성하세요.
-# 4. 가능한 경우 JOIN 키(예: member_no)를 활용하여 필요한 테이블을 연결하세요.
-# 5. temp_dataset의 각 테이블에 대한 설명은 아래 context_schema에 제공됩니다.
-# 6. SQL은 BigQuery 기준으로 작성하세요. 단, 질문자가 결과를 원하면 SELECT 문에 필요한 컬럼을 명시해 주세요.
-
-# # 입력 정보
-
-# [사용자 질문]
-# {question}
-
-# [접근 가능한 팀]
-# {chat_history}
-
-# [테이블 설명]
-# {context_schema}
-
-# # 출력 형식:
-# 다음 형식을 따르세요.
-
-# ```sql
-# -- 간단한 설명: (이 쿼리가 무엇을 하는지 한 줄 요약)
-# SELECT ...
-# FROM ...
-# WHERE ...
-# ```
-
-# 필요 시 ORDER BY, LIMIT 등을 적절히 추가하세요.
-# """
-
-#     hr_rule = "질문자가 인사팀이 아니면 hr_dataset에 있는 테이블은 절대 사용하지 마세요." if not is_hr_team(user_department) else "(질문자가 인사팀이므로 hr_dataset 사용 가능)"
-#     template = base_template.format(hr_rule=hr_rule)
-
-#     prompt_template = PromptTemplate(
-#         input_variables=["context_schema", "question", "chat_history"],
-#         template=template
-#     )
-
-#     human_prompt = HumanMessagePromptTemplate(prompt=prompt_template)
-#     final_prompt = ChatPromptTemplate(messages=[human_prompt])
-
-#     return final_prompt
-
-
-# # ----------------------------
-# # RAG 체인 구성 함수
-# # ----------------------------
-# def set_rag_chain(question, user_department, pc):
-#     logging.info("📥 RAG 체인 구성 시작")
-
-#     # 1. VectorStore 설정
-#     logging.info("🔗 Pinecone VectorStore 초기화 중...")
-#     embedding = ()  # 여기에 실제 임베딩 객체를 넣으세요
-
-#     schema_vectorstore = PineconeVectorStore(
-#         index=pc.Index("schema-index"),
-#         embedding=embedding
-#     )
-
-#     # 2. Retriever 설정
-#     logging.info("🔍 문서 검색기 초기화 중 (MMR + ReRanker)")
-#     schema_retriever = schema_vectorstore.as_retriever(
-#         search_type='mmr',
-#         search_kwargs={"k": 3}
-#     )
-
-#     model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
-#     compressor = CrossEncoderReranker(model=model, top_n=3)
-
-#     schema_retriever_compression = ContextualCompressionRetriever(
-#         base_compressor=compressor,
-#         base_retriever=schema_retriever
-#     )
-
-#     # 3. Gemini LLM 설정
-#     logging.info("🤖 Gemini LLM 초기화 중...")
-#     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-#     llm = ChatGoogleGenerativeAI(
-#         model="gemini-1.5-pro",
-#         google_api_key=GEMINI_API_KEY
-#     )
-
-#     # 4. 체인 연결
-#     logging.info("🔗 RAG 체인 구성 완료, 질의 수행 중...")
-#     rag_chain = (
-#         {
-#             "chat_history": RunnableLambda(lambda x: user_department),
-#             "context_schema": schema_retriever_compression,
-#             "question": RunnablePassthrough()
-#         }
-#         | get_prompt(user_department)
-#         | llm
-#         | StrOutputParser()
-#     )
-
-#     answer = rag_chain.invoke(question)
-#     logging.info("✅ 질의 처리 완료")
-
-#     return answer

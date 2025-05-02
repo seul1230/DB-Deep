@@ -38,7 +38,7 @@ logging.info("📦 Pinecone 초기화")
 # ----------------------------
 # 3. 문서 로드 및 출처 메타데이터 추가
 # ----------------------------
-text_files = ["card_members.txt", "card_credit.txt", "card_sales.txt"]  # 다중 문서 목록
+text_files = ["1.card_members.txt", "2.card_credit.txt", "3.card_sales.txt"]  # 다중 문서 목록
 docs = []
 
 for file_path in text_files:

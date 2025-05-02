@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from rag_chain import set_rag_chain, get_prompt_for_insight
-from utils.sql_utils import clean_sql_from_response, clean_json_from_response, SQLExecutor
+from module.rag_chain import set_rag_chain, get_prompt_for_insight
+from module.sql_utils import clean_sql_from_response, clean_json_from_response, SQLExecutor
+from module.setup import init_pinecone
 
 import pinecone
 import logging
@@ -16,18 +17,19 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 
 # Pinecone 초기화
-pinecone.init(
-    api_key=os.environ.get("PINECONE_API_KEY"),
-    environment=os.environ.get("PINECONE_ENV")
-)
-pc = pinecone
+pc = init_pinecone()
 
 # 요청 데이터 모델
 class QueryRequest(BaseModel):
     question: str
     department: str
 
-
+class InsightRequest(BaseModel):
+    question: str
+    chart_spec: dict
+    data: list  # list of dicts (DataFrame to_dict(orient="records"))
+    chat_history: str | None = None
+    user_department: str | None = None
 
 @app.post("/api/nl2sql")
 def run_nl2sql(request: QueryRequest):
