@@ -15,7 +15,7 @@ spring:
     servlet:
       path: /api
   elasticsearch:
-    uris: ${ES_URI:http://localhost:9200}
+    uris: ${ES_URI:http://elasticsearch:9200}
     connection-timeout: 5s
     socket-timeout: 5s
 
