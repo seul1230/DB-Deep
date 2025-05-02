@@ -1,24 +1,6 @@
 version: '3.8'
 
 services:
-  dbdeep-app:
-    build:
-      context: ./dbdeep-BE
-    env_file:
-      - dbdeep-BE/.env
-    ports:
-      - "8081:8080"
-    environment:
-      - FIRESTORE_CREDENTIAL_LOCATION=/credentials/key.json
-      - SPRING_DATA_ELASTICSEARCH_URIS=http://elasticsearch:9200
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kibana:
-        condition: service_started
-    networks:
-      - esnet
-
   elasticsearch:
     image: bitnami/elasticsearch:7.17.10-debian-11-r0
     container_name: elasticsearch
@@ -30,9 +12,9 @@ services:
     volumes:
       - esdata:/bitnami/elasticsearch
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200 || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:9200/"]
       interval: 10s
-      timeout: 5s
+      timeout:  5s
       retries: 5
     networks:
       - esnet
@@ -45,9 +27,25 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
     networks:
       - esnet
+
+  dbdeep-app:
+    build:
+      context: ./dbdeep-BE
+    env_file:
+      - dbdeep-BE/.env
+    environment:
+      - FIRESTORE_CREDENTIAL_LOCATION=/credentials/key.json
+    ports:
+      - "8081:8080"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_started
 
 volumes:
   esdata:
