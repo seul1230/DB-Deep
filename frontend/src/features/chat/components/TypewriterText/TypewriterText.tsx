@@ -6,9 +6,10 @@ import { Components } from 'react-markdown';
 interface TypewriterTextProps {
   markdownText: string;
   onChartClick: (chartId: string) => void;
+  onTyping?: () => void;
 }
 
-export const TypewriterText = ({ markdownText, onChartClick }: TypewriterTextProps) => {
+export const TypewriterText = ({ markdownText, onChartClick, onTyping }: TypewriterTextProps) => {
   const [displayedText, setDisplayedText] = useState('');
 
   useEffect(() => {
@@ -16,14 +17,18 @@ export const TypewriterText = ({ markdownText, onChartClick }: TypewriterTextPro
     const speed = 20; // 타자 속도
     const interval = setInterval(() => {
       if (i < markdownText.length) {
-        setDisplayedText((prev) => prev + markdownText.charAt(i));
+        setDisplayedText((prev) => {
+          const next = prev + markdownText.charAt(i);
+          onTyping?.();
+          return next;
+        });        
         i++;
       } else {
         clearInterval(interval);
       }
     }, speed);
     return () => clearInterval(interval);
-  }, [markdownText]);
+  }, [markdownText, onTyping]);
 
   const renderers: Components = {
     p: (props) => <p className={styles['chatDetailPage-paragraph']}>{props.children}</p>,

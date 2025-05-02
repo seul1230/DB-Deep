@@ -27,14 +27,19 @@ const NotificationPanel: React.FC<Props> = ({ isOpen }) => {
       </div>
       <div className={styles["NotificationPanel-list"]}>
         {notifications.map((n) => (
-          <div key={n.id} className={styles["NotificationPanel-item"]}>
-            <FiBell size={14} />
-            <div>
-              <strong>공유 알림</strong>
+          <div
+            key={n.id}
+            className={`${styles["NotificationPanel-item"]} ${n.read ? styles["read"] : styles["unread"]}`}
+          >
+            <FiBell size={16} className={styles["NotificationPanel-icon"]} />
+            <div className={styles["NotificationPanel-content"]}>
+              <div className={styles["NotificationPanel-headerRow"]}>
+                <strong>공유 알림</strong>
+                <span className={styles["NotificationPanel-time"]}>{n.time}</span>
+              </div>
               <p>{n.user}님이 {n.message}를 공유했습니다.</p>
             </div>
-            <span className={styles["NotificationPanel-time"]}>{n.time}</span>
-          </div>
+          </div>        
         ))}
       </div>
     </div>

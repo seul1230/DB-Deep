@@ -9,7 +9,6 @@ import { useThemeStore } from "@/shared/store/themeStore";
 import ProfileOverlay from "../ProfileOverlay/ProfileOverlay";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { usePanelStore } from "@/shared/store/usePanelStore"; //
-import NotificationPanel from "@/widgets/NotificationPanel/NotificationPanel";
 
 const profileImageUrl: string | null = null;
 
@@ -20,7 +19,7 @@ const Sidebar: React.FC = () => {
   const { clearTokens } = useAuth();
 
   const [showOverlay, setShowOverlay] = useState(false);
-  const { openNotification, isNotificationOpen, hasNotification  } = usePanelStore();
+  const { openNotification, hasNotification  } = usePanelStore();
 
   useEffect(() => {
     document.body.classList.toggle("dark", theme === "dark");
@@ -87,7 +86,6 @@ const Sidebar: React.FC = () => {
                 />
               )}
             </div>
-            <NotificationPanel isOpen={isNotificationOpen} />
           </li>
           <li><FiSearch size={20} className={styles["Sidebar-icon"]} /></li>
           <li><FiPlusSquare size={20} className={styles["Sidebar-icon"]} /></li>

@@ -1,5 +1,4 @@
 .Sidebar-wrapper {
-  position: fixed;
   top: 0;
   left: 0;
   width: 68px;
@@ -18,7 +17,8 @@
   align-items: center;
   justify-content: center;
   height: 64px;
-  margin-bottom: 16px;
+  margin-bottom: 32px;
+  margin-top: 10px;
   position: relative;
 }
 
@@ -46,18 +46,15 @@
   cursor: pointer;
 }
 
-.Sidebar-nav li:hover {
-  color: var(--icon-blue-hover);
-}
-
 .Sidebar-icon {
   color: var(--icon-blue);
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.Sidebar-icon:hover {
+.Sidebar-nav li:hover .Sidebar-icon {
   color: var(--icon-blue-hover);
+  transform: scale(1.15);
 }
 
 .Sidebar-bottom {
