@@ -14,14 +14,16 @@ spring:
   mvc:
     servlet:
       path: /api
+  elasticsearch:
+    uris: ${ES_URI:http://localhost:9200}
+    connection-timeout: 5s
+    socket-timeout: 5s
+
   data:
     elasticsearch:
       repositories:
         bootstrap-mode: lazy
         enabled: true
-      client:
-#        uris: http://localhost:9200 # 로컬 테스트 용
-        uris: http://elasticsearch:9200 # 배포 용
 jwt:
   secretKey: ${JWT_SECRET}
 
