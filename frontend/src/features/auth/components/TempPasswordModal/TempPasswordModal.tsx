@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "./TempPasswordModal.module.css";
 import { FiMail, FiX } from "react-icons/fi";
+import Button from "@/shared/ui/Button/Button";
 
 interface TempPasswordModalProps {
   onClose: () => void;
@@ -114,17 +115,23 @@ const TempPasswordModal: React.FC<TempPasswordModalProps> = ({
         </div>
       )}
 
+      
       <div className={styles["TempPasswordModal-buttonGroup"]}>
-        <button onClick={onClose} className={styles["TempPasswordModal-cancelButton"]}>
-          취소
-        </button>
-        <button
+        <Button
+          label="취소"
+          onClick={onClose}
+          borderColor="var(--icon-blue)"
+          backgroundColor="var(--background-color)"
+          textColor="var(--icon-blue)"
+        />
+        <Button
+          label="전송"
           onClick={() => alert("전송 완료")}
-          className={styles["TempPasswordModal-sendButton"]}
+          borderColor="var(--icon-blue)"
+          backgroundColor="var(--icon-blue)"
+          textColor="var(--background-color)"
           disabled={!isEmailSent}
-        >
-          전송
-        </button>
+        />
       </div>
     </div>
   );
