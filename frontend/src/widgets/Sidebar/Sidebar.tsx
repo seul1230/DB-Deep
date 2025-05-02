@@ -1,29 +1,33 @@
-import React, { useState } from "react";
-import { FiBell, FiSearch, FiPlusSquare , FiFolderMinus, FiSun } from "react-icons/fi";
+import React, { useEffect } from "react";
+import { FiBell, FiSearch, FiPlusSquare, FiFolderMinus, FiSun, FiMoon } from "react-icons/fi";
 import { LuBookmarkMinus } from "react-icons/lu";
-import { PiChatsBold  } from "react-icons/pi";
+import { PiChatsBold } from "react-icons/pi";
 import { TbLogout } from "react-icons/tb";
 import styles from "./Sidebar.module.css";
 import { useLocation } from "react-router-dom";
-import defaultProfileImage from "../../assets/default-profile.jpg";
+import defaultProfileImage from "@/assets/default-profile.jpg";
+import { useThemeStore } from "@/shared/store/themeStore";
 
-const profileImageUrl: string | null = null; // 나중에 API 만들어지면 받을 변수
+const profileImageUrl: string | null = null; // API 연동 시 변경
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [hasNotification, setHasNotification] = useState(false); // 실제는 API에서 받아올 값
-  const [showNotifications, setShowNotifications] = useState(false);
+  const hasNotification = false; // 실제 API로 대체 예정
+
+  const { theme, toggleTheme } = useThemeStore();
+
+  // 다크모드 클래스 body에 반영
+  useEffect(() => {
+    document.body.classList.toggle("dark", theme === "dark");
+  }, [theme]);
+  // const [isDarkMode, setIsDarkMode] = useState(false);
+  // const [hasNotification, setHasNotification] = useState(false); // 실제는 API에서 받아올 값
+  // const [showNotifications, setShowNotifications] = useState(false);
 
   // 로그인 페이지에서는 사이드바 숨기기
   if (location.pathname === "/login") {
     return null;
   }
-
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => !prev);
-    // 여기서 실제 다크모드 적용 로직 추가하면 됨 (예: document.body.classList.toggle)
-  };
 
   return (
     <>
@@ -40,30 +44,30 @@ const Sidebar: React.FC = () => {
       </div>
       <nav className={styles["Sidebar-nav"]}>
         <ul>
-        <li onClick={() => setShowNotifications((prev) => !prev)}>
-              <div style={{ position: "relative" }}>
-                <FiBell size={20} className={styles["Sidebar-icon"]} />
-                {hasNotification && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: -2,
-                      right: -2,
-                      width: 7,
-                      height: 7,
-                      backgroundColor: "var(--red-alert)",
-                      borderRadius: "50%",
-                      border: "2px solid white",
-                    }}
-                  />
-                )}
-              </div>
-            </li>
-          <li><FiSearch size={20} className={styles["Sidebar-icon"]}/></li>
-          <li><FiPlusSquare size={20} className={styles["Sidebar-icon"]}/></li>
-          <li><PiChatsBold  size={20} className={styles["Sidebar-icon"]}/></li>
-          <li><LuBookmarkMinus size={20} className={styles["Sidebar-icon"]}/></li>
-          <li><FiFolderMinus size={20} className={styles["Sidebar-icon"]}/></li>
+          <li>
+            <div style={{ position: "relative" }}>
+              <FiBell size={20} className={styles["Sidebar-icon"]} />
+              {hasNotification && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: -2,
+                    right: -2,
+                    width: 7,
+                    height: 7,
+                    backgroundColor: "var(--red-alert)",
+                    borderRadius: "50%",
+                    border: "2px solid white",
+                  }}
+                />
+              )}
+            </div>
+          </li>
+          <li><FiSearch size={20} className={styles["Sidebar-icon"]} /></li>
+          <li><FiPlusSquare size={20} className={styles["Sidebar-icon"]} /></li>
+          <li><PiChatsBold size={20} className={styles["Sidebar-icon"]} /></li>
+          <li><LuBookmarkMinus size={20} className={styles["Sidebar-icon"]} /></li>
+          <li><FiFolderMinus size={20} className={styles["Sidebar-icon"]} /></li>
         </ul>
       </nav>
 
@@ -72,20 +76,26 @@ const Sidebar: React.FC = () => {
         <label className={styles["Sidebar-toggleWrapper"]}>
           <input
             type="checkbox"
-            checked={isDarkMode}
-            onChange={toggleDarkMode}
+            checked={theme === "dark"}
+            onChange={toggleTheme}
             className={styles["Sidebar-toggleInput"]}
           />
           <span className={styles["Sidebar-toggleSlider"]}>
-            <FiSun className={styles["Sidebar-toggleIcon"]} />
+            <span className={styles["Sidebar-toggleKnob"]}>
+              {theme === "light" ? (
+                <FiSun className={styles["Sidebar-iconToggle"]} />
+              ) : (
+                <FiMoon className={styles["Sidebar-iconToggle"]} />
+              )}
+            </span>
           </span>
         </label>
       </div>
     </aside>
 
-    {showNotifications && (
+    {/* {showNotifications && (
       <NotificationPanel onClose={() => setShowNotifications(false)} />
-    )}
+    )} */}
     </>
   );
 };
