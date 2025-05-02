@@ -1,6 +1,16 @@
 version: '3.8'
 
 services:
+  dbdeep-app:
+    build:
+      context: ./dbdeep-BE
+    env_file:
+      - dbdeep-BE/.env
+    ports:
+      - "8081:8080"
+    depends_on:
+      - elasticsearch
+      - kibana
   elasticsearch:
     image: bitnami/elasticsearch:7.17.10-debian-11-r0
     container_name: elasticsearch
