@@ -1,20 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FiBell, FiSearch, FiPlusSquare, FiFolderMinus, FiSun, FiMoon } from "react-icons/fi";
 import { LuBookmarkMinus } from "react-icons/lu";
 import { PiChatsBold } from "react-icons/pi";
-import { TbLogout } from "react-icons/tb";
 import styles from "./Sidebar.module.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import defaultProfileImage from "@/assets/default-profile.jpg";
 import { useThemeStore } from "@/shared/store/themeStore";
+import ProfileOverlay from "../ProfileOverlay/ProfileOverlay";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 
 const profileImageUrl: string | null = null; // API 연동 시 변경
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const hasNotification = false; // 실제 API로 대체 예정
-
   const { theme, toggleTheme } = useThemeStore();
+  const { clearTokens } = useAuth();
+
+  const [showOverlay, setShowOverlay] = useState(false);
 
   // 다크모드 클래스 body에 반영
   useEffect(() => {
@@ -26,6 +30,16 @@ const Sidebar: React.FC = () => {
     return null;
   }
 
+  const handleLogout = () => {
+    clearTokens();
+    window.location.href = "/login"; // 강제 로그아웃
+  };
+
+  const handleChangePassword = () => {
+    setShowOverlay(false);
+    navigate("/change-password", { state: { reason: "manual" } });
+  };  
+
   return (
     <aside className={styles["Sidebar-wrapper"]}>
       <div className={styles["Sidebar-top"]}>
@@ -36,7 +50,15 @@ const Sidebar: React.FC = () => {
           onError={(e) => {
             e.currentTarget.src = defaultProfileImage;
           }}
+          onClick={() => setShowOverlay((prev) => !prev)}
         />
+        {showOverlay && (
+          <ProfileOverlay
+            onClose={() => setShowOverlay(false)}
+            onLogout={handleLogout}
+            onChangePassword={handleChangePassword}
+          />
+        )}
       </div>
       <nav className={styles["Sidebar-nav"]}>
         <ul>
@@ -68,7 +90,6 @@ const Sidebar: React.FC = () => {
       </nav>
 
       <div className={styles["Sidebar-bottom"]}>
-        <TbLogout size={20} className={styles["Sidebar-icon"]} />
         <label className={styles["Sidebar-toggleWrapper"]}>
           <input
             type="checkbox"
