@@ -23,6 +23,7 @@ public enum ErrorCode {
     INVALID_SIGN_IN(4040, HttpStatus.NOT_FOUND, "이메일 혹은 비밀번호가 틀립니다"),
     EXPIRED_TOKEN(4010, UNAUTHORIZED, "만료된 토큰입니다"),
     INVALID_TOKEN(4010, UNAUTHORIZED, "유효하지 않은 토큰입니다"),
+    INVALID_AUTH_CODE(4010, UNAUTHORIZED, "인증번호가 다릅니다"),
 
     // 채팅 에러
     CHAT_ROOM_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 채팅방입니다"),

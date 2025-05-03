@@ -52,6 +52,7 @@ public class AuthService {
         memberRepository.save(member);
     }
 
+
     private Authentication authenticate(Member member) {
         User user = new User(
                 String.valueOf(member.getId()),

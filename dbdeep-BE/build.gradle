@@ -73,9 +73,15 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.23.4'
 
     implementation("co.elastic.clients:elasticsearch-java:8.13.0") // 최신 버전 기준
+    implementation 'org.springframework.data:spring-data-elasticsearch:4.2.2'
     implementation("jakarta.json:jakarta.json-api:2.1.1")           // JSON 바인딩용
     implementation("org.glassfish:jakarta.json:2.0.1")
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // 메일 전송 위한 라이브러리 추가
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
