@@ -35,13 +35,13 @@ public class AuthController {
         authService.signUp(signUpRequest);
     }
 
-    @PostMapping("/email/send")
+    @PostMapping("/email/code")
     public JSONResponse<Void> sendResetCode(@RequestBody SendAuthCodeRequest request) {
         mailService.sendAuthenticationCode(PASSWORD_RESET_SUBJECT, request.getEmail());
         return JSONResponse.onSuccess();
     }
 
-    @PostMapping("/email/send/verify")
+    @PostMapping("/email/code/verify")
     public JSONResponse<Void> checkResetCode(@RequestBody CheckCodeRequest request) {
         mailService.checkAuthCode(request);
         return JSONResponse.onSuccess();
