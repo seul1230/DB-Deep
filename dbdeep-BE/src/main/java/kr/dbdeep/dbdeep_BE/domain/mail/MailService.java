@@ -42,7 +42,7 @@ public class MailService {
             mailSender.send(message);
             authCodeRepository.save(email, randomCode);
         } catch (MailSendException e) {
-//            throw new InvalidMailException(MAIL_SEND_EXCEPTION_MESSAGE);
+            throw new CommonException(ErrorCode.MAIL_SEND_ERROR);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +72,7 @@ public class MailService {
 
             mailSender.send(message);
         } catch (MailSendException e) {
-//            throw new InvalidMailException(MAIL_SEND_EXCEPTION_MESSAGE);
+            throw new CommonException(ErrorCode.MAIL_SEND_ERROR);
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
