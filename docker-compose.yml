@@ -1,12 +1,15 @@
-version: '3.8'
-
 services:
   elasticsearch:
     image: bitnami/elasticsearch:7.17.10-debian-11-r0
     container_name: elasticsearch
     environment:
-      - ELASTICSEARCH_ENABLE_SECURITY=false
-      - ELASTICSEARCH_HEAP_SIZE=512m
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsSL http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "9200:9200"
     healthcheck:
@@ -16,6 +19,28 @@ services:
       retries: 5
     volumes:
       - esdata:/bitnami/elasticsearch
+    networks:
+      - esnet
+
+  elasticsearch-init:
+    image: curlimages/curl:latest
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    entrypoint: [ "sh", "-c" ]
+    command: >
+      "sleep 5 && 
+      curl -X PUT http://elasticsearch:9200/chat-messages -H 'Content-Type: application/json' -d '{
+        \"mappings\": {
+          \"properties\": {
+            \"chatRoomId\": { \"type\": \"keyword\" },
+            \"content\": { \"type\": \"text\" },
+            \"memberId\": { \"type\": \"integer\" },
+            \"senderType\": { \"type\": \"keyword\" },
+            \"timestamp\": { \"type\": \"date\" }
+          }
+        }
+      }'"
     networks:
       - esnet
 
@@ -39,9 +64,17 @@ services:
       - "8081:8080"
     environment:
       - FIRESTORE_CREDENTIAL_LOCATION=/credentials/key.json
-      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+      - SPRING_DATA_ELASTICSEARCH_URIS=elasticsearch:9200
       - SPRING_DATA_ELASTICSEARCH_REPOSITORIES_BOOTSTRAP_MODE=lazy
       - SPRING_DATA_ELASTICSEARCH_REPOSITORIES_FAIL_FAST=false
+      - JWT_SECRET=${JWT_SECRET}
+      - MYSQL_URL=${MYSQL_URL}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_CONFIG_IMPORT=optional:file:.env[.properties]
+      - SPRING_MAIL_USERNAME=dbdeep104@gmail.com
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
+
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -51,8 +84,19 @@ services:
     networks:
       - esnet
 
+  redis:
+    image: redis:7.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    networks:
+      - esnet
+
 volumes:
   esdata:
+  redisdata:
 
 networks:
   esnet:
