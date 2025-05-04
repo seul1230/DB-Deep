@@ -56,7 +56,7 @@ services:
     build:
       context: ./dbdeep-BE
     env_file:
-      - ./dbdeep-BE/.env 
+      - ./.env 
     ports:
       - "8081:8080"
     environment:
