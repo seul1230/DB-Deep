@@ -1,6 +1,6 @@
 package kr.dbdeep.dbdeep_BE.domain.auth.resolver;
 
-import kr.dbdeep.dbdeep_BE.domain.auth.CustomUserDetails;
+import kr.dbdeep.dbdeep_BE.domain.auth.entity.CustomUserDetails;
 import kr.dbdeep.dbdeep_BE.domain.auth.annotation.CurrentMemberId;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
