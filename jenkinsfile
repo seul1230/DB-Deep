@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         GCP_PROJECT = 'dbdeep-458113'
-        REGION = 'asia-northeast3'
+        REGION = 'us-central1'
         SERVICE = 'dbdeep-da'
         REPO = 'dbdeep-da-repo' // Artifact Registry 이름
         IMAGE = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
