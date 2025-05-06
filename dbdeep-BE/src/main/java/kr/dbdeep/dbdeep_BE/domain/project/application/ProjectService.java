@@ -1,8 +1,10 @@
 package kr.dbdeep.dbdeep_BE.domain.project.application;
 
+import java.util.List;
 import kr.dbdeep.dbdeep_BE.domain.member.exception.MemberNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.member.infrastructure.MemberRepository;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectListResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.entity.Project;
 import kr.dbdeep.dbdeep_BE.domain.project.exception.ProjectNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.project.infrastructure.ProjectRepository;
@@ -38,5 +40,14 @@ public class ProjectService {
             throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
         }
         projectRepository.deleteById(projectId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectListResponse> getAll(Integer memberId) {
+        return projectRepository.findAllByMember(memberRepository.findById(memberId)
+                        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND)))
+                .stream()
+                .map(project -> new ProjectListResponse(project.getId(), project.getTitle(), project.getCreatedAt()))
+                .toList();
     }
 }

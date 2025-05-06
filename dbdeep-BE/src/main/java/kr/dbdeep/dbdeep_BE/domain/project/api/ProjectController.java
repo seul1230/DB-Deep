@@ -1,12 +1,15 @@
 package kr.dbdeep.dbdeep_BE.domain.project.api;
 
+import java.util.List;
 import kr.dbdeep.dbdeep_BE.domain.auth.annotation.CurrentMemberId;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectRequest;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectListResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.application.ProjectService;
 import kr.dbdeep.dbdeep_BE.global.response.JSONResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,16 +24,22 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping
-    public JSONResponse<CreateProjectResponse> createProject(@CurrentMemberId Integer memberId,
-                                                             @RequestBody CreateProjectRequest request) {
+    public JSONResponse<CreateProjectResponse> create(@CurrentMemberId Integer memberId,
+                                                      @RequestBody CreateProjectRequest request) {
         var created = projectService.create(memberId, request.title());
         return JSONResponse.onSuccess(created);
     }
 
     @DeleteMapping("/{projectId}")
-    public JSONResponse<Void> deleteProject(@CurrentMemberId Integer memberId,
-                                            @PathVariable Integer projectId) {
+    public JSONResponse<Void> delete(@CurrentMemberId Integer memberId,
+                                     @PathVariable Integer projectId) {
         projectService.delete(memberId, projectId);
         return JSONResponse.onSuccess();
+    }
+
+    @GetMapping
+    public JSONResponse<List<ProjectListResponse>> getAll(@CurrentMemberId Integer memberId) {
+        var projects = projectService.getAll(memberId);
+        return JSONResponse.onSuccess(projects);
     }
 }
