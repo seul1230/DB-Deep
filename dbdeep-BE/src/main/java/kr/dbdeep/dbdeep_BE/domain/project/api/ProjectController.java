@@ -2,6 +2,7 @@ package kr.dbdeep.dbdeep_BE.domain.project.api;
 
 import java.util.List;
 import kr.dbdeep.dbdeep_BE.domain.auth.annotation.CurrentMemberId;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.AddChatRoomRequest;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectRequest;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectListResponse;
@@ -48,6 +49,14 @@ public class ProjectController {
                                           @PathVariable Integer projectId,
                                           @RequestBody CreateProjectRequest request) {
         projectService.updateTitle(memberId, projectId, request.title());
+        return JSONResponse.onSuccess();
+    }
+
+    @PostMapping("/{projectId}")
+    public JSONResponse<Void> addChatRoom(@CurrentMemberId Integer memberId,
+                                          @PathVariable Integer projectId,
+                                          @RequestBody AddChatRoomRequest request) {
+        projectService.addChatRoom(memberId, projectId, request);
         return JSONResponse.onSuccess();
     }
 }

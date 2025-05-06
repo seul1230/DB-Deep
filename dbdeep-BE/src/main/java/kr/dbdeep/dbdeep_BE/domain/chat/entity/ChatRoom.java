@@ -42,4 +42,8 @@ public class ChatRoom extends BaseTimeEntity {
         this.chatroomName = title;
     }
 
+    public void connectToProject(Integer projectId) {
+        this.projectId = projectId;
+    }
+
 }

@@ -1,8 +1,12 @@
 package kr.dbdeep.dbdeep_BE.domain.project.application;
 
 import java.util.List;
+import kr.dbdeep.dbdeep_BE.domain.chat.entity.ChatRoom;
+import kr.dbdeep.dbdeep_BE.domain.chat.exception.ChatRoomNotFoundException;
+import kr.dbdeep.dbdeep_BE.domain.chat.infrastructure.ChatRoomRepository;
 import kr.dbdeep.dbdeep_BE.domain.member.exception.MemberNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.member.infrastructure.MemberRepository;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.AddChatRoomRequest;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectListResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.entity.Project;
@@ -21,6 +25,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final MemberRepository memberRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
     public CreateProjectResponse create(Integer memberId, String title) {
@@ -59,5 +64,18 @@ public class ProjectService {
             throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
         }
         project.updateTitle(title);
+    }
+
+    @Transactional
+    public void addChatRoom(Integer memberId, Integer projectId, AddChatRoomRequest request) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        ChatRoom chatRoom = chatRoomRepository.findById(request.chatId())
+                .orElseThrow(() -> new ChatRoomNotFoundException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+
+        if (!project.getMember().getId().equals(memberId) || !chatRoom.getMemberId().equals(memberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+        chatRoom.connectToProject(projectId);
     }
 }
