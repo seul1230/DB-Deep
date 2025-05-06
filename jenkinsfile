@@ -63,7 +63,7 @@ pipeline {
     stage('Smoke Test') {
       agent { docker { image 'curlimages/curl:latest' } }
       steps {
-        sh 'curl -f https://dbdeep.kr/ || exit 1'
+        sh 'curl -f https://www.dbdeep.kr/ || exit 1'
       }
     }
   }
