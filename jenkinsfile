@@ -1,9 +1,3 @@
-2초 동안 생각함
-
-
-아래처럼 `echo "$GCLOUD_KEY"` 부분을 제거하고, `$GCLOUD_KEY`를 직접 `--key-file`에 넘기며, `CLOUDSDK_CONFIG`를 워크스페이스 하위로 지정하도록 수정했습니다. 이 파일 그대로 Jenkins에 반영하시면 됩니다.
-
-```groovy
 pipeline {
   agent none
   options {
@@ -78,4 +72,3 @@ pipeline {
     }
   }
 }
-```
