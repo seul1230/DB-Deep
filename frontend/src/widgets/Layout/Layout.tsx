@@ -5,6 +5,7 @@ import Logo from "@/shared/ui/Logo/Logo";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import NotificationPanel from "../NotificationPanel/NotificationPanel";
 import ChatLogPanel from "../ChatLogPanel/ChatLogPanel";
+import ProjectPanel from "../ProjectPanel/ProjectPanel";
 
 const SIDEBAR_WIDTH = 68;
 const PANEL_WIDTH = 240;
@@ -14,7 +15,8 @@ const Layout: React.FC = () => {
 
   const isNotificationOpen = openPanel === "notification";
   const isChatLogOpen = openPanel === "chatLog";
-  const isAnyPanelOpen = isNotificationOpen || isChatLogOpen;
+  const isProjectOpen = openPanel === "project";
+  const isAnyPanelOpen = isNotificationOpen || isChatLogOpen || isProjectOpen;
 
   return (
     <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
@@ -68,6 +70,21 @@ const Layout: React.FC = () => {
             }}
           >
             <ChatLogPanel />
+          </div>
+        )}
+        {isProjectOpen && (
+          <div
+            style={{
+              width: PANEL_WIDTH,
+              flexShrink: 0,
+              borderLeft: '1px solid var(--light-gray)',
+              background: 'var(--sidebar-bg)',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
+            }}
+          >
+            <ProjectPanel />
           </div>
         )}
       </div>
