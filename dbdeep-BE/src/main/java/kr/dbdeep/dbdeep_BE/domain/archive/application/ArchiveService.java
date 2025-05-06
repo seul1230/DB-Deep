@@ -63,4 +63,13 @@ public class ArchiveService {
                 .build();
         archiveRepository.save(archive);
     }
+
+    public void delete(Integer memberId, Integer archiveId) {
+        Archive archive = archiveRepository.findById(archiveId)
+                .orElseThrow(() -> new ArchiveNotFoundException(ErrorCode.ARCHIVE_NOT_FOUND));
+        if (!archive.getMember().getId().equals(memberId)) {
+            throw new ArchiveNotFoundException(ErrorCode.ARCHIVE_UNAUTHORIZED);
+        }
+        archiveRepository.delete(archive);
+    }
 }
