@@ -1,0 +1,54 @@
+pipeline {
+  agent any
+  environment {
+    GCP_PROJECT = 'dbdeep'
+    GCS_BUCKET  = 'gs://dbdeep-fe'
+    CDN_URL_MAP = 'dbdeep-load-balancer'
+    GCLOUD_KEY = credentials('gcp-service-account-json')
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('Build') {
+      steps {
+        sh 'npm ci'
+        sh 'npm run build'
+      }
+    }
+    stage('Authenticate GCP') {
+      steps {
+        sh '''
+          echo "$GCLOUD_KEY" > gcloud-key.json
+          gcloud auth activate-service-account --key-file=gcloud-key.json
+          gcloud config set project $GCP_PROJECT
+        '''
+      }
+    }
+    stage('Deploy to GCS') {
+      steps {
+        sh 'gsutil -m rsync -r dist/ $GCS_BUCKET'
+      }
+    }
+    stage('Invalidate CDN') {
+      steps {
+        sh 'gcloud compute url-maps invalidate-cdn-cache $CDN_URL_MAP --path "/*"'
+      }
+    }
+    stage('Smoke Test') {
+      steps {
+        sh 'curl -f https://dbdeep.kr/health || exit 1'
+      }
+    }
+  }
+  post {
+    success {
+      slackSend channel: '#deploy', message: "✅ 프론트 배포 성공: ${env.BUILD_URL}"
+    }
+    failure {
+      slackSend channel: '#deploy', message: "❌ 프론트 배포 실패: ${env.BUILD_URL}"
+    }
+  }
+}
