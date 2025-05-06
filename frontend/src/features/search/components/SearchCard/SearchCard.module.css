@@ -1,0 +1,108 @@
+.card {
+    background: var(--background-color);
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--light-gray);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+    transition: box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  }
+  
+  .meta {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  
+  
+  .titleRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .cardTitle {
+    font-weight: 600;
+    color: var(--text-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .date {
+    font-size: 12px;
+    color: var(--gray-text);
+    flex-shrink: 0;
+  }
+  
+  
+  .moreIcon {
+    color: var(--gray-text);
+    margin-left: 8px;
+    cursor: pointer;
+  }
+  
+  .description {
+    font-size: 13px;
+    color: var(--text-color);
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  
+  .highlight {
+    background-color: var(--yellow);
+  }
+  
+  .table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  
+  .table th, .table td {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--light-gray);
+  }
+  
+  .chartPreview {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    height: 80px;
+    margin-top: 12px;
+  }
+  
+  .chartBar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+  }
+  
+  .chartValue {
+    background: var(--primary-mid-blue);
+    width: 100%;
+    border-radius: 4px;
+  }
+  
+  .chartLabel {
+    font-size: 11px;
+    color: var(--gray-text);
+    margin-top: 4px;
+  }
+  

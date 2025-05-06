@@ -54,13 +54,13 @@
   
   /* hover 시 블럭처럼 보이도록 */
   .ChatLogPanel-item:hover {
-    background-color: #f5f6fa;
+    background-color: var(--primary-light-blue);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   }
   
   /* active 항목은 항상 블럭처럼 보임 */
   .ChatLogPanel-item.active {
-    background-color: var(--primary-light-blue);
+    background-color: var(--sidebar-bg);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
   

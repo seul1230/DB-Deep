@@ -53,8 +53,13 @@
   }
   
   .ProjectPanel-item:hover {
-    background-color: #f5f6fa;
+    background-color: var(--primary-light-blue);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  }
+
+  .ProjectPanel-item.active {
+    background-color: var(--sidebar-bg);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
   
   .ProjectPanel-content {
