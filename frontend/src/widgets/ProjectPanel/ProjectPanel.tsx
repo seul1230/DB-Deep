@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./ProjectPanel.module.css";
 import { usePanelStore } from "@/shared/store/usePanelStore";
-import { FiX, FiMessageSquare, FiChevronRight } from "react-icons/fi";
+import { FiMessageSquare, FiChevronRight } from "react-icons/fi";
 
 const projects = [
   { id: 1, title: "성과 요약 프로젝트", chatCount: 9 },
