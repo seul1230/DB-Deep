@@ -8,6 +8,7 @@ import kr.dbdeep.dbdeep_BE.domain.member.exception.MemberNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.member.infrastructure.MemberRepository;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.AddChatRoomRequest;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectChatRoomResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectListResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.entity.Project;
 import kr.dbdeep.dbdeep_BE.domain.project.exception.ProjectNotFoundException;
@@ -77,5 +78,20 @@ public class ProjectService {
             throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
         }
         chatRoom.connectToProject(projectId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectChatRoomResponse> getChatRooms(Integer memberId, Integer projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        if (!project.getMember().getId().equals(memberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+
+        return chatRoomRepository.findAllByProjectId(projectId)
+                .stream()
+                .map(chatRoom -> new ProjectChatRoomResponse(chatRoom.getId(), chatRoom.getChatroomName(),
+                        chatRoom.getLastMessageAt()))
+                .toList();
     }
 }

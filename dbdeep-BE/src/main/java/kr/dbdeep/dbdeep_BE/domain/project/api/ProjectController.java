@@ -5,6 +5,7 @@ import kr.dbdeep.dbdeep_BE.domain.auth.annotation.CurrentMemberId;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.AddChatRoomRequest;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectRequest;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectChatRoomResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectListResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.application.ProjectService;
 import kr.dbdeep.dbdeep_BE.global.response.JSONResponse;
@@ -58,5 +59,12 @@ public class ProjectController {
                                           @RequestBody AddChatRoomRequest request) {
         projectService.addChatRoom(memberId, projectId, request);
         return JSONResponse.onSuccess();
+    }
+
+    @GetMapping("/{projectId}")
+    public JSONResponse<List<ProjectChatRoomResponse>> getChatRooms(@CurrentMemberId Integer memberId,
+                                                                    @PathVariable Integer projectId) {
+        var chatRooms = projectService.getChatRooms(memberId, projectId);
+        return JSONResponse.onSuccess(chatRooms);
     }
 }
