@@ -1,6 +1,7 @@
 package kr.dbdeep.dbdeep_BE.domain.chat.infrastructure;
 
 import com.google.cloud.Timestamp;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.Query.Direction;
@@ -31,7 +32,7 @@ public class ChatMessageRepository {
                             .id(doc.getId())
                             .chatRoomId(doc.getString("chat_room_id"))
                             .content(doc.getString("content"))
-                            .memberId(doc.getLong("sender_id"))
+                            .memberId(Integer.valueOf(doc.getString("sender_id")))
                             .senderType(doc.getString("sender_type"))
                             .timestamp(doc.getTimestamp("timestamp"))
                             .build())
@@ -56,7 +57,7 @@ public class ChatMessageRepository {
                             .id(doc.getId())
                             .chatRoomId(doc.getString("chat_room_id"))
                             .content(doc.getString("content"))
-                            .memberId(doc.getLong("sender_id"))
+                            .memberId(Integer.valueOf(doc.getString("sender_id")))
                             .senderType(doc.getString("sender_type"))
                             .timestamp(doc.getTimestamp("timestamp"))
                             .build())
@@ -66,6 +67,28 @@ public class ChatMessageRepository {
             throw new RuntimeException("Firestore 쿼리 실패", e);
         }
     }
+
+    public ChatMessage findById(String messageId) {
+        try {
+            DocumentSnapshot doc = firestore.collection("chat_messages")
+                    .document(messageId)
+                    .get()
+                    .get();
+
+            return ChatMessage.builder()
+                    .id(doc.getId())
+                    .chatRoomId(doc.getString("chat_room_id"))
+                    .content(doc.getString("content"))
+                    .memberId(Integer.valueOf(doc.getString("sender_id")))
+                    .senderType(doc.getString("sender_type"))
+                    .timestamp(doc.getTimestamp("timestamp"))
+                    .build();
+
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException("Firestore 쿼리 실패", e);
+        }
+    }
+
 
     public void saveAll(List<ChatMessage> messages) {
         var batch = firestore.batch();
