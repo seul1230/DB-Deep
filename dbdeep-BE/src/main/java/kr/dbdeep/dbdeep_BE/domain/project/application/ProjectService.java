@@ -50,4 +50,14 @@ public class ProjectService {
                 .map(project -> new ProjectListResponse(project.getId(), project.getTitle(), project.getCreatedAt()))
                 .toList();
     }
+
+    @Transactional
+    public void updateTitle(Integer memberId, Integer projectId, String title) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        if (!project.getMember().getId().equals(memberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+        project.updateTitle(title);
+    }
 }

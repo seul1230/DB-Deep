@@ -42,4 +42,12 @@ public class ProjectController {
         var projects = projectService.getAll(memberId);
         return JSONResponse.onSuccess(projects);
     }
+
+    @PostMapping("/{projectId}/title")
+    public JSONResponse<Void> updateTitle(@CurrentMemberId Integer memberId,
+                                          @PathVariable Integer projectId,
+                                          @RequestBody CreateProjectRequest request) {
+        projectService.updateTitle(memberId, projectId, request.title());
+        return JSONResponse.onSuccess();
+    }
 }
