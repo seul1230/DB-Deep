@@ -1,3 +1,9 @@
+2초 동안 생각함
+
+
+아래처럼 `echo "$GCLOUD_KEY"` 부분을 제거하고, `$GCLOUD_KEY`를 직접 `--key-file`에 넘기며, `CLOUDSDK_CONFIG`를 워크스페이스 하위로 지정하도록 수정했습니다. 이 파일 그대로 Jenkins에 반영하시면 됩니다.
+
+```groovy
 pipeline {
   agent none
   options {
@@ -27,12 +33,17 @@ pipeline {
       steps {
         withCredentials([file(credentialsId: 'gcp-service-account-json', variable: 'GCLOUD_KEY')]) {
           sh '''
-            echo "$GCLOUD_KEY" > gcloud-key.json
-            gcloud auth activate-service-account --key-file=gcloud-key.json
+            # gcloud 설정·로그용 디렉터리
+            export CLOUDSDK_CONFIG=$WORKSPACE/.gcloud
+
+            # 서비스 계정 키 파일로 인증
+            gcloud auth activate-service-account --key-file="$GCLOUD_KEY"
             gcloud config set project $GCP_PROJECT
+
+            # 빌드 결과 복원 후 GCS에 동기화
+            unstash 'dist'
+            gsutil -m rsync -r frontend/dist/ $GCS_BUCKET
           '''
-          unstash 'dist'
-          sh 'gsutil -m rsync -r frontend/dist/ $GCS_BUCKET'
         }
       }
     }
@@ -40,10 +51,14 @@ pipeline {
       agent { docker { image 'google/cloud-sdk:slim' } }
       steps {
         withCredentials([file(credentialsId: 'gcp-service-account-json', variable: 'GCLOUD_KEY')]) {
-          echo "$GCLOUD_KEY" > gcloud-key.json
-          sh 'gcloud auth activate-service-account --key-file=gcloud-key.json'
-          sh 'gcloud config set project $GCP_PROJECT'
-          sh "gcloud compute url-maps invalidate-cdn-cache $CDN_URL_MAP --path '/*'"
+          sh '''
+            export CLOUDSDK_CONFIG=$WORKSPACE/.gcloud
+
+            gcloud auth activate-service-account --key-file="$GCLOUD_KEY"
+            gcloud config set project $GCP_PROJECT
+
+            gcloud compute url-maps invalidate-cdn-cache $CDN_URL_MAP --path '/*'
+          '''
         }
       }
     }
@@ -63,3 +78,4 @@ pipeline {
     }
   }
 }
+```
