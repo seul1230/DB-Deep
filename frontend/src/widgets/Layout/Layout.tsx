@@ -4,21 +4,26 @@ import Sidebar from "@/widgets/Sidebar/Sidebar";
 import Logo from "@/shared/ui/Logo/Logo";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import NotificationPanel from "../NotificationPanel/NotificationPanel";
+import ChatLogPanel from "../ChatLogPanel/ChatLogPanel";
 
 const SIDEBAR_WIDTH = 68;
 const PANEL_WIDTH = 240;
 
 const Layout: React.FC = () => {
-  const { isNotificationOpen } = usePanelStore();
+  const { openPanel } = usePanelStore();
+
+  const isNotificationOpen = openPanel === "notification";
+  const isChatLogOpen = openPanel === "chatLog";
+  const isAnyPanelOpen = isNotificationOpen || isChatLogOpen;
 
   return (
     <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
-      {/* ✅ 왼쪽 영역 (Sidebar + 알림 패널) */}
+      {/* 왼쪽 영역 (Sidebar + 패널) */}
       <div style={{
         display: 'flex',
         flexShrink: 0,
         flexDirection: 'row',
-        width: isNotificationOpen ? SIDEBAR_WIDTH + PANEL_WIDTH : SIDEBAR_WIDTH,
+        width: isAnyPanelOpen ? SIDEBAR_WIDTH + PANEL_WIDTH : SIDEBAR_WIDTH,
         transition: 'width 0.3s ease',
       }}>
         {/* Sidebar */}
@@ -33,7 +38,7 @@ const Layout: React.FC = () => {
           <Sidebar />
         </div>
 
-        {/* 패널 */}
+        {/* 열려 있는 패널만 표시 */}
         {isNotificationOpen && (
           <div
             style={{
@@ -47,7 +52,22 @@ const Layout: React.FC = () => {
               transition: 'all 0.3s ease',
             }}
           >
-            <NotificationPanel isOpen={true} />
+            <NotificationPanel isOpen />
+          </div>
+        )}
+        {isChatLogOpen && (
+          <div
+            style={{
+              width: PANEL_WIDTH,
+              flexShrink: 0,
+              borderLeft: '1px solid var(--light-gray)',
+              background: 'var(--sidebar-bg)',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
+            }}
+          >
+            <ChatLogPanel />
           </div>
         )}
       </div>

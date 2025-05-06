@@ -137,13 +137,7 @@
   background: transparent;
 }
 
-/* ✅ 반응형 */
-@media (max-width: 1024px) {
-  .NotificationPanel {
-    width: 220px;
-  }
-}
-
+/* 반응형 */
 @media (max-width: 768px) {
   .NotificationPanel {
     width: 100vw;

@@ -34,3 +34,27 @@
     display: inline-block;
   }
   
+  @media (max-width: 1024px) {
+    .RecommendedList-listItem span {
+      max-width: 360px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .RecommendedList-listItem span {
+      max-width: 240px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .RecommendedList-listItem span {
+      max-width: 160px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .RecommendedList-listItem span {
+      max-width: 120px;
+    }
+  }
+  

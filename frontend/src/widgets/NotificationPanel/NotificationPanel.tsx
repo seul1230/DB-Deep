@@ -17,13 +17,13 @@ interface Props {
 }
 
 const NotificationPanel: React.FC<Props> = ({ isOpen }) => {
-  const { closeNotification } = usePanelStore();
+  const { closePanel } = usePanelStore();
 
   return (
     <div className={`${styles["NotificationPanel"]} ${isOpen ? styles["open"] : ""}`}>
       <div className={styles["NotificationPanel-header"]}>
         <span>알림</span>
-        <button onClick={closeNotification} className={styles["NotificationPanel-close"]}>×</button>
+        <button onClick={closePanel} className={styles["NotificationPanel-close"]}>×</button>
       </div>
       <div className={styles["NotificationPanel-list"]}>
         {notifications.map((n) => (
