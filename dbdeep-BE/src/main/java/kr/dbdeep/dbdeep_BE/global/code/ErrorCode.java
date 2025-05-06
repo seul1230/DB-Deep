@@ -41,8 +41,13 @@ public enum ErrorCode {
     // 아카이브 에러
     ARCHIVE_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 아카이브입니다"),
     ARCHIVE_ALREADY_EXISTS(4000, BAD_REQUEST, "이미 아카이브된 메시지입니다"),
-    ARCHIVE_UNAUTHORIZED(4010, UNAUTHORIZED, "아카이브 권한이 없습니다");
+    ARCHIVE_UNAUTHORIZED(4010, UNAUTHORIZED, "아카이브 권한이 없습니다"),
 
+    // 프로젝트 에러
+    PROJECT_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 프로젝트입니다"),
+    PROJECT_ALREADY_EXISTS(4000, BAD_REQUEST, "이미 존재하는 프로젝트입니다"),
+    PROJECT_UNAUTHORIZED(4010, UNAUTHORIZED, "프로젝트 권한이 없습니다"),
+    ;
     private final int code;
     private final HttpStatus httpStatus;
     private final String message;

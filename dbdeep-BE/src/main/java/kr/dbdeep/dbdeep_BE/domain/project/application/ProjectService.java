@@ -4,11 +4,13 @@ import kr.dbdeep.dbdeep_BE.domain.member.exception.MemberNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.member.infrastructure.MemberRepository;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.entity.Project;
+import kr.dbdeep.dbdeep_BE.domain.project.exception.ProjectNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.project.infrastructure.ProjectRepository;
 import kr.dbdeep.dbdeep_BE.global.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +20,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
     public CreateProjectResponse create(Integer memberId, String title) {
         Project project = Project.builder()
                 .member(memberRepository.findById(memberId)
@@ -25,5 +28,15 @@ public class ProjectService {
                 .title(title).build();
         Project saved = projectRepository.save(project);
         return new CreateProjectResponse(saved.getId(), saved.getTitle());
+    }
+
+    @Transactional
+    public void delete(Integer MemberId, Integer projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        if (!project.getMember().getId().equals(MemberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+        projectRepository.deleteById(projectId);
     }
 }
