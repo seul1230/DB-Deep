@@ -40,6 +40,10 @@ const Sidebar: React.FC = () => {
     navigate("/change-password", { state: { reason: "manual" } });
   };  
 
+  const handleGoToSearch = () => {
+    navigate("/search");
+  };
+
   return (
     <aside className={styles["Sidebar-wrapper"]}>
       <div className={styles["Sidebar-top"]}>
@@ -87,7 +91,14 @@ const Sidebar: React.FC = () => {
               )}
             </div>
           </li>
-          <li><FiSearch size={20} className={styles["Sidebar-icon"]} /></li>
+          <li>
+            <FiSearch
+              size={20}
+              className={styles["Sidebar-icon"]}
+              onClick={handleGoToSearch}
+              style={{ cursor: "pointer" }}
+            />
+          </li>
           <li><FiPlusSquare size={20} className={styles["Sidebar-icon"]} /></li>
           <li>
             <PiChatsBold
