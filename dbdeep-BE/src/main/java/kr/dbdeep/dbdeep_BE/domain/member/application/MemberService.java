@@ -23,11 +23,11 @@ public class MemberService {
     }
 
     public Member findById(Integer id) {
-        return memberRepository.findById(id).orElseThrow(() -> new CommonException(ErrorCode.MEMBER__NOT_FOUND));
+        return memberRepository.findById(id).orElseThrow(() -> new CommonException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email).orElseThrow(() -> new CommonException(ErrorCode.MEMBER__NOT_FOUND));
+        return memberRepository.findByEmail(email).orElseThrow(() -> new CommonException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
 }

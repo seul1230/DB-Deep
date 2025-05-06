@@ -30,7 +30,7 @@ public enum ErrorCode {
     CHAT_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 채팅입니다"),
 
     // 멤버 에러
-    MEMBER__NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 유저입니다"),
+    MEMBER_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 유저입니다"),
 
     // 알림 에러
     NOTIFICATION_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 알림입니다"),
