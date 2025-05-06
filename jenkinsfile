@@ -5,7 +5,7 @@ pipeline {
     timeout(time: 30, unit: 'MINUTES')
   }
   environment {
-    GCP_PROJECT = 'dbdeep'
+    GCP_PROJECT = 'dbdeep-458113'
     GCS_BUCKET  = 'gs://dbdeep-fe'
     CDN_URL_MAP = 'dbdeep-load-balancer'
   }
