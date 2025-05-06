@@ -40,4 +40,16 @@ public class NotificationService {
 
         notification.markAsRead();
     }
+
+    @Transactional
+    public void delete(Integer memberId, Integer notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NotificationException(ErrorCode.NOTIFICATION_NOT_FOUND));
+
+        if (!notification.getMemberId().equals(memberId)) {
+            throw new NotificationException(ErrorCode.NOTIFICATION_NOT_FOUND);
+        }
+        notificationRepository.delete(notification);
+    }
+
 }
