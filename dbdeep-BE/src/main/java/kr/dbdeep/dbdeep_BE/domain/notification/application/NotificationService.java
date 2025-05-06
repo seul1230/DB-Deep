@@ -28,4 +28,16 @@ public class NotificationService {
                 .map(NotificationResponse::from)
                 .toList();
     }
+
+    @Transactional
+    public void markAsRead(Integer memberId, Integer notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NotificationException(ErrorCode.NOTIFICATION_NOT_FOUND));
+
+        if (!notification.getMemberId().equals(memberId)) {
+            throw new NotificationException(ErrorCode.NOTIFICATION_NOT_FOUND);
+        }
+
+        notification.markAsRead();
+    }
 }
