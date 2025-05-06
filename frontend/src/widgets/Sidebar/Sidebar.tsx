@@ -19,7 +19,7 @@ const Sidebar: React.FC = () => {
   const { clearTokens } = useAuth();
 
   const [showOverlay, setShowOverlay] = useState(false);
-  const { hasNotification, toggleNotification } = usePanelStore();
+  const { hasNotification, toggleNotification, toggleChatLog } = usePanelStore();
 
   useEffect(() => {
     document.body.classList.toggle("dark", theme === "dark");
@@ -89,7 +89,14 @@ const Sidebar: React.FC = () => {
           </li>
           <li><FiSearch size={20} className={styles["Sidebar-icon"]} /></li>
           <li><FiPlusSquare size={20} className={styles["Sidebar-icon"]} /></li>
-          <li><PiChatsBold size={20} className={styles["Sidebar-icon"]} /></li>
+          <li>
+            <PiChatsBold
+              size={20}
+              className={styles["Sidebar-icon"]}
+              onClick={toggleChatLog}
+              style={{ cursor: "pointer" }}
+            />
+          </li>
           <li><LuBookmarkMinus size={20} className={styles["Sidebar-icon"]} /></li>
           <li><FiFolderMinus size={20} className={styles["Sidebar-icon"]} /></li>
         </ul>
