@@ -11,11 +11,12 @@ pipeline {
   }
   stages {
     stage('Checkout & Build') {
-      agent { docker { image 'node:18-alpine' } }
+      agent { docker { image 'node:20-alpine' } }
       steps {
         checkout scm
         dir('frontend') {
-          sh 'npm install'
+          sh 'mkdir -p .npm-cache'
+          sh 'npm install --cache .npm-cache'
           sh 'npm run build'
           stash name: 'dist', includes: 'dist/**'
         }
