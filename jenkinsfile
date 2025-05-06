@@ -25,18 +25,17 @@ pipeline {
     stage('Deploy to GCS') {
       agent { docker { image 'google/cloud-sdk:slim' } }
       steps {
-        // 먼저 dist 를 unstash (Jenkins 스텝)
         unstash 'dist'
-
         withCredentials([file(credentialsId: 'gcp-service-account-json', variable: 'GCLOUD_KEY')]) {
           sh '''
             export CLOUDSDK_CONFIG=$WORKSPACE/.gcloud
+            export HOME=$WORKSPACE
 
-            # 서비스 계정 키 파일로 인증
+            # Authenticate with service account key
             gcloud auth activate-service-account --key-file="$GCLOUD_KEY"
             gcloud config set project $GCP_PROJECT
 
-            # GCS로 동기화
+            # Sync built files to GCS
             gsutil -m rsync -r frontend/dist/ $GCS_BUCKET
           '''
         }
@@ -48,8 +47,12 @@ pipeline {
         withCredentials([file(credentialsId: 'gcp-service-account-json', variable: 'GCLOUD_KEY')]) {
           sh '''
             export CLOUDSDK_CONFIG=$WORKSPACE/.gcloud
+            export HOME=$WORKSPACE
+
             gcloud auth activate-service-account --key-file="$GCLOUD_KEY"
             gcloud config set project $GCP_PROJECT
+
+            # Invalidate CDN cache
             gcloud compute url-maps invalidate-cdn-cache $CDN_URL_MAP --path '/*'
           '''
         }
@@ -63,7 +66,11 @@ pipeline {
     }
   }
   post {
-    success { echo "✅ 프론트 배포 성공: ${env.BUILD_URL}" }
-    failure { echo "❌ 프론트 배포 실패: ${env.BUILD_URL}" }
+    success {
+      echo "✅ 프론트 배포 성공: ${env.BUILD_URL}"
+    }
+    failure {
+      echo "❌ 프론트 배포 실패: ${env.BUILD_URL}"
+    }
   }
 }
