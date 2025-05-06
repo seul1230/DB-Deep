@@ -22,6 +22,7 @@ pipeline {
         }
       }
     }
+
     stage('Deploy to GCS') {
       agent { docker { image 'google/cloud-sdk:slim' } }
       steps {
@@ -31,16 +32,15 @@ pipeline {
             export CLOUDSDK_CONFIG=$WORKSPACE/.gcloud
             export HOME=$WORKSPACE
 
-            # Authenticate with service account key
             gcloud auth activate-service-account --key-file="$GCLOUD_KEY"
             gcloud config set project $GCP_PROJECT
 
-            # Sync built files to GCS
-            gsutil -m rsync -r frontend/dist/ $GCS_BUCKET
+            gsutil -m rsync -r dist/ $GCS_BUCKET
           '''
         }
       }
     }
+
     stage('Invalidate CDN') {
       agent { docker { image 'google/cloud-sdk:slim' } }
       steps {
@@ -52,12 +52,14 @@ pipeline {
             gcloud auth activate-service-account --key-file="$GCLOUD_KEY"
             gcloud config set project $GCP_PROJECT
 
-            # Invalidate CDN cache
-            gcloud compute url-maps invalidate-cdn-cache $CDN_URL_MAP --path '/*'
+            gcloud compute url-maps invalidate-cdn-cache $CDN_URL_MAP \
+              --global \
+              --path '/*'
           '''
         }
       }
     }
+
     stage('Smoke Test') {
       agent { docker { image 'curlimages/curl:latest' } }
       steps {
@@ -65,6 +67,7 @@ pipeline {
       }
     }
   }
+
   post {
     success {
       echo "✅ 프론트 배포 성공: ${env.BUILD_URL}"
