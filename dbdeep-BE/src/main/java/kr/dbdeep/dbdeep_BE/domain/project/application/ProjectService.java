@@ -94,4 +94,15 @@ public class ProjectService {
                         chatRoom.getLastMessageAt()))
                 .toList();
     }
+
+    @Transactional
+    public void deleteChatRoom(Integer memberId, Integer projectId, AddChatRoomRequest chatRoomId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        if (!project.getMember().getId().equals(memberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndProjectId(chatRoomId.chatId(), projectId);
+        chatRoom.disconnectFromProject();
+    }
 }

@@ -67,4 +67,14 @@ public class ProjectController {
         var chatRooms = projectService.getChatRooms(memberId, projectId);
         return JSONResponse.onSuccess(chatRooms);
     }
+
+    @DeleteMapping("/{projectId}/chatroom")
+    public JSONResponse<Void> removeChatRoom(@CurrentMemberId Integer memberId,
+                                             @PathVariable Integer projectId,
+                                             @RequestBody AddChatRoomRequest request) {
+        projectService.deleteChatRoom(memberId, projectId, request);
+        return JSONResponse.onSuccess();
+    }
+
+
 }

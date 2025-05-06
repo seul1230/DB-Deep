@@ -46,4 +46,8 @@ public class ChatRoom extends BaseTimeEntity {
         this.projectId = projectId;
     }
 
+    public void disconnectFromProject() {
+        this.projectId = null;
+    }
+
 }

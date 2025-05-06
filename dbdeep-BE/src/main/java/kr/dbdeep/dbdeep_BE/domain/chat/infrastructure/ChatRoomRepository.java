@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
     List<ChatRoom> findAllByProjectId(Integer projectId);
+
+    ChatRoom findByIdAndProjectId(String chatRoomId, Integer projectId);
 }
