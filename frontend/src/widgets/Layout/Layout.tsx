@@ -18,7 +18,7 @@ const Layout: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
-      {/* ✅ 왼쪽 영역 (Sidebar + 패널) */}
+      {/* 왼쪽 영역 (Sidebar + 패널) */}
       <div style={{
         display: 'flex',
         flexShrink: 0,
