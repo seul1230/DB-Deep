@@ -2,35 +2,30 @@
 # pip install langchain pinecone-client transformers sentence-transformers openai
 
 import os
+import logging
 from dotenv import load_dotenv
+
+from module.setup import init_pinecone
 
 from langchain.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI  # 또는 HuggingFaceHub 등 대체 가능
-# from pinecone import Pinecone, ServerlessSpec
-import pinecone
+from langchain_google_vertexai import VertexAIEmbeddings
 
-import logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+import pinecone
 
 load_dotenv()
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logging.info("📦 문서 임베딩 및 Pinecone 업로드 시작")
 
 # ----------------------------
 # 2. Pinecone 초기화
 # ----------------------------
 
-PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
-if not PINECONE_API_KEY:
-    raise ValueError("❌ PINECONE_API_KEY가 설정되어 있지 않습니다")
-pinecone.init(
-    api_key=PINECONE_API_KEY,      
-    # environment="YOUR_PINECONE_ENV"      # "us-west4-gcp"
-)
+init_pinecone()
 index_name = "schema-index"             # 인덱스 이름
 
 logging.info("📦 Pinecone 초기화")
@@ -78,30 +73,3 @@ vectorstore = Pinecone.from_documents(
 
 logging.info("✅ 모든 작업 완료: 문서 임베딩 → Pinecone 업로드 완료")
 
-
-# # ----------------------------
-# # 7. 질의 → 문서 검색 → 답변 생성
-# # ----------------------------
-# retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-
-# qa_chain = RetrievalQA.from_chain_type(
-#     llm=OpenAI(temperature=0),  # 🔑 OpenAI API 키가 환경변수로 설정되어 있어야 함
-#     retriever=retriever,
-#     return_source_documents=True
-# )
-
-# # ----------------------------
-# # 8. 예시 질의 실행
-# # ----------------------------
-# query = "VIP 고객 중 최근 3개월간 카드론을 많이 쓴 사람은?"
-# result = qa_chain.run(query)
-
-# # ----------------------------
-# # 9. 결과 출력
-# # ----------------------------
-# print("\n[답변]:")
-# print(result)
-
-# print("\n[참고된 문서 출처]:")
-# for doc in qa_chain.last_run["source_documents"]:
-#     print("-", doc.metadata.get("source"))

@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 from dotenv import load_dotenv
 
@@ -8,6 +9,11 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import CrossEncoderReranker
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
+
+from langchain.chat_models import init_chat_model
+from langchain.embeddings import HuggingFaceEmbeddings
+
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
 from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
 from langchain_pinecone import PineconeVectorStore
@@ -109,12 +115,17 @@ def get_prompt_for_insight(request):
 # ----------------------------
 # RAG 체인 구성 함수
 # ----------------------------
+
 def set_rag_chain(question, user_department, pc):
     logging.info("📥 RAG 체인 구성 시작")
 
     # Pinecone + Embedding
     logging.info("🔗 Pinecone VectorStore 초기화 중...")
-    embedding = ()  # 실제 임베딩 객체로 교체
+    embedding = HuggingFaceEmbeddings(
+        model_name="nlpai-lab/KURE-v1",
+        model_kwargs={"device": "cpu"},  # GPU 사용 가능 시 "cuda"
+        encode_kwargs={"normalize_embeddings": True}
+    )
 
     schema_vectorstore = PineconeVectorStore(
         index=pc.Index("schema-index"),
@@ -137,10 +148,16 @@ def set_rag_chain(question, user_department, pc):
     # Gemini LLM
     logging.info("🤖 Gemini LLM 초기화 중...")
     GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-pro",
-        google_api_key=GEMINI_API_KEY
-    )
+    GEMINI_API_BASE = os.environ.get("GEMINI_API_BASE")
+    
+    # llm = ChatGoogleGenerativeAI(
+    #     model="gemini-2.0-flash-lite",
+    #     google_api_key=GEMINI_API_KEY,
+    #     streaming=True,
+    #     callbacks=[StreamingStdOutCallbackHandler()]
+    # )
+
+    llm = init_chat_model("gemini-2.0-flash-lite", model_provider="google_genai")
 
     # 체인 정의
     rag_chain = (
@@ -154,5 +171,11 @@ def set_rag_chain(question, user_department, pc):
         | StrOutputParser()
     )
 
-    return rag_chain.invoke(question)
+    answer = rag_chain.invoke(question)
+
+    print("\n[참고된 문서 출처]:")
+    for doc in rag_chain.last_run["source_documents"]:
+        print("-", doc.metadata.get("source"))
+
+    return answer
 

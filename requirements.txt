@@ -1,0 +1,31 @@
+# LangChain core
+langchain
+
+# LangChain for Google Gemini API (선택: ChatGoogleGenerativeAI 사용 시 필요)
+langchain-google-genai
+
+# Embedding model (KURE 포함)
+sentence-transformers
+
+# Pinecone Vector DB
+pinecone-client
+
+# Streaming HTTP client for Gemini Native API
+aiohttp
+
+# FastAPI 백엔드
+fastapi
+uvicorn[standard]
+
+# Google BigQuery + 인증
+google-cloud-bigquery
+google-auth
+
+# 환경 변수 로드용
+python-dotenv
+
+# (선택) 데이터프레임 처리
+pandas
+
+# (선택) 토큰 수 계산용 - GPT 모델 대응 시
+tiktoken
