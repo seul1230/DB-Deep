@@ -3,15 +3,6 @@ import styles from "./ArchivePage.module.css";
 import SectionTitle from "@/features/archive/components/SectionTitle/SectionTitle";
 import ArchiveCard from "@/features/archive/components/ArchiveCard/ArchiveCard";
 
-interface Props {
-  title: string;
-  date: string;
-  description?: string;
-  tableData?: string[][];
-  chartData?: { label: string; value: number }[];
-  onClick?: () => void;
-}
-
 const ArchivePage = () => {
   const cards = [
     {
