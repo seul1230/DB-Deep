@@ -167,8 +167,6 @@ const LoginPage: React.FC = () => {
             <Suspense>
               <TempPasswordModal
                 onClose={closeModal}
-                onSend={(email) => console.log("이메일 전송:", email)}
-                onVerifyCode={(code) => console.log("인증번호 검증:", code)}
               />
             </Suspense>
           </div>
