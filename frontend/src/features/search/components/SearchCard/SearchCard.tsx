@@ -28,7 +28,7 @@ const SearchCard: React.FC<Props> = ({ title, date, content, highlight, chartDat
   return (
     <div className={styles.card} onClick={onClick}>
       <div className={styles.meta}>
-        <FiMessageSquare size={20} className={styles.icon} />
+        <FiMessageSquare className={styles.icon} />
         <div className={styles.titleRow}>
           <div className={styles.cardTitle}>{highlightText(title, highlight)}</div>
           <div className={styles.date}>{date}</div>

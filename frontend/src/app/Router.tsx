@@ -4,6 +4,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import Layout from "../widgets/Layout/Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import SearchPage from "@/pages/SearchPage/SearchPage";
+import ArchivePage from "@/pages/ArchivePage/ArchivePage";
 
 const LoginPage = lazy(() => import("../pages/LoginPage/LoginPage"));
 const MainPage = lazy(() => import("../pages/MainPage/MainPage"));
@@ -33,6 +34,7 @@ const Router = () => {
         <Route path="/change-password" element={<ChangePasswordPage />} />
         <Route path="/chat/:chatId" element={<ChatDetailPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/archive" element={<ArchivePage />} />
         {/* 여기에 더 추가 가능 */}
       </Route>
     </Routes>
