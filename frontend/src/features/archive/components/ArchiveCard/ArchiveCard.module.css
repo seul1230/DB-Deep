@@ -1,98 +1,119 @@
-.card {
+  .card {
     background: var(--background-color);
     padding: 16px;
     border-radius: 14px;
     border: 1px solid var(--light-gray);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-    transition: box-shadow 0.2s ease, background-color 0.2s ease;
-    cursor: pointer;
-    position: relative;
+
+    width: 100%;
+    max-width: 680px;
+    box-sizing: border-box;        /* padding 포함해서 max-width 계산 */
+    margin: 0 auto;                /* 가운데 정렬 */
+
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    align-items: stretch;          /* 내부 내용 좌측 정렬 유지 */
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, background-color 0.2s ease;
   }
-  
+
   .card:hover {
     background-color: var(--primary-light-blue);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
   
+  
   .meta {
+    width: 100%;
+    max-width: 680px;
     display: flex;
-    align-items: center;
-    font-size: 13px;
-    gap: 8px;
-    margin-bottom: 8px;
+    justify-content: flex-start;
   }
   
-  
-  .titleRow {
+  .metaInner {
     display: flex;
     align-items: center;
-    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    justify-content: space-between;
+  }
+  
+  .icon {
+    margin-top: 4px;
+    color: var(--icon-blue);
+    font-size: 20px;
+  }
+  
+  .centerArea {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    gap: 10px;
     flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
+    margin-left: 8px;
   }
-
-  .cardTitle {
+  
+  .title {
     font-weight: 600;
     font-size: 18px;
     color: var(--text-color);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
   
   .date {
     font-size: 12px;
     color: var(--gray-text);
-    flex-shrink: 0;
     margin-top: 7px;
   }
   
-  .icon {
-    color: var(--icon-blue);
-    font-size: 20px;
-    margin-top: 4px;
+  .moreIcon {
+    color: var(--gray-text);
+    cursor: pointer;
   }
   
-  .moreIcon {
-    color: var(--icon-blue);
-    margin-left: 8px;
-    cursor: pointer;
+  /* 공통 wrapper: description, table, chart 전부 적용 */
+  .contentAligned {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .contentAligned > * {
+    max-width: 100%;
+    width: 100%;
   }
   
   .description {
     font-size: 13px;
     color: var(--text-color);
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
-  
-  .highlight {
-    background-color: var(--yellow);
+    margin-top: 8px;
+    line-height: 1.5;
+    width: 100%;
+    max-width: 100%;
   }
   
   .table {
-    width: 100%;
     font-size: 12px;
     border-collapse: collapse;
-    margin-top: 8px;
+    margin-top: 12px;
+    width: 100%;
   }
   
-  .table th, .table td {
+  .table th,
+  .table td {
     padding: 6px 8px;
-    text-align: left;
     border-bottom: 1px solid var(--light-gray);
+    text-align: left;
   }
   
   .chartPreview {
     display: flex;
     align-items: flex-end;
     gap: 12px;
-    height: 80px;
+    height: 100px;
     margin-top: 12px;
+    width: 100%;
+    max-width: 100%;
   }
   
   .chartBar {
