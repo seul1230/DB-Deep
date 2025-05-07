@@ -59,7 +59,7 @@
     font-weight: 600;
     color: var(--icon-blue);
     text-align: left;
-    margin-bottom: 24px;
+    margin-bottom: 10px;
     transition: color 0.3s;
   }
   

@@ -30,18 +30,11 @@ const LoginPage: React.FC = () => {
         onSuccess: () => {
           navigate("/main"); 
         },
-        onError: (error: AxiosError) => {
-          const status = error?.response?.status;
-          if (status === 400) {
-            alert("요청이 잘못되었습니다.");
-          } else if (status === 401) {
-            alert("이메일 또는 비밀번호가 올바르지 않습니다.");
-          } else if (status === 500) {
-            alert("서버 오류가 발생했습니다.");
-          } else {
-            alert("네트워크 오류가 발생했습니다.");
-          }
-        },
+        onError: (error) => {
+          const axiosError = error as AxiosError<{ message: string }>;
+          const message = axiosError.response?.data?.message || "예상치 못한 오류가 발생했습니다.";
+          alert(message);
+        }        
       }
     );
   };
