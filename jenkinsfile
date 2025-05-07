@@ -17,7 +17,7 @@ pipeline {
         dir('frontend') {
           sh 'mkdir -p .npm-cache'
           sh 'npm install --cache .npm-cache'
-          sh 'npm run build'
+          sh 'npm run build:prod'
           stash name: 'dist', includes: 'dist/**'
         }
       }
