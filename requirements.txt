@@ -1,15 +1,3 @@
-# LangChain core
-langchain
-
-# LangChain for Google Gemini API (선택: ChatGoogleGenerativeAI 사용 시 필요)
-langchain-google-genai
-
-# Embedding model (KURE 포함)
-sentence-transformers
-
-# Pinecone Vector DB
-pinecone-client
-
 # Streaming HTTP client for Gemini Native API
 aiohttp
 
@@ -17,15 +5,37 @@ aiohttp
 fastapi
 uvicorn[standard]
 
-# Google BigQuery + 인증
-google-cloud-bigquery
-google-auth
+# --- 환경 변수 관리
+python-dotenv==1.0.1
 
-# 환경 변수 로드용
-python-dotenv
+# --- HTTP 요청 처리 (Gemini GMS)
+httpx==0.27.0
 
-# (선택) 데이터프레임 처리
-pandas
+# --- LangChain 핵심 구성 요소
+langchain
+langchain-core
+langchain-community
+langchain-pinecone
 
-# (선택) 토큰 수 계산용 - GPT 모델 대응 시
-tiktoken
+# --- Pinecone 벡터스토어
+pinecone-client==3.1.0
+
+# --- 임베딩 및 reranking 모델
+transformers==4.39.3
+torch==2.2.2
+sentence-transformers==2.5.1
+scikit-learn==1.4.2
+
+# --- 문서 로딩, 전처리
+pandas==2.2.2
+tqdm==4.66.2
+
+# --- Google BigQuery
+google-cloud-bigquery==3.17.2
+google-auth==2.29.0
+google-auth-oauthlib==1.2.0
+google-cloud-core==2.4.1
+
+# --- 문서 임베딩 처리용
+unstructured==0.12.6
+openpyxl==3.1.2

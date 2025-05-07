@@ -1,20 +1,14 @@
-# 1. 필수 패키지 설치 필요
-# pip install langchain pinecone-client transformers sentence-transformers openai
-
 import os
 import logging
 from dotenv import load_dotenv
 
-from module.setup import init_pinecone
+from config.setup import init_pinecone
 
 from langchain.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain_google_vertexai import VertexAIEmbeddings
 
-
-import pinecone
 
 load_dotenv()
 
@@ -22,7 +16,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logging.info("📦 문서 임베딩 및 Pinecone 업로드 시작")
 
 # ----------------------------
-# 2. Pinecone 초기화
+#  Pinecone 초기화
 # ----------------------------
 
 init_pinecone()
@@ -31,7 +25,7 @@ index_name = "schema-index"             # 인덱스 이름
 logging.info("📦 Pinecone 초기화")
 
 # ----------------------------
-# 3. 문서 로드 및 출처 메타데이터 추가
+#  문서 로드 및 출처 메타데이터 추가
 # ----------------------------
 text_files = ["1.card_members.txt", "2.card_credit.txt", "3.card_sales.txt"]  # 다중 문서 목록
 docs = []
@@ -45,14 +39,14 @@ for file_path in text_files:
     docs.extend(loaded_docs)
 
 # ----------------------------
-# 4. 문서 분할 (chunk 단위)
+#  문서 분할 (chunk 단위)
 # ----------------------------
 logging.info("✂️ 문서 chunk 분할 중...")
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
 splits = text_splitter.split_documents(docs)
 
 # ----------------------------
-# 5. KURE-v1 임베딩 (Hugging Face 모델 사용)
+#  KURE-v1 임베딩 (Hugging Face 모델 사용)
 # ----------------------------
 logging.info("🔍 KURE 임베딩 생성 중...")
 embedding = HuggingFaceEmbeddings(
@@ -62,7 +56,7 @@ embedding = HuggingFaceEmbeddings(
 )
 
 # ----------------------------
-# 6. Pinecone에 업로드
+#  Pinecone에 업로드
 # ----------------------------
 logging.info("📡 Pinecone에 벡터 업로드 중...")
 vectorstore = Pinecone.from_documents(
