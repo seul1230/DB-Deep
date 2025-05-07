@@ -78,7 +78,7 @@ public class ChatShareService {
                         .id(UUID.randomUUID().toString())
                         .chatRoomId(newChatRoomId)
                         .content(m.getContent())
-                        .memberId(memberId.longValue())
+                        .memberId((int) memberId.longValue())
                         .senderType(m.getSenderType())
                         .timestamp(m.getTimestamp())
                         .build())

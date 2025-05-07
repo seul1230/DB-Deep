@@ -1,4 +1,4 @@
-package kr.dbdeep.dbdeep_BE.domain.auth;
+package kr.dbdeep.dbdeep_BE.domain.auth.entity;
 
 import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;

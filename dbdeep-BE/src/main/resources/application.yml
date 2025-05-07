@@ -57,3 +57,10 @@ cors:
 
 firestore:
   credential-location: ${FIRESTORE_CREDENTIAL_LOCATION}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  api-docs:
+    path: /v3/api-docs
