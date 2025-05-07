@@ -1,7 +1,6 @@
 services:
   elasticsearch:
     image: bitnami/elasticsearch:7.17.10-debian-11-r0
-    container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -41,7 +40,6 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.10
-    container_name: kibana
     ports:
       - "5601:5601"
     environment:
@@ -83,7 +81,6 @@ services:
 
   redis:
     image: redis:7.2
-    container_name: redis
     ports:
       - "6379:6379"
     volumes:
