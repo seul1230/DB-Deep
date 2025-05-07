@@ -2,24 +2,22 @@ import React, { useEffect, useState } from "react";
 import styles from "./TempPasswordModal.module.css";
 import { FiMail, FiX } from "react-icons/fi";
 import Button from "@/shared/ui/Button/Button";
+import { useSendEmail, useVerifyCode } from "../../hooks/authApi";
 
 interface TempPasswordModalProps {
   onClose: () => void;
-  onSend: (email: string) => void;
-  onVerifyCode: (code: string) => void;
 }
 
-const TempPasswordModal: React.FC<TempPasswordModalProps> = ({
-  onClose,
-  onSend,
-  onVerifyCode,
-}) => {
+const TempPasswordModal: React.FC<TempPasswordModalProps> = ({ onClose }) => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isEmailSent, setIsEmailSent] = useState(false);
   const [code, setCode] = useState("");
   const [timer, setTimer] = useState(180);
   const [timerActive, setTimerActive] = useState(false);
+
+  const sendEmailMutation = useSendEmail();
+  const verifyCodeMutation = useVerifyCode();
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -37,26 +35,34 @@ const TempPasswordModal: React.FC<TempPasswordModalProps> = ({
     return `${min}:${sec}`;
   };
 
-  const validateEmail = (value: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(value);
-  };
+  const validateEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-  const handleEmailSend = () => {
+  const handleEmailSend = async () => {
     if (!email) return;
     if (!validateEmail(email)) {
       setEmailError("올바른 이메일 형식을 입력해주세요.");
       return;
     }
-    setEmailError("");
-    setIsEmailSent(true);
-    setTimer(180);
-    setTimerActive(true);
-    onSend(email);
+    try {
+      await sendEmailMutation.mutateAsync(email);
+      setEmailError("");
+      setIsEmailSent(true);
+      setTimer(180);
+      setTimerActive(true);
+      alert("인증번호가 이메일로 전송되었습니다!");
+    } catch {
+      setEmailError("이메일 전송에 실패했습니다.");
+    }
   };
 
-  const handleVerify = () => {
-    if (code) onVerifyCode(code);
+  const handleVerify = async () => {
+    try {
+      await verifyCodeMutation.mutateAsync({ email, code: Number(code) });
+      alert("인증 성공! 입력하신 이메일로 임시 비밀번호가 발급되었습니다.");
+      onClose();
+    } catch {
+      alert("인증 실패. 다시 시도해주세요.");
+    }
   };
 
   return (
@@ -84,11 +90,17 @@ const TempPasswordModal: React.FC<TempPasswordModalProps> = ({
             disabled={isEmailSent}
             className={styles["TempPasswordModal-input"]}
           />
-          {!isEmailSent && (
-            <button className={styles["TempPasswordModal-inlineButton"]} onClick={handleEmailSend}>
-              이메일 인증
-            </button>
-          )}
+          <button
+            className={styles["TempPasswordModal-inlineButton"]}
+            onClick={handleEmailSend}
+            disabled={sendEmailMutation.isPending}
+          >
+            {sendEmailMutation.isPending
+              ? "전송 중..."
+              : isEmailSent
+              ? "인증번호 재발송"
+              : "이메일 인증"}
+          </button>
         </div>
         {emailError && <p className={styles["TempPasswordModal-error"]}>{emailError}</p>}
       </div>
@@ -107,15 +119,14 @@ const TempPasswordModal: React.FC<TempPasswordModalProps> = ({
             <button
               className={styles["TempPasswordModal-inlineButton"]}
               onClick={handleVerify}
-              disabled={!code}
+              disabled={!code || verifyCodeMutation.isPending}
             >
-              확인
+              {verifyCodeMutation.isPending ? "확인 중..." : "확인"}
             </button>
           </div>
         </div>
       )}
 
-      
       <div className={styles["TempPasswordModal-buttonGroup"]}>
         <Button
           label="취소"
@@ -123,14 +134,6 @@ const TempPasswordModal: React.FC<TempPasswordModalProps> = ({
           borderColor="var(--icon-blue)"
           backgroundColor="var(--background-color)"
           textColor="var(--icon-blue)"
-        />
-        <Button
-          label="전송"
-          onClick={() => alert("전송 완료")}
-          borderColor="var(--icon-blue)"
-          backgroundColor="var(--icon-blue)"
-          textColor="var(--background-color)"
-          disabled={!isEmailSent}
         />
       </div>
     </div>
