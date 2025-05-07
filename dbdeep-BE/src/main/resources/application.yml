@@ -52,6 +52,8 @@ cors:
     - https://dbdeep.kr
     - http://k12s104.p.ssafy.io
     - http://dbdeep.kr
+    - https://www.dbdeep.kr
+    - http://www.dbdeep.kr
 
 firestore:
   credential-location: ${FIRESTORE_CREDENTIAL_LOCATION}
