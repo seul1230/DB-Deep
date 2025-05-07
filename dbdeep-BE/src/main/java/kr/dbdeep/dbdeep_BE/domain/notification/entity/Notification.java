@@ -53,5 +53,12 @@ public class Notification {
     @CreatedDate
     @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
+
+    public void markAsRead() {
+        if (!this.isRead) {
+            this.isRead = true;
+            this.readAt = LocalDateTime.now();
+        }
+    }
 }
 

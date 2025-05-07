@@ -34,6 +34,7 @@ public enum ErrorCode {
 
     // 알림 에러
     NOTIFICATION_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 알림입니다"),
+    NOTIFICATION_IS_EMPTY(4000, BAD_REQUEST, "알림이 없습니다"),
 
     // 메일 에러
     MAIL_SEND_ERROR(5000, INTERNAL_SERVER_ERROR, "메일 전송 중 에러가 발생했습니다"),

@@ -1,8 +1,15 @@
 package kr.dbdeep.dbdeep_BE.domain.project.application;
 
+import java.util.List;
+import kr.dbdeep.dbdeep_BE.domain.chat.entity.ChatRoom;
+import kr.dbdeep.dbdeep_BE.domain.chat.exception.ChatRoomNotFoundException;
+import kr.dbdeep.dbdeep_BE.domain.chat.infrastructure.ChatRoomRepository;
 import kr.dbdeep.dbdeep_BE.domain.member.exception.MemberNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.member.infrastructure.MemberRepository;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.AddChatRoomRequest;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectChatRoomResponse;
+import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectListResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.entity.Project;
 import kr.dbdeep.dbdeep_BE.domain.project.exception.ProjectNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.project.infrastructure.ProjectRepository;
@@ -19,6 +26,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final MemberRepository memberRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
     public CreateProjectResponse create(Integer memberId, String title) {
@@ -38,5 +46,63 @@ public class ProjectService {
             throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
         }
         projectRepository.deleteById(projectId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectListResponse> getAll(Integer memberId) {
+        return projectRepository.findAllByMember(memberRepository.findById(memberId)
+                        .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND)))
+                .stream()
+                .map(project -> new ProjectListResponse(project.getId(), project.getTitle(), project.getCreatedAt()))
+                .toList();
+    }
+
+    @Transactional
+    public void updateTitle(Integer memberId, Integer projectId, String title) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        if (!project.getMember().getId().equals(memberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+        project.updateTitle(title);
+    }
+
+    @Transactional
+    public void addChatRoom(Integer memberId, Integer projectId, AddChatRoomRequest request) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        ChatRoom chatRoom = chatRoomRepository.findById(request.chatId())
+                .orElseThrow(() -> new ChatRoomNotFoundException(ErrorCode.CHAT_ROOM_NOT_FOUND));
+
+        if (!project.getMember().getId().equals(memberId) || !chatRoom.getMemberId().equals(memberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+        chatRoom.connectToProject(projectId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectChatRoomResponse> getChatRooms(Integer memberId, Integer projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        if (!project.getMember().getId().equals(memberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+
+        return chatRoomRepository.findAllByProjectId(projectId)
+                .stream()
+                .map(chatRoom -> new ProjectChatRoomResponse(chatRoom.getId(), chatRoom.getChatroomName(),
+                        chatRoom.getLastMessageAt()))
+                .toList();
+    }
+
+    @Transactional
+    public void deleteChatRoom(Integer memberId, Integer projectId, AddChatRoomRequest chatRoomId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
+        if (!project.getMember().getId().equals(memberId)) {
+            throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
+        }
+        ChatRoom chatRoom = chatRoomRepository.findByIdAndProjectId(chatRoomId.chatId(), projectId);
+        chatRoom.disconnectFromProject();
     }
 }
