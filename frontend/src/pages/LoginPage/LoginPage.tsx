@@ -6,7 +6,9 @@ import { lazy, Suspense } from "react";
 import { AxiosError } from "axios";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import { useNavigate } from "react-router-dom";
-import logoImage from "../../assets/logo.png"
+import logoLight from "../../assets/logo.png";
+import logoDark from "../../assets/logo-dark.png";
+import { useThemeStore } from "@/shared/store/themeStore";
 
 const TempPasswordModal = lazy(() => import("@/features/auth/components/TempPasswordModal/TempPasswordModal"));
 
@@ -18,6 +20,7 @@ const LoginPage: React.FC = () => {
   const [isClosing, setIsClosing] = useState(false);    
   const loginMutation = useLogin();
   const navigate = useNavigate();  
+  const { theme } = useThemeStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,8 +83,12 @@ const LoginPage: React.FC = () => {
         <div className={styles["LoginPage-right"]}>
           <div className={styles["LoginPage-box"]}>
 
-            {/* ✅ 모바일 전용 로고 */}
-            <img src={logoImage} alt="Logo" className={styles["LoginPage-mobileLogo"]} />
+            {/* ✅ 모바일 전용 로고, theme 기반 src 적용 */}
+            <img
+              src={theme === "dark" ? logoDark : logoLight}
+              alt="Logo"
+              className={styles["LoginPage-mobileLogo"]}
+            />
 
             <form onSubmit={handleSubmit} className={styles["LoginPage-form"]}>
               <div className={styles["LoginPage-title"]}>로그인</div>

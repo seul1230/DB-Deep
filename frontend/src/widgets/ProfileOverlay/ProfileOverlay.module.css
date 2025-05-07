@@ -25,6 +25,7 @@
     gap: 8px;
     transition: background 0.2s;
     white-space: nowrap;
+    color: var(--text-color);
   }
   
   .ProfileOverlay-button:hover {
