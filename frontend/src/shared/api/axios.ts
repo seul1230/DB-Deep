@@ -16,7 +16,9 @@ api.interceptors.request.use((config) => {
   if (
     token &&
     config.url &&
-    !config.url.includes("/auth/signin")
+    !config.url.includes("/auth/signin") &&
+    !config.url.includes("/auth/email/code") &&
+    !config.url.includes("/auth/email/code/verify")
   ) {
     config.headers.Authorization = `Bearer ${token}`;
   }
