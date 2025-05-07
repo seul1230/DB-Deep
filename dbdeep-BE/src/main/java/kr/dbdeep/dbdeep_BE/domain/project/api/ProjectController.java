@@ -6,6 +6,8 @@ import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.application.ProjectService;
 import kr.dbdeep.dbdeep_BE.global.response.JSONResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,5 +25,12 @@ public class ProjectController {
                                                              @RequestBody CreateProjectRequest request) {
         var created = projectService.create(memberId, request.title());
         return JSONResponse.onSuccess(created);
+    }
+
+    @DeleteMapping("/{projectId}")
+    public JSONResponse<Void> deleteProject(@CurrentMemberId Integer memberId,
+                                            @PathVariable Integer projectId) {
+        projectService.delete(memberId, projectId);
+        return JSONResponse.onSuccess();
     }
 }
