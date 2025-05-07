@@ -6,6 +6,7 @@ import { lazy, Suspense } from "react";
 import { AxiosError } from "axios";
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import { useNavigate } from "react-router-dom";
+import logoImage from "../../assets/logo.png"
 
 const TempPasswordModal = lazy(() => import("@/features/auth/components/TempPasswordModal/TempPasswordModal"));
 
@@ -78,6 +79,10 @@ const LoginPage: React.FC = () => {
         </div>
         <div className={styles["LoginPage-right"]}>
           <div className={styles["LoginPage-box"]}>
+
+            {/* ✅ 모바일 전용 로고 */}
+            <img src={logoImage} alt="Logo" className={styles["LoginPage-mobileLogo"]} />
+
             <form onSubmit={handleSubmit} className={styles["LoginPage-form"]}>
               <div className={styles["LoginPage-title"]}>로그인</div>
 

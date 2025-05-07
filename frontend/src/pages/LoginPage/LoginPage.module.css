@@ -223,3 +223,15 @@
     animation: modalFadeIn 0.3s ease-out;
   }
   
+  /* ✅ 모바일 전용 로고 스타일 */
+.LoginPage-mobileLogo {
+  display: none;
+  width: 250px;
+  margin: 0 auto 50px;
+}
+
+@media (max-width: 960px) {
+  .LoginPage-mobileLogo {
+    display: block;
+  }
+}
