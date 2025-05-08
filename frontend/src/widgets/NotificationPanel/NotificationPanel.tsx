@@ -38,7 +38,7 @@ const NotificationPanel: React.FC<Props> = ({ isOpen }) => {
           <span>알림</span>
           <button onClick={closePanel} className={styles["NotificationPanel-close"]}>×</button>
         </div>
-        <div className={styles["NotificationPanel-list"]}>로딩 중...</div>
+        <div className={styles["NotificationPanel-list"]}></div>
       </div>
     );
   }

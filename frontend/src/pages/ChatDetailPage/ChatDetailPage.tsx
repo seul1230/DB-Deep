@@ -3,8 +3,9 @@ import { useRef, useState, Suspense, useCallback } from 'react';
 import { ChatBubbleUser } from '@/features/chat/components/ChatBubbleUser/ChatBubbleUser';
 import { ChatBubbleDBDeep } from '@/features/chat/components/ChatBubbleDBDeep/ChatBubbleDBDeep';
 import { ChartCanvas } from '@/features/chat/components/ChartCanvas/ChartCanvas';
-import styles from './ChatDetailPage.module.css'; // ✅ 모듈 CSS import
+import styles from './ChatDetailPage.module.css';
 import QuestionInput from '@/shared/ui/QuestionInput/QuestionInput';
+import Button from '@/shared/ui/Button/Button';
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
@@ -66,11 +67,10 @@ const ChatDetailPage = () => {
     }
   }, []);
 
-  const currentChatList = Number(chatId) === 1 ? dummyChatList : [];
+  const currentChatList = chatId && Number(chatId) === 1 ? dummyChatList : [];
 
   return (
     <div className={styles['chatDetailPage-outer']}>
-      {/* 채팅 영역 */}
       <div className={styles['chatDetailPage-scrollArea']} ref={chatBoxRef}>
         <div className={styles['chatDetailPage-chatBox']}>
           {currentChatList.length === 0 ? (
@@ -83,11 +83,11 @@ const ChatDetailPage = () => {
                 <ChatBubbleUser key={msg.id} text={msg.text} />
               ) : (
                 <ChatBubbleDBDeep
-                key={msg.id}
-                text={msg.text}
-                onChartClick={handleChartClick}
-                onTyping={scrollToBottom}
-              />
+                  key={msg.id}
+                  text={msg.text}
+                  onChartClick={handleChartClick}
+                  onTyping={scrollToBottom}
+                />
               )
             )
           )}
@@ -100,9 +100,17 @@ const ChatDetailPage = () => {
         </Suspense>
       </div>
 
-      {/* ✅ 하단 입력창 */}
       <div className={styles['chatDetailPage-inputWrapper']}>
+      <div className={styles['chatDetailPage-inputArea']}>
         <QuestionInput onChange={(text) => console.log('입력:', text)} />
+        <Button
+          label="지금까지의 채팅 공유"
+          onClick={() => alert('지금까지의 채팅을 공유합니다!')}
+          borderColor="var(--icon-blue)"
+          backgroundColor="var(--icon-blue)"
+          textColor="var(--background-color)"
+        />
+      </div>
       </div>
     </div>
   );

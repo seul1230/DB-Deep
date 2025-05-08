@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./MainPage.module.css";
 import QuestionInput from "@/shared/ui/QuestionInput/QuestionInput";
-import RecommendedList from "@/shared/ui/RecommendedList/RecommendedList";
+import RecommendedList from "@/features/chat/components/RecommendedList/RecommendedList";
 
 const recommendedQuestions = [
   "마케팅 캠페인 전후의 전환율 차이를 알려줘",
