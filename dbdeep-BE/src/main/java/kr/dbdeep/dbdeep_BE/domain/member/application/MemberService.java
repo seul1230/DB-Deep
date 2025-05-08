@@ -3,6 +3,7 @@ package kr.dbdeep.dbdeep_BE.domain.member.application;
 import java.util.List;
 import kr.dbdeep.dbdeep_BE.domain.member.dto.MemberDto;
 import kr.dbdeep.dbdeep_BE.domain.member.entity.Member;
+import kr.dbdeep.dbdeep_BE.domain.member.infrastructure.MemberQueryRepository;
 import kr.dbdeep.dbdeep_BE.domain.member.infrastructure.MemberRepository;
 import kr.dbdeep.dbdeep_BE.global.code.ErrorCode;
 import kr.dbdeep.dbdeep_BE.global.exception.CommonException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberService {
 
+    private final MemberQueryRepository memberQueryRepository;
     private final MemberRepository memberRepository;
 
     public List<MemberDto> findAll() {
@@ -20,6 +22,10 @@ public class MemberService {
                 .stream()
                 .map(MemberDto::from)
                 .toList();
+    }
+
+    public List<MemberDto> search(String name, String email, String teamName) {
+        return memberQueryRepository.searchByOneCondition(name, email, teamName);
     }
 
     public Member findById(Integer id) {
