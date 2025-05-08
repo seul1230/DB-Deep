@@ -1,4 +1,3 @@
-// SearchPage.tsx
 import React, { useState } from "react";
 import styles from "./SearchPage.module.css";
 import SearchInput from "@/features/search/SearchInput/SearchInput";

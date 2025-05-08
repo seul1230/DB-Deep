@@ -1,7 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "@/widgets/Sidebar/Sidebar";
-import Logo from "@/shared/ui/Logo/Logo";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import NotificationPanel from "../NotificationPanel/NotificationPanel";
 import ChatLogPanel from "../ChatLogPanel/ChatLogPanel";

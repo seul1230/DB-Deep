@@ -76,7 +76,7 @@ const LoginPage: React.FC = () => {
         <div className={styles["LoginPage-right"]}>
           <div className={styles["LoginPage-box"]}>
 
-            {/* ✅ 모바일 전용 로고, theme 기반 src 적용 */}
+            {/* 모바일 전용 로고, theme 기반 src 적용 */}
             <img
               src={theme === "dark" ? logoDark : logoLight}
               alt="Logo"

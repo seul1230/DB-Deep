@@ -30,7 +30,7 @@
     max-width: 680px; 
     height: 1px;
     background-color: var(--light-gray);
-    margin-top: -24px;  /* 제목과 너무 멀어지지 않도록 */
+    margin-top: -24px;
     margin-bottom: 24px;
   }
   

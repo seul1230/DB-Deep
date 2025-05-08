@@ -1,4 +1,3 @@
-// src/features/auth/hooks/useAuth.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 

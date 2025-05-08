@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from "react";
+import { forwardRef, useState } from "react";
 import styles from "./ChatLogItemMenu.module.css";
 import { FiEdit3, FiFolderPlus, FiChevronRight } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";

@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ChatLogPanel.module.css";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import { useChatRooms } from "@/features/chat/useChatRooms";
 import dayjs from "dayjs";
 import ChatLogItemMenu from "../ChatLogOverlay/ChatLogItemMenu";
-import ProjectSelectorOverlay from "../ProjectSelectorOverlay/ProjectSelectorOverlay";
-import { useOverlayStore } from "@/shared/store/overlayStore";
+import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
 
 const ChatLogPanel: React.FC = () => {
   const { closePanel } = usePanelStore();

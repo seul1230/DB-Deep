@@ -1,4 +1,3 @@
-// ArchivePage.tsx
 import styles from "./ArchivePage.module.css";
 import SectionTitle from "@/entities/archive/SectionTitle/SectionTitle";
 import ArchiveCard from "@/entities/archive/ArchiveCard/ArchiveCard";
