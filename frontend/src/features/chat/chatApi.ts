@@ -1,4 +1,3 @@
-// src/features/chat/hooks/chatApi.ts
 import axios from '@/shared/api/axios';
 
 export interface ChatRoom {
@@ -25,4 +24,12 @@ export const fetchChatRooms = async (
   });
 
   return response.data.result;
+};
+
+export const shareChat = async (chatId: string, targetIds: string[]) => {
+  const response = await axios.post("/chats/share", {
+    chatId,
+    targets: targetIds,
+  });
+  return response.data;
 };

@@ -6,7 +6,7 @@
     box-sizing: border-box;
     min-height: 48px;
     resize: none;
-    border: none;
+    border: 1px solid var(--gray-text);
     padding: 12px 20px;
     border-radius: 12px;
     font-size: 16px;
@@ -16,11 +16,12 @@
     box-shadow: 0 2px 4px var(--modal-overlay-bg);
     transition: height 0.2s ease;
     overflow-y: auto;
+    background-color: var(--background-color);
   }
   
   @media (max-width: 768px) {
     .QuestionInput-input {
-      width: 90%;
+      width: 100%;
       font-size: 15px;
     }
   }
