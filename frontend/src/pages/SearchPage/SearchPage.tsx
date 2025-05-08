@@ -1,9 +1,9 @@
 // SearchPage.tsx
 import React, { useState } from "react";
 import styles from "./SearchPage.module.css";
-import SearchInput from "@/features/search/components/SearchInput/SearchInput";
-import SearchTabs from "@/features/search/components/SearchTabs/SearchTabs";
-import SearchCard from "@/features/search/components/SearchCard/SearchCard";
+import SearchInput from "@/features/search/SearchInput/SearchInput";
+import SearchTabs from "@/features/search/SearchTabs/SearchTabs";
+import SearchCard from "@/entities/search/SearchCard/SearchCard";
 
 interface SearchResult {
   id: number;

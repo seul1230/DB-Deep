@@ -1,7 +1,7 @@
 // ArchivePage.tsx
 import styles from "./ArchivePage.module.css";
-import SectionTitle from "@/features/archive/components/SectionTitle/SectionTitle";
-import ArchiveCard from "@/features/archive/components/ArchiveCard/ArchiveCard";
+import SectionTitle from "@/entities/archive/SectionTitle/SectionTitle";
+import ArchiveCard from "@/entities/archive/ArchiveCard/ArchiveCard";
 
 const ArchivePage = () => {
   const cards = [

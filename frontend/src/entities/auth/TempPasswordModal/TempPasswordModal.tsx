@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./TempPasswordModal.module.css";
 import { FiMail, FiX } from "react-icons/fi";
 import Button from "@/shared/ui/Button/Button";
-import { useSendEmail, useVerifyCode } from "../../hooks/authApi";
+import { useSendEmail, useVerifyCode } from "@/features/auth/useEmail";
 
 interface TempPasswordModalProps {
   onClose: () => void;

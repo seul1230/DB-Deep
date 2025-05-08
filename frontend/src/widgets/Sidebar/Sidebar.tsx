@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import defaultProfileImage from "@/assets/default-profile.jpg";
 import { useThemeStore } from "@/shared/store/themeStore";
 import ProfileOverlay from "../ProfileOverlay/ProfileOverlay";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 import { usePanelStore } from "@/shared/store/usePanelStore"; //
 
 const profileImageUrl: string | null = null;

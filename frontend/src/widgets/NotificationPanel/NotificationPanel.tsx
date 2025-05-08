@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import styles from "./NotificationPanel.module.css";
 import { FiBell } from "react-icons/fi";
 import { usePanelStore } from "@/shared/store/usePanelStore";
-import { useNotifications } from "@/features/notifications/hooks/useNotifications";
+import { useNotifications } from "@/features/notifications/useNotifications";
 import dayjs from "dayjs";
 import "dayjs/locale/ko";
 import relativeTime from "dayjs/plugin/relativeTime";

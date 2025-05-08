@@ -1,6 +1,6 @@
-// src/features/auth/hooks/useLogin.ts
 import { useMutation } from "@tanstack/react-query";
-import { login, LoginRequest, LoginResponse } from "@/shared/api/auth";
+import { LoginRequest, LoginResponse } from "./authTypes";
+import { login } from "./authApi";
 import { AxiosError } from "axios";
 import { useAuth } from "./useAuth";
 

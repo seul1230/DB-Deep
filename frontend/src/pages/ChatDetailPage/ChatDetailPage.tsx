@@ -1,8 +1,8 @@
 import { useParams } from 'react-router-dom';
 import { useRef, useState, Suspense, useCallback } from 'react';
-import { ChatBubbleUser } from '@/features/chat/components/ChatBubbleUser/ChatBubbleUser';
-import { ChatBubbleDBDeep } from '@/features/chat/components/ChatBubbleDBDeep/ChatBubbleDBDeep';
-import { ChartCanvas } from '@/features/chat/components/ChartCanvas/ChartCanvas';
+import { ChatBubbleUser } from '@/entities/chat/ChatBubbleUser/ChatBubbleUser';
+import { ChatBubbleDBDeep } from '@/entities/chat/ChatBubbleDBDeep/ChatBubbleDBDeep';
+import { ChartCanvas } from '@/entities/chat/ChartCanvas/ChartCanvas';
 import styles from './ChatDetailPage.module.css';
 import QuestionInput from '@/shared/ui/QuestionInput/QuestionInput';
 import Button from '@/shared/ui/Button/Button';

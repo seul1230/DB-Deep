@@ -4,13 +4,13 @@ import loginLeftImage from "../../assets/loginLeftSide.png";
 import { FiEye, FiEyeOff, FiMail, FiLock } from "react-icons/fi";
 import { lazy, Suspense } from "react";
 import { AxiosError } from "axios";
-import { useLogin } from "@/features/auth/hooks/useLogin";
+import { useLogin } from "@/features/auth/useLogin";
 import { useNavigate } from "react-router-dom";
 import logoLight from "../../assets/logo.png";
 import logoDark from "../../assets/logo-dark.png";
 import { useThemeStore } from "@/shared/store/themeStore";
 
-const TempPasswordModal = lazy(() => import("@/features/auth/components/TempPasswordModal/TempPasswordModal"));
+const TempPasswordModal = lazy(() => import("@/entities/auth/TempPasswordModal/TempPasswordModal"));
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
