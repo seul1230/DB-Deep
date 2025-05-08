@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 
 @Slf4j
@@ -62,12 +61,12 @@ public class CommonExceptionHandler {
                 .body(JSONResponse.onFailure(e.getErrorCode()));
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<?> handleNoResourceFound(NoResourceFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(JSONResponse.onFailure(ErrorCode.NOT_FOUND));
-    }
+//    @ExceptionHandler(NoResourceFoundException.class)
+//    public ResponseEntity<?> handleNoResourceFound(NoResourceFoundException ex) {
+//        return ResponseEntity
+//                .status(HttpStatus.NOT_FOUND)
+//                .body(JSONResponse.onFailure(ErrorCode.NOT_FOUND));
+//    }
 
 
     // 서버 내부 오류 (SQL 연결 오류 등) 처리

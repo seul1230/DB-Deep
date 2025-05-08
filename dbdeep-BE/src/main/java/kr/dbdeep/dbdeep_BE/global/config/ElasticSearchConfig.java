@@ -1,29 +1,31 @@
 package kr.dbdeep.dbdeep_BE.global.config;
 
-import org.elasticsearch.client.RestHighLevelClient;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.client.ClientConfiguration;
-import org.springframework.data.elasticsearch.client.RestClients;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 
 @Configuration
 public class ElasticSearchConfig {
 
-    @Value("${spring.data.elasticsearch.uris}")
+    @Value("${spring.elasticsearch.uris}")
     private String url;
 
     @Bean
-    public RestHighLevelClient restHighLevelClient() {
-        ClientConfiguration clientConfiguration = ClientConfiguration.builder()
-                .connectedTo(url)
-                .build();
-        return RestClients.create(clientConfiguration).rest();
+    public RestClient restClient() {
+        return RestClient.builder(HttpHost.create(url)).build();
     }
 
     @Bean
-    public ElasticsearchRestTemplate elasticsearchTemplate(RestHighLevelClient client) {
-        return new ElasticsearchRestTemplate(client);
+    public ElasticsearchClient elasticsearchClient(RestClient restClient) {
+        RestClientTransport transport = new RestClientTransport(
+                restClient,
+                new JacksonJsonpMapper()
+        );
+        return new ElasticsearchClient(transport);
     }
 }

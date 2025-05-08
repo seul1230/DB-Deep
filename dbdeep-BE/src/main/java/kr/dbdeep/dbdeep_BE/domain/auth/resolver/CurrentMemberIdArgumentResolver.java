@@ -1,10 +1,7 @@
 package kr.dbdeep.dbdeep_BE.domain.auth.resolver;
 
-import kr.dbdeep.dbdeep_BE.domain.auth.entity.CustomUserDetails;
 import kr.dbdeep.dbdeep_BE.domain.auth.annotation.CurrentMemberId;
 import org.springframework.core.MethodParameter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -26,18 +23,16 @@ public class CurrentMemberIdArgumentResolver implements HandlerMethodArgumentRes
             ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
-    ) throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("로그인 정보가 없습니다.");
+    ) {
+        String memberIdHeader = webRequest.getHeader("X-Member-Id");
+        if (memberIdHeader == null) {
+            throw new IllegalStateException("X-Member-Id 헤더가 없습니다.");
         }
 
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof CustomUserDetails customUserDetails) {
-            return customUserDetails.getMemberId();
+        try {
+            return Integer.parseInt(memberIdHeader);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("X-Member-Id 값이 정수가 아닙니다.", e);
         }
-
-        throw new IllegalStateException("memberId를 추출할 수 없습니다.");
     }
 }
