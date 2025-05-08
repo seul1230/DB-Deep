@@ -44,7 +44,7 @@ const dummyCharts: Record<string, ChartData> = {
   },
 };
 
-export const ChartCanvas = ({ chartId, onClose }: ChartCanvasProps) => {
+const ChartCanvas = ({ chartId, onClose }: ChartCanvasProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [plotlyElement, setPlotlyElement] = useState<PlotlyHTMLElement | null>(null);
 
@@ -93,3 +93,5 @@ export const ChartCanvas = ({ chartId, onClose }: ChartCanvasProps) => {
     </div>
   );
 };
+
+export default ChartCanvas;

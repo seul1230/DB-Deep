@@ -1,12 +1,13 @@
 import { useParams } from 'react-router-dom';
-import { useRef, useState, Suspense, useCallback } from 'react';
+import React, { useRef, useState, Suspense, useCallback } from 'react';
 import { ChatBubbleUser } from '@/entities/chat/ChatBubbleUser/ChatBubbleUser';
 import { ChatBubbleDBDeep } from '@/entities/chat/ChatBubbleDBDeep/ChatBubbleDBDeep';
-import { ChartCanvas } from '@/entities/chat/ChartCanvas/ChartCanvas';
 import styles from './ChatDetailPage.module.css';
 import QuestionInput from '@/shared/ui/QuestionInput/QuestionInput';
 import Button from '@/shared/ui/Button/Button';
-import TeamMemberSelectModal from '@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal';
+
+const ChartCanvas = React.lazy(() => import('@/entities/chat/ChartCanvas/ChartCanvas'));
+const TeamMemberSelectModal = React.lazy(() => import("@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal"));
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
@@ -115,18 +116,17 @@ const ChatDetailPage = () => {
         </div>
       </div>
 
+      <Suspense fallback={<div style={{ display: "none" }} />}>
       {showModal && (
-      <TeamMemberSelectModal
-        onClose={() => setShowModal(false)}
-        onSelect={(memberId) => {
-          alert(`팀원 ${memberId}에게 공유했습니다!`);
-          setShowModal(false);
-        }}
-        onShare={(selectedMembers) => {
-          console.log('공유할 멤버:', selectedMembers);
-        }}
-      />
-    )}
+        <TeamMemberSelectModal
+          onClose={() => setShowModal(false)}
+          onSelect={(memberId) => {
+            alert(`팀원 ${memberId}에게 공유했습니다!`);
+            setShowModal(false);
+          }}
+        />
+      )}
+      </Suspense>
     </div>
   );
 };
