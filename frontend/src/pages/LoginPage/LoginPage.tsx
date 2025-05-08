@@ -15,7 +15,7 @@ const TempPasswordModal = lazy(() => import("@/entities/auth/TempPasswordModal/T
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState<boolean>(false); // << 추가해야 함
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showModal, setShowModal] = useState(false);
   const [isClosing, setIsClosing] = useState(false);    
   const loginMutation = useLogin();
