@@ -1,6 +1,6 @@
 .container {
   width: 100%;
-  padding: 84px 32px 80px;
+  padding: auto 32px 80px;
   box-sizing: border-box;
   background-color: var(--background-color);
   display: flex;

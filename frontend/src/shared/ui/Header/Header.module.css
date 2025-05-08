@@ -1,0 +1,19 @@
+.header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background-color: var(--background-color);
+    display: flex;
+    align-items: center;
+    padding-left: 96px;
+    z-index: 20;
+    border-bottom: 1px solid var(--light-gray);
+  }
+  
+  .logo {
+    width: 100px;
+    height: auto;
+    cursor: pointer;
+  }
