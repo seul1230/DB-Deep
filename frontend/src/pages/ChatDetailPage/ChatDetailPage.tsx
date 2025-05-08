@@ -6,7 +6,7 @@ import { ChartCanvas } from '@/entities/chat/ChartCanvas/ChartCanvas';
 import styles from './ChatDetailPage.module.css';
 import QuestionInput from '@/shared/ui/QuestionInput/QuestionInput';
 import Button from '@/shared/ui/Button/Button';
-import TeamMemberSelectModal from '@/features/chat/TeamMemberSelectModal/TeamMemberSelectModal';
+import TeamMemberSelectModal from '@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal';
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
