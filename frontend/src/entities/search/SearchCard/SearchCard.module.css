@@ -69,7 +69,7 @@
   }
   
   .moreIcon {
-    color: var(--icon-blue);
+    color: var(--gray-text);
     margin-left: 8px;
     cursor: pointer;
   }

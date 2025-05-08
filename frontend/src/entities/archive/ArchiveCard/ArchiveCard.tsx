@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useRef } from "react";
 import styles from "./ArchiveCard.module.css";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
-import ArchiveOverlay from "@/widgets/ArchiveOverlay/ArchiveOverlay";
-import { useArchiveOverlayStore } from "@/shared/store/useArchiveOverlayStore";
+import CardOverlay from "@/shared/ui/Card/CardOverlay";
+import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
 
 interface Props {
   id: string;
@@ -15,7 +15,19 @@ interface Props {
 }
 
 const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData, chartData, onClick }) => {
-  const toggleOverlay = useArchiveOverlayStore((state) => state.toggleOverlayForTarget);
+  const moreIconRef = useRef<HTMLDivElement>(null);
+  const { toggleOverlayForTarget, isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
+
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rect = moreIconRef.current?.getBoundingClientRect();
+    if (rect) {
+      toggleOverlayForTarget(
+        { top: rect.bottom + window.scrollY, left: rect.left + window.scrollX + 8 },
+        id
+      );
+    }
+  };
 
   return (
     <div className={styles.card} onClick={onClick}>
@@ -28,14 +40,11 @@ const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData,
           </div>
           <div
             className={styles.moreIcon}
-            onClick={(e) => {
-              e.stopPropagation(); // 이미 document에서 외부 클릭 감지하고 있으므로 이것만으로 충분
-              const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-              toggleOverlay({ top: rect.bottom + 4, left: rect.left }, id);
-            }}
+            onClick={handleMoreClick}
+            ref={moreIconRef}
           >
-        <FiMoreVertical />
-      </div>
+            <FiMoreVertical />
+          </div>
         </div>
       </div>
 
@@ -55,9 +64,7 @@ const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData,
             <tbody>
               {tableData.map((row, i) => (
                 <tr key={i}>
-                  {row.map((cell, j) => (
-                    <td key={j}>{cell}</td>
-                  ))}
+                  {row.map((cell, j) => <td key={j}>{cell}</td>)}
                 </tr>
               ))}
             </tbody>
@@ -79,7 +86,16 @@ const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData,
         </div>
       )}
 
-      <ArchiveOverlay />
+      {isOpen && targetId === id && (
+        <CardOverlay
+          position={position}
+          targetId={id}
+          onCopy={(id) => console.log("복사:", id)}
+          onDelete={(id) => console.log("삭제:", id)}
+          showDelete
+          onClose={closeOverlay}
+        />
+      )}
     </div>
   );
 };

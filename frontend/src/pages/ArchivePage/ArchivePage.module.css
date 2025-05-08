@@ -1,18 +1,18 @@
 .container {
   width: 100%;
-  padding: auto 32px 80px;
+  min-height: 100vh;
   box-sizing: border-box;
   background-color: var(--background-color);
   display: flex;
   justify-content: center;
+  padding: 0 32px 80px;
 }
 
 .inner {
   width: 100%;
   max-width: 960px;
   box-sizing: border-box;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 0 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
