@@ -1,0 +1,24 @@
+.ProjectSelectorOverlay {
+  background: var(--background-color);
+  border: 1px solid var(--light-gray);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  padding: 12px;
+  width: 240px;
+  z-index: 1002;
+}
+
+.ProjectItem {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--text-color);
+  transition: background 0.2s;
+}
+
+.ProjectItem:hover {
+  background-color: var(--primary-light-blue);
+}

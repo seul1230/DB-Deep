@@ -6,6 +6,7 @@ import ArchiveCard from "@/entities/archive/ArchiveCard/ArchiveCard";
 const ArchivePage = () => {
   const cards = [
     {
+      id: "1",
       title: "세그먼트 구매 패턴",
       date: "2025년 4월 23일 오후 4시 32분",
       description: "고객 세그먼트별 구매 패턴 분석 결과입니다.",
@@ -17,6 +18,7 @@ const ArchivePage = () => {
       ],
     },
     {
+      id: "2",
       title: "마케팅 캠페인 전후의 전환율",
       date: "2025년 2월 11일 오전 9시 02분",
       chartData: [

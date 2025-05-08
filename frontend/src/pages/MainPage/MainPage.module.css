@@ -1,7 +1,6 @@
 .MainPage-container {
   padding: 160px 60px 60px;
   background-color: var(--background-color);
-  margin-left: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -3,6 +3,7 @@
     height: 100vh;
     background: var(--background-color);
     border-left: 1px solid var(--light-gray);
+    border-right: 1px solid var(--light-gray);
     display: flex;
     flex-direction: column;
     z-index: 5;
@@ -91,6 +92,7 @@
     font-size: 18px;
     color: var(--gray-text);
     margin-left: 8px;
+    margin-top: 4px;
   }
   
   /* 스크롤바 */

@@ -1,24 +1,22 @@
 import React from "react";
 import styles from "./ArchiveCard.module.css";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
+import ArchiveOverlay from "@/widgets/ArchiveOverlay/ArchiveOverlay";
+import { useArchiveOverlayStore } from "@/shared/store/useArchiveOverlayStore";
 
 interface Props {
+  id: string;
   title: string;
   date: string;
   description?: string;
   tableData?: string[][];
   chartData?: { label: string; value: number }[];
-  onClick?: () => void; // 클릭 이벤트 추가
+  onClick?: () => void;
 }
 
-const ArchiveCard: React.FC<Props> = ({
-  title,
-  date,
-  description,
-  tableData,
-  chartData,
-  onClick,
-}) => {
+const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData, chartData, onClick }) => {
+  const toggleOverlay = useArchiveOverlayStore((state) => state.toggleOverlayForTarget);
+
   return (
     <div className={styles.card} onClick={onClick}>
       <div className={styles.meta}>
@@ -28,13 +26,16 @@ const ArchiveCard: React.FC<Props> = ({
             <div className={styles.title}>{title}</div>
             <div className={styles.date}>{date}</div>
           </div>
-          <FiMoreVertical
+          <div
             className={styles.moreIcon}
             onClick={(e) => {
-              e.stopPropagation(); // 카드 클릭 이벤트 방지
-              console.log("더보기 클릭");
+              e.stopPropagation(); // 이미 document에서 외부 클릭 감지하고 있으므로 이것만으로 충분
+              const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+              toggleOverlay({ top: rect.bottom + 4, left: rect.left }, id);
             }}
-          />
+          >
+        <FiMoreVertical />
+      </div>
         </div>
       </div>
 
@@ -77,6 +78,8 @@ const ArchiveCard: React.FC<Props> = ({
           ))}
         </div>
       )}
+
+      <ArchiveOverlay />
     </div>
   );
 };

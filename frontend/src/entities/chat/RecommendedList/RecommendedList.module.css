@@ -23,7 +23,7 @@
   }
   
   .RecommendedList-listItem:hover {
-    background-color: #f5f6fa;
+    background-color: var(--sidebar-bg);
   }
   
   .RecommendedList-listItem span {
