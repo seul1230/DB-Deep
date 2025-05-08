@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ChatLogPanel.module.css";
 import { usePanelStore } from "@/shared/store/usePanelStore";
-import { useChatRooms } from "@/features/chatLog/hooks/useChatRooms";
+import { useChatRooms } from "@/features/chat/useChatRooms";
 import dayjs from "dayjs";
 
 const ChatLogPanel: React.FC = () => {

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -12,7 +12,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = useAuth.getState().accessToken;
 
-  // 로그인 요청에는 Authorization 헤더 제외
+  // Authorization 헤더 제외
   if (
     token &&
     config.url &&

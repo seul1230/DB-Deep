@@ -1,6 +1,6 @@
 import { lazy, useEffect } from "react";
 import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useAuth } from "@/features/auth/useAuth";
 import Layout from "../widgets/Layout/Layout";
 import ProtectedRoute from "./ProtectedRoute";
 import SearchPage from "@/pages/SearchPage/SearchPage";
