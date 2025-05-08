@@ -12,19 +12,22 @@ python-dotenv==1.0.1
 httpx==0.27.0
 
 # --- LangChain 핵심 구성 요소
-langchain
-langchain-core
-langchain-community
+langchain==0.3.21 ; python_version >= "3.11" and python_version < "3.12"
+langchain-community==0.3.20 ; python_version >= "3.11" and python_version < "3.12"
+langchain-core==0.3.45 ; python_version >= "3.11" and python_version < "3.12"
+langchain-huggingface==0.1.2 ; python_version >= "3.11" and python_version < "3.12"
+langchain-text-splitters==0.3.7 ; python_version >= "3.11" and python_version < "3.12"
 langchain-pinecone
 
 # --- Pinecone 벡터스토어
-pinecone-client==3.1.0
+pinecone
 
 # --- 임베딩 및 reranking 모델
-transformers==4.39.3
+transformers==4.49.0 ; python_version >= "3.11" and python_version < "3.12"
 torch==2.2.2
-sentence-transformers==2.5.1
+sentence-transformers
 scikit-learn==1.4.2
+tokenizers==0.21.1 ; python_version >= "3.11" and python_version < "3.12"
 
 # --- 문서 로딩, 전처리
 pandas==2.2.2

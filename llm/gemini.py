@@ -9,7 +9,7 @@ from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.outputs import GenerationChunk
 from langchain_core.language_models.llms import LLM
 
-class GeminiViaGMS(LLM):
+class GeminiStreamingViaGMS(LLM):
     model_name: str = "gemini-2.0-flash:streamGenerateContent"
     api_key: str = ""
     api_base: str = "https://gms.p.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta"
@@ -19,7 +19,7 @@ class GeminiViaGMS(LLM):
 
     @property
     def _llm_type(self) -> str:
-        return "gemini-via-gms"
+        return "gemini-streaming-via-gms"
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
         url = f"{self.api_base}/models/{self.model_name}?key={self.api_key}"
@@ -74,3 +74,34 @@ class GeminiViaGMS(LLM):
                     await asyncio.sleep(0.2)
                 except Exception:
                     continue
+                
+                
+class GeminiSyncViaGMS(LLM):
+    model_name: str = "gemini-2.0-flash:generateContent"
+    api_key: str = ""
+    api_base: str = "https://gms.p.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta"
+
+    @property
+    def _llm_type(self) -> str:
+        return "gemini-sync-via-gms"
+
+    def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
+        url = f"{self.api_base}/models/{self.model_name}?key={self.api_key}"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "contents": [
+                {
+                    "parts": [{"text": prompt}]
+                }
+            ]
+        }
+        timeout = httpx.Timeout(60.0)
+        with httpx.Client(timeout=timeout) as client:
+            response = client.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            result = response.json()
+
+            try:
+                return result['candidates'][0]['content']['parts'][0]['text']
+            except Exception as e:
+                raise ValueError(f"응답 파싱 오류: {e}\n전체 응답: {result}")
