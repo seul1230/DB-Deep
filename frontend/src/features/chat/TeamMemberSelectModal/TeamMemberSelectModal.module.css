@@ -1,0 +1,157 @@
+.TeamMemberSelectModal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--modal-overlay-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+  
+.TeamMemberSelectModal-container {
+  background: var(--background-color);
+  border-radius: 20px;
+  width: 500px;
+  max-width: 70%;
+  padding: 25px 20px;
+  box-sizing: border-box;
+}
+  
+.TeamMemberSelectModal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+  
+.TeamMemberSelectModal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--icon-blue)
+}
+  
+.TeamMemberSelectModal-searchWrapper {
+  position: relative;
+  margin-bottom: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+  
+.TeamMemberSelectModal-searchIcon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: var(--icon-blue);
+}
+  
+.TeamMemberSelectModal-searchInput {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid var(--icon-blue);
+  border-radius: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background-color: var(--background-color);
+}
+  
+.TeamMemberSelectModal-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--icon-blue);
+  border-radius: 10px;
+  padding: 10px;
+}
+  
+.TeamMemberSelectModal-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-radius: 8px;
+  padding: 10px 10px;
+}
+  
+.TeamMemberSelectModal-item:hover {
+  background-color: var(--primary-light-blue);
+}
+  
+.TeamMemberSelectModal-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--icon-blue);
+  border-radius: 4px;
+  background-color: var(--background-color);
+  position: relative;
+  cursor: pointer;
+}
+  
+.TeamMemberSelectModal-item input[type="checkbox"]:checked::after {
+  content: "✔";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--icon-blue);
+  font-size: 14px;
+}
+  
+.TeamMemberSelectModal-profile {
+  display: flex;
+  align-items: center;
+}
+  
+.TeamMemberSelectModal-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  margin-right: 14px;
+  border: 1px solid var(--icon-blue);
+  object-fit: cover;
+}
+  
+.TeamMemberSelectModal-text {
+  display: flex;
+  flex-direction: column;
+}
+  
+.TeamMemberSelectModal-name {
+  font-weight: 600;
+}
+
+.TeamMemberSelectModal-email {
+  font-size: 12px;
+  color: var(--gray-text);
+}
+  
+.TeamMemberSelectModal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.TeamMemberSelectModal-footer span {
+  color: var(--gray-text);
+  font-size: 14px;
+  margin-left: 5px;
+}
+  
+.TeamMemberSelectModal-buttons button {
+  padding: 8px 12px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s, border 0.3s;
+}
+  
+.TeamMemberSelectModal-buttons button:hover {
+  filter: brightness(0.9);
+}

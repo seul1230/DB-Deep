@@ -6,11 +6,13 @@ import { ChartCanvas } from '@/entities/chat/ChartCanvas/ChartCanvas';
 import styles from './ChatDetailPage.module.css';
 import QuestionInput from '@/shared/ui/QuestionInput/QuestionInput';
 import Button from '@/shared/ui/Button/Button';
+import TeamMemberSelectModal from '@/features/chat/TeamMemberSelectModal/TeamMemberSelectModal';
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const [showChart, setShowChart] = useState(false);
   const [selectedChartId, setSelectedChartId] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
@@ -52,6 +54,25 @@ const ChatDetailPage = () => {
       `,
     },
   ];
+
+  const dummyMembers = [
+    {
+      id: '1',
+      name: '이승우',
+      email: 'lsw@dbdeep.com',
+      team: '데이터분석팀',
+      avatarUrl: '/avatars/lsw.png',
+    },
+    {
+      id: '2',
+      name: '박경완',
+      email: 'pkw@dbdeep.com',
+      team: '데이터분석팀',
+      avatarUrl: '/avatars/pkw.png',
+    },
+    // ... 추가
+  ];
+  
 
   const handleChartClick = (chartId: string) => {
     setSelectedChartId(chartId);
@@ -101,17 +122,31 @@ const ChatDetailPage = () => {
       </div>
 
       <div className={styles['chatDetailPage-inputWrapper']}>
-      <div className={styles['chatDetailPage-inputArea']}>
-        <QuestionInput onChange={(text) => console.log('입력:', text)} />
-        <Button
-          label="지금까지의 채팅 공유"
-          onClick={() => alert('지금까지의 채팅을 공유합니다!')}
-          borderColor="var(--icon-blue)"
-          backgroundColor="var(--icon-blue)"
-          textColor="var(--background-color)"
+        <div className={styles['chatDetailPage-inputArea']}>
+          <QuestionInput onChange={(text) => console.log('입력:', text)} />
+          <Button
+            label="지금까지의 채팅 공유"
+            onClick={() => setShowModal(true)}
+            borderColor="var(--icon-blue)"
+            backgroundColor="var(--icon-blue)"
+            textColor="var(--background-color)"
+          />
+        </div>
+      </div>
+
+      {showModal && (
+        <TeamMemberSelectModal
+          members={dummyMembers}
+          onClose={() => setShowModal(false)}
+          onSelect={(memberId) => {
+            alert(`팀원 ${memberId}에게 공유했습니다!`);
+            setShowModal(false);
+          }}
+          onShare={(selectedMembers) => {
+            console.log('공유할 멤버:', selectedMembers);
+          }}
         />
-      </div>
-      </div>
+      )}
     </div>
   );
 };

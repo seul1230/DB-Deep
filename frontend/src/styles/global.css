@@ -37,5 +37,5 @@ body.dark {
   --yellow: #facc15;
   --background-color: #18181b;
   --text-color: #f3f4f6;
-  --modal-overlay-bg: rgba(255, 255, 255, 0.1);
+  --modal-overlay-bg: rgba(255, 255, 255, 0.2);
 }
