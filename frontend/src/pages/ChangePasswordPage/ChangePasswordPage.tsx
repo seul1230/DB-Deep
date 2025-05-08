@@ -1,10 +1,13 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ChangePasswordPage.module.css";
 import { FiEye, FiEyeOff, FiLock } from "react-icons/fi";
+import { useChangePassword } from "@/features/auth/useChangePassword";
+import { AxiosError } from "axios";
 
 const ChangePasswordPage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const reason = location.state?.reason || "manual";
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -14,9 +17,38 @@ const ChangePasswordPage: React.FC = () => {
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  const { mutate, isPending } = useChangePassword();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("비밀번호가 변경되었습니다!");
+    if (newPassword !== confirmPassword) {
+      alert("새 비밀번호가 일치하지 않습니다.");
+      return;
+    }
+    mutate(
+      { password: currentPassword, newPassword },
+      {
+        onSuccess: (data) => {
+          alert(data.message);
+          navigate("/main");
+        },
+        onError: (error) => {
+          const axiosError = error as AxiosError;
+          const status = axiosError?.response?.status;
+          if (status === 400) {
+            alert("잘못된 요청입니다.");
+          } else if (status === 401) {
+            alert("로그인이 필요합니다.");
+          } else if (status === 403) {
+            alert("접근 권한이 없습니다.");
+          } else if (status === 500) {
+            alert("서버 오류가 발생했습니다.");
+          } else {
+            alert("알 수 없는 오류가 발생했습니다.");
+          }
+        },
+      }
+    );
   };
 
   return (
@@ -103,8 +135,12 @@ const ChangePasswordPage: React.FC = () => {
           </div>
         </div>
 
-        <button type="submit" className={styles["ChangePasswordPage-submitButton"]}>
-          비밀번호 변경
+        <button
+          type="submit"
+          className={styles["ChangePasswordPage-submitButton"]}
+          disabled={isPending}
+        >
+          {isPending ? "처리 중..." : "비밀번호 변경"}
         </button>
       </form>
     </div>
