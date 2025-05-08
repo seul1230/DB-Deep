@@ -38,10 +38,18 @@ const Sidebar: React.FC = () => {
   const handleChangePassword = () => {
     setShowOverlay(false);
     navigate("/change-password", { state: { reason: "manual" } });
-  };  
+  };
 
+  const handleGoToMain = () => {
+    navigate("/main");
+  };
+  
   const handleGoToSearch = () => {
     navigate("/search");
+  };
+
+  const handleGoToArchive = () => {
+    navigate("/archive");
   };
 
   return (
@@ -99,7 +107,14 @@ const Sidebar: React.FC = () => {
               style={{ cursor: "pointer" }}
             />
           </li>
-          <li><FiPlusSquare size={20} className={styles["Sidebar-icon"]} /></li>
+          <li>
+            <FiPlusSquare
+              size={20}
+              className={styles["Sidebar-icon"]}
+              onClick={handleGoToMain}
+              style={{ cursor: "pointer" }}
+            />
+          </li>
           <li>
             <PiChatsBold
               size={20}
@@ -108,7 +123,14 @@ const Sidebar: React.FC = () => {
               style={{ cursor: "pointer" }}
             />
           </li>
-          <li><LuBookmarkMinus size={20} className={styles["Sidebar-icon"]} /></li>
+          <li>
+            <LuBookmarkMinus
+              size={20}
+              className={styles["Sidebar-icon"]}
+              onClick={handleGoToArchive}
+              style={{ cursor: "pointer" }}
+            />
+          </li>
           <li>
             <FiFolderMinus
               size={20}
