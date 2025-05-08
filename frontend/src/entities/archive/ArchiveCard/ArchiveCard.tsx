@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import styles from "./ArchiveCard.module.css";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
-import CardOverlay from "@/shared/ui/Card/CardOverlay";
+import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
 import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
 
 interface Props {
