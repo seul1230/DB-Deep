@@ -1,6 +1,5 @@
 package kr.dbdeep.dbdeep_BE.domain.auth.application;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -9,16 +8,17 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.stream.Collectors;
-import kr.dbdeep.dbdeep_BE.domain.auth.entity.CustomUserDetails;
+import kr.dbdeep.dbdeep_BE.domain.auth.dto.TokenDto;
+import kr.dbdeep.dbdeep_BE.domain.member.entity.Member;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -64,38 +64,28 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String generateAccessToken(Authentication authentication) {
+    public TokenDto generateAuthenticationTokens(Member member) {
+        Authentication authentication = authenticate(member);
+        return TokenDto.builder()
+                .accessToken(generateAccessToken(authentication))
+                .refreshToken(generateRefreshToken(authentication))
+                .build();
+    }
+
+    private String generateAccessToken(Authentication authentication) {
         return generateToken(authentication, ACCESS_TOKEN_EXPIRE);
     }
 
-    public String generateRefreshToken(Authentication authentication) {
+    private String generateRefreshToken(Authentication authentication) {
         return generateToken(authentication, REFRESH_TOKEN_EXPIRE);
     }
 
-    public Authentication getAuthentication(String accessToken) {
-        Claims claims = parseClaims(accessToken);
-
-        Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get("auth").toString().split(","))
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-        Integer memberId = Integer.parseInt(claims.getSubject());
-
-        CustomUserDetails principal = new CustomUserDetails(memberId, "anonymous", null, authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
-    }
-
-    private Claims parseClaims(String accessToken) {
-        try {
-            Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
-            if (claims.get("auth") == null) {
-                throw new RuntimeException("권한 정보가 없는 토큰입니다.");
-            }
-            return claims;
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
+    private Authentication authenticate(Member member) {
+        User user = new User(
+                String.valueOf(member.getId()),
+                "",
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + member.getType().name()))
+        );
+        return new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
     }
 }

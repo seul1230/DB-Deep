@@ -57,7 +57,7 @@ public class MailService {
         Member member = memberService.findByEmail(request.getEmail());
         String newPassword = PasswordGenerator.generate(12);
         sendNewPasswordEmail("새 비밀번호 안내", request.getEmail(), newPassword);
-        member.updatePassword(passwordEncoder.encode(newPassword));
+        member.resetPassword(passwordEncoder.encode(newPassword));
     }
 
     public void sendNewPasswordEmail(String subject, String email, String newPassword) {

@@ -61,7 +61,19 @@ public class Member extends BaseTimeEntity {
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
 
+    @Builder.Default
+    @Column(name = "password_not_changed")
+    private Boolean passwordNotChanged = false;
+
+    public void resetPassword(String password) {
+        this.password = password;
+        passwordNotChanged = true;
+    }
+
     public void updatePassword(String password) {
         this.password = password;
+        passwordNotChanged = false;
     }
+
+
 }
