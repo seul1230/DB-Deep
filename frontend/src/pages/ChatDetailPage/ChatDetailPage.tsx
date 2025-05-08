@@ -53,26 +53,7 @@ const ChatDetailPage = () => {
 - **20대 여성 특화 멤버십 프로그램 출시 검토**
       `,
     },
-  ];
-
-  const dummyMembers = [
-    {
-      id: '1',
-      name: '이승우',
-      email: 'lsw@dbdeep.com',
-      team: '데이터분석팀',
-      avatarUrl: '/avatars/lsw.png',
-    },
-    {
-      id: '2',
-      name: '박경완',
-      email: 'pkw@dbdeep.com',
-      team: '데이터분석팀',
-      avatarUrl: '/avatars/pkw.png',
-    },
-    // ... 추가
-  ];
-  
+  ]; 
 
   const handleChartClick = (chartId: string) => {
     setSelectedChartId(chartId);
@@ -135,18 +116,17 @@ const ChatDetailPage = () => {
       </div>
 
       {showModal && (
-        <TeamMemberSelectModal
-          members={dummyMembers}
-          onClose={() => setShowModal(false)}
-          onSelect={(memberId) => {
-            alert(`팀원 ${memberId}에게 공유했습니다!`);
-            setShowModal(false);
-          }}
-          onShare={(selectedMembers) => {
-            console.log('공유할 멤버:', selectedMembers);
-          }}
-        />
-      )}
+      <TeamMemberSelectModal
+        onClose={() => setShowModal(false)}
+        onSelect={(memberId) => {
+          alert(`팀원 ${memberId}에게 공유했습니다!`);
+          setShowModal(false);
+        }}
+        onShare={(selectedMembers) => {
+          console.log('공유할 멤버:', selectedMembers);
+        }}
+      />
+    )}
     </div>
   );
 };
