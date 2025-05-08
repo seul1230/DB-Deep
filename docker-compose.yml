@@ -5,7 +5,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsSL http://localhost:9200/_cluster/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -fsSL http://localhost:9200/_cluster/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -54,9 +54,7 @@ services:
     build:
       context: ./dbdeep-BE
     env_file:
-      - ./.env 
-    ports:
-      - "8081:8080"
+      - ./.env
     environment:
       - FIRESTORE_CREDENTIAL_LOCATION=${FIRESTORE_CREDENTIAL_LOCATION}
       - SPRING_DATA_ELASTICSEARCH_URIS=elasticsearch:9200
@@ -78,6 +76,25 @@ services:
     restart: on-failure
     networks:
       - esnet
+
+  gateway:
+    build:
+      context: .
+      dockerfile: dbdeep-gateway/Dockerfile
+    env_file:
+      - ./.env
+    ports:
+      - "8081:8081"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - SPRING_DATA_ELASTICSEARCH_URIS=elasticsearch:9200
+      - SPRING_CONFIG_IMPORT=optional:file:.env[.properties]
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - esnet
+    restart: on-failure
 
   redis:
     image: redis:7.2
