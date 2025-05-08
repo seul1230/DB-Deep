@@ -39,6 +39,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .pathMatchers("/backend/api/auth/**").permitAll()
                         .pathMatchers(SecurityWhitelist.PERMIT_ALL.toArray(new String[0])).permitAll()
+                        .pathMatchers("/backend/api/auth/password/change").authenticated()
                         .anyExchange().authenticated()
                 )
                 .addFilterBefore(jwtAuthorizationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
