@@ -26,6 +26,20 @@ export const fetchChatRooms = async (
   return response.data.result;
 };
 
+export const updateChatTitle = async (chatId: string, newTitle: string) => {
+  const response = await axios.patch(
+    `/chats/${chatId}/title`,
+    { title: newTitle },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  return response.data;
+};
+
 export const shareChat = async (chatId: string, targetIds: string[]) => {
   const response = await axios.post("/chats/share", {
     chatId,
