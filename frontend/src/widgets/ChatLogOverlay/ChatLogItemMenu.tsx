@@ -3,7 +3,6 @@ import styles from "./ChatLogItemMenu.module.css";
 import { FiEdit3, FiFolderPlus, FiChevronRight } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import ProjectSelectorOverlay from "../ProjectSelectorOverlay/ProjectSelectorOverlay";
-import { useQueryClient } from "@tanstack/react-query";
 import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
 
 interface Props {
@@ -16,7 +15,6 @@ interface Props {
 
 const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
   ({ position, onClose, onSaveToProject, selectedChatId, onRequestTitleEdit }, ref) => {
-    const queryClient = useQueryClient();
     const [isHoveringProject, setIsHoveringProject] = useState(false);
 
     const closeMenu = useOverlayStore((state) => state.closeMenu);
