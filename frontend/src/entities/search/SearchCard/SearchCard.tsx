@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import styles from "./SearchCard.module.css";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
-import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
 import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
 
 interface Props {
@@ -28,7 +27,7 @@ const highlightText = (text: string, keyword?: string) => {
 };
 
 const SearchCard: React.FC<Props> = ({ id, title, date, content, highlight, chartData, table, onClick }) => {
-  const { toggleOverlayForTarget, isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
+  const { toggleOverlayForTarget} = useCardOverlayStore();
   const moreRef = useRef<HTMLDivElement>(null);
 
   const handleMoreClick = (e: React.MouseEvent) => {
