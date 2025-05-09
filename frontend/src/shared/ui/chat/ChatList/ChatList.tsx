@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { ChatBubbleUser } from '@/shared/ui/chat/ChatBubbleUser/ChatBubbleUser';
-import { ChatBubbleDBDeep } from '@/shared/ui/chat/ChatBubbleDBDeep/ChatBubbleDBDeep';
+import { ChatBubbleUser } from '@/shared/ui/Chat/ChatBubbleUser/ChatBubbleUser';
+import { ChatBubbleDBDeep } from '@/shared/ui/Chat/ChatBubbleDBDeep/ChatBubbleDBDeep';
 import { ChatMessage } from '@/features/chat/chatTypes';
 import styles from './ChatList.module.css';
 
