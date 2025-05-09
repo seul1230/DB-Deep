@@ -4,10 +4,11 @@ import styles from "./ChatLogPanel.module.css";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import { useChatRooms } from "@/features/chat/useChatRooms";
 import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
-import { updateChatTitle } from "@/features/chat/chatApi";
+import { updateChatTitle, deleteChatRoom } from "@/features/chat/chatApi";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import ChatLogItemMenu from "../ChatLogOverlay/ChatLogItemMenu";
+import DeleteConfirmModal from "@/shared/ui/DeleteConfirmModal/DeleteConfirmModal";
 
 const ChatLogPanel: React.FC = () => {
   const { closePanel } = usePanelStore();
@@ -27,6 +28,9 @@ const ChatLogPanel: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editedTitle, setEditedTitle] = useState("");
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [chatIdToDelete, setChatIdToDelete] = useState<string | null>(null);
+
   const handleClickChatRoom = (chatId: string) => {
     navigate(`/chat/${chatId}`);
   };
@@ -45,6 +49,20 @@ const ChatLogPanel: React.FC = () => {
       alert("채팅방 제목 수정에 실패했습니다.");
     } finally {
       setEditingId(null);
+    }
+  };
+
+  const handleDeleteChatRoom = async () => {
+    if (!chatIdToDelete) return;
+    try {
+      await deleteChatRoom(chatIdToDelete);
+      await queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
+    } catch (err) {
+      console.error("삭제 실패", err);
+      alert("채팅 삭제에 실패했습니다.");
+    } finally {
+      setShowDeleteModal(false);
+      setChatIdToDelete(null);
     }
   };
 
@@ -157,6 +175,26 @@ const ChatLogPanel: React.FC = () => {
               setEditedTitle(chat.title);
             }
           }}
+          onRequestDelete={(chatId) => {
+            setChatIdToDelete(chatId);
+            setShowDeleteModal(true);
+          }}
+        />
+      )}
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setChatIdToDelete(null);
+          }}
+          onConfirm={handleDeleteChatRoom}
+          message={
+            <>
+              <strong style={{ fontWeight: 700 }}>{`"${data?.chatRooms.find(c => c.id === chatIdToDelete)?.title}"`}</strong> 채팅방을 삭제하시겠습니까?
+              <br />
+              삭제된 채팅방은 복구할 수 없습니다.
+            </>
+          }
         />
       )}
     </div>

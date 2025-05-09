@@ -41,3 +41,8 @@ export const shareChat = async (chatId: string, targetIds: string[]) => {
   });
   return response.data;
 };
+
+export const deleteChatRoom = async (chatId: string) => {
+  const response = await axios.delete(`/chats/${chatId}`);
+  return response.data;
+};
