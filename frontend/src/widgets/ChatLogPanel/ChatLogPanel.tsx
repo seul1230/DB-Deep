@@ -102,6 +102,7 @@ const ChatLogPanel: React.FC = () => {
           onSaveToProject={() => {
             closeMenu();
           }}
+          selectedChatId={selectedChatId}
         />
       )}
     </div>
