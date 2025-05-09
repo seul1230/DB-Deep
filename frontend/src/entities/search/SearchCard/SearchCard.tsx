@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useRef } from "react";
 import styles from "./SearchCard.module.css";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
+import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
+import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
 
 interface Props {
   title: string;
@@ -25,6 +27,23 @@ const highlightText = (text: string, keyword?: string) => {
 };
 
 const SearchCard: React.FC<Props> = ({ title, date, content, highlight, chartData, table, onClick }) => {
+  const { toggleOverlayForTarget, isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
+  const moreRef = useRef<HTMLDivElement>(null);
+
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rect = moreRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    toggleOverlayForTarget(
+      {
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+      },
+      title
+    );
+  };
+
   return (
     <div className={styles.card} onClick={onClick}>
       <div className={styles.meta}>
@@ -33,9 +52,10 @@ const SearchCard: React.FC<Props> = ({ title, date, content, highlight, chartDat
           <div className={styles.cardTitle}>{highlightText(title, highlight)}</div>
           <div className={styles.date}>{date}</div>
         </div>
-        <FiMoreVertical className={styles.moreIcon} />
+        <div ref={moreRef}>
+          <FiMoreVertical className={styles.moreIcon} onClick={handleMoreClick} />
+        </div>
       </div>
-
 
       {content && <div className={styles.description}>{highlightText(content, highlight)}</div>}
 
@@ -59,6 +79,15 @@ const SearchCard: React.FC<Props> = ({ title, date, content, highlight, chartDat
             </div>
           ))}
         </div>
+      )}
+
+      {isOpen && targetId === title && (
+        <CardOverlay
+          position={position}
+          targetId={title}
+          onCopy={(id) => console.log("복사:", id)}
+          onClose={closeOverlay}
+        />
       )}
     </div>
   );

@@ -1,0 +1,33 @@
+.CardOverlay {
+  background: var(--background-color);
+  border: 1px solid var(--light-gray);
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 2px 0;
+  width: 76px;
+}
+
+.CardOverlayItem,
+.CardOverlayItemDanger {
+  padding: 6px 10px;
+  margin: 2px 6px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  gap: 6px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.CardOverlayItem:hover {
+  background-color: var(--primary-light-blue);
+}
+
+.CardOverlayItemDanger {
+  color: var(--red-alert);
+}
+
+.CardOverlayItemDanger:hover {
+  background-color: var(--yellow);
+}

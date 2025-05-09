@@ -1,17 +1,23 @@
 /* SectionTitle.module.css */
 .titleWrapper {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 680px;
+    margin: 0 auto;
   }
   
   .title {
     font-size: 28px;
     font-weight: 600;
     color: var(--text-color);
+    text-align: left;
+    width: 100%;
   }
   
   .divider {
     width: 100%;
-    max-width: 680px;
     height: 1px;
     background-color: var(--light-gray);
     margin-top: -8px; 

@@ -1,4 +1,3 @@
-// SearchPage.tsx
 import React, { useState } from "react";
 import styles from "./SearchPage.module.css";
 import SearchInput from "@/features/search/SearchInput/SearchInput";
@@ -35,7 +34,7 @@ const sampleResults: SearchResult[] = [
   {
     id: 3,
     title: "세그먼트 구매 패턴",
-    date: "2025년 4월 23일 오후 4시 32분",
+    date: "2025년 4월 23일 오후 4시 33분",
     description:
       "이번 마케팅 캠페인 전후의 전환율을 비교한 결과, 캠페인 이전에는 11.00%, 캠페인 이후는 15.00%로 확인되었습니다. 이는 약 4.00%p의 전환율 상승을 의미하며, 상대적으로 36% 이상의 개선 효과를 나타냅니다.",
   },

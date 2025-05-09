@@ -1,24 +1,34 @@
-import React from "react";
+import React, { useRef } from "react";
 import styles from "./ArchiveCard.module.css";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
+import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
+import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
 
 interface Props {
+  id: string;
   title: string;
   date: string;
   description?: string;
   tableData?: string[][];
   chartData?: { label: string; value: number }[];
-  onClick?: () => void; // 클릭 이벤트 추가
+  onClick?: () => void;
 }
 
-const ArchiveCard: React.FC<Props> = ({
-  title,
-  date,
-  description,
-  tableData,
-  chartData,
-  onClick,
-}) => {
+const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData, chartData, onClick }) => {
+  const moreIconRef = useRef<HTMLDivElement>(null);
+  const { toggleOverlayForTarget, isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
+
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rect = moreIconRef.current?.getBoundingClientRect();
+    if (rect) {
+      toggleOverlayForTarget(
+        { top: rect.bottom + window.scrollY, left: rect.left + window.scrollX + 8 },
+        id
+      );
+    }
+  };
+
   return (
     <div className={styles.card} onClick={onClick}>
       <div className={styles.meta}>
@@ -28,13 +38,13 @@ const ArchiveCard: React.FC<Props> = ({
             <div className={styles.title}>{title}</div>
             <div className={styles.date}>{date}</div>
           </div>
-          <FiMoreVertical
+          <div
             className={styles.moreIcon}
-            onClick={(e) => {
-              e.stopPropagation(); // 카드 클릭 이벤트 방지
-              console.log("더보기 클릭");
-            }}
-          />
+            onClick={handleMoreClick}
+            ref={moreIconRef}
+          >
+            <FiMoreVertical />
+          </div>
         </div>
       </div>
 
@@ -54,9 +64,7 @@ const ArchiveCard: React.FC<Props> = ({
             <tbody>
               {tableData.map((row, i) => (
                 <tr key={i}>
-                  {row.map((cell, j) => (
-                    <td key={j}>{cell}</td>
-                  ))}
+                  {row.map((cell, j) => <td key={j}>{cell}</td>)}
                 </tr>
               ))}
             </tbody>
@@ -76,6 +84,17 @@ const ArchiveCard: React.FC<Props> = ({
             </div>
           ))}
         </div>
+      )}
+
+      {isOpen && targetId === id && (
+        <CardOverlay
+          position={position}
+          targetId={id}
+          onCopy={(id) => console.log("복사:", id)}
+          onDelete={(id) => console.log("삭제:", id)}
+          showDelete
+          onClose={closeOverlay}
+        />
       )}
     </div>
   );

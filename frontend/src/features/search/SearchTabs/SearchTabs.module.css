@@ -3,6 +3,8 @@
     gap: 12px;
     margin: 16px 0 32px;
     color: var(--gray-text);
+    margin-left: 0;
+    margin-right: 0;
   }
   
   .tab {

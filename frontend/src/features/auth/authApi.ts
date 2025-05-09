@@ -3,11 +3,12 @@ import api from "@/shared/api/axios";
 
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const response = await api.post<LoginApiResponse>("/auth/signin", data);
-  return {
-    accessToken: response.data.result.tokens.accessToken,
-    refreshToken: response.data.result.tokens.refreshToken,
-    profile: response.data.result.profile,
-  };
+  const {
+    tokens: { accessToken, refreshToken },
+    profile,
+  } = response.data.result;
+
+  return { accessToken, refreshToken, profile };
 };
 
 export const sendEmailCode = async (email: string) => {

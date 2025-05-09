@@ -1,24 +1,22 @@
-.container {
+  .container {
     width: 100%;
-    padding: 84px 32px 80px;
+    min-height: 100vh;
     box-sizing: border-box;
     background-color: var(--background-color);
     display: flex;
-    padding-left: 180px;
     justify-content: center;
+    padding: 0 32px 80px; /* auto 제거하고 0으로 수정 */
   }
-  
+
   .inner {
     width: 100%;
     max-width: 960px;
     box-sizing: border-box;
-    padding-left: 80px;
-    padding-right: 20px; 
+    padding: 0 20px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
   }
-  
   
   .title {
     font-size: 28px;
@@ -32,34 +30,25 @@
     max-width: 680px; 
     height: 1px;
     background-color: var(--light-gray);
-    margin-top: -24px;  /* 제목과 너무 멀어지지 않도록 */
+    margin-top: -24px;
     margin-bottom: 24px;
   }
   
   .header {
     width: 100%;
+    max-width: 680px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin: 0 auto; /* 추가: 가운데 정렬 */
   }
-  
+
   .resultList {
     width: 100%;
     max-width: 680px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-  }
-  
-
-  @media (max-width: 768px) {
-    .container {
-      padding: 60px 16px;
-    }
-  
-    .inner {
-      padding-left: 80px;
-      padding-right: 80px;
-    }
+    margin: 0 auto;
   }
   

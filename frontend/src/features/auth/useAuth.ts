@@ -1,18 +1,22 @@
-// src/features/auth/hooks/useAuth.ts
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
+interface UserProfile {
+  email: string;
+  imageUrl: string | null;
+  passwordNotChanged: boolean;
+}
 
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
-  profile: {
-    email: string;
-    imageUrl: string | null;
-    passwordNotChanged: boolean;
-  } | null;
+  profile: UserProfile | null;
   isLoggedOut: boolean;
-  setTokens: (accessToken: string, refreshToken: string) => void;
-  setProfile: (profile: AuthState["profile"]) => void;
+  setTokens: (
+    accessToken: string,
+    refreshToken: string,
+    profile: UserProfile
+  ) => void;
   clearTokens: () => void;
   setLoggedOut: () => void;
 }
@@ -25,10 +29,10 @@ export const useAuth = create<AuthState>()(
       refreshToken: null,
       profile: null,
       isLoggedOut: false,
-      setTokens: (accessToken, refreshToken) =>
-        set({ accessToken, refreshToken, isLoggedOut: false }),
+      setTokens: (accessToken, refreshToken, profile) =>
+        set({ accessToken, refreshToken, profile, isLoggedOut: false }),
       clearTokens: () =>
-        set({ accessToken: null, refreshToken: null, isLoggedOut: true }),
+        set({ accessToken: null, refreshToken: null, profile: null, isLoggedOut: true }),
       setLoggedOut: () => set({ isLoggedOut: true }),
       setProfile: (profile) =>
         set({ profile })
