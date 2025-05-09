@@ -35,6 +35,7 @@ const CardOverlay: React.FC<CardOverlayProps> = ({
         position: "fixed",
         zIndex: 3000,
       }}
+      onClick={(e) => e.stopPropagation()}
     >
       <div className={styles.CardOverlayItem} onClick={() => onCopy(targetId)}>
         <FiCopy /> 복사

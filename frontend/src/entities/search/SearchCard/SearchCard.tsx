@@ -5,6 +5,7 @@ import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
 import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
 
 interface Props {
+  id: string;
   title: string;
   date: string;
   content?: string;
@@ -26,7 +27,7 @@ const highlightText = (text: string, keyword?: string) => {
   );
 };
 
-const SearchCard: React.FC<Props> = ({ title, date, content, highlight, chartData, table, onClick }) => {
+const SearchCard: React.FC<Props> = ({ id, title, date, content, highlight, chartData, table, onClick }) => {
   const { toggleOverlayForTarget, isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
   const moreRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +41,7 @@ const SearchCard: React.FC<Props> = ({ title, date, content, highlight, chartDat
         top: rect.bottom + window.scrollY,
         left: rect.left + window.scrollX,
       },
-      title
+      id
     );
   };
 
@@ -79,15 +80,6 @@ const SearchCard: React.FC<Props> = ({ title, date, content, highlight, chartDat
             </div>
           ))}
         </div>
-      )}
-
-      {isOpen && targetId === title && (
-        <CardOverlay
-          position={position}
-          targetId={title}
-          onCopy={(id) => console.log("복사:", id)}
-          onClose={closeOverlay}
-        />
       )}
     </div>
   );
