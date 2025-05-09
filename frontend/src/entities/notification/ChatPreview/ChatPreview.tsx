@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ChatList from '@/shared/ui/Chatt/ChatList/ChatList';
+import ChatList from '@/shared/ui/Chat/ChatList/ChatList';
 import { fetchChatDetail } from '@/features/chat/chatApi';
 import { ChatMessage } from '@/features/chat/chatTypes';
 import styles from './ChatPreview.module.css';

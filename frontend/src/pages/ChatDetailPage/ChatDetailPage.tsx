@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import React, { useEffect, useState, Suspense } from 'react';
-import ChatList from '@/shared/ui/Chatt/ChatList/ChatList';
+import ChatList from '@/shared/ui/Chat/ChatList/ChatList';
 import QuestionInput from '@/shared/ui/QuestionInput/QuestionInput';
 import Button from '@/shared/ui/Button/Button';
 import styles from './ChatDetailPage.module.css';
