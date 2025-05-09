@@ -7,6 +7,7 @@ import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.AllowShareChatRequest;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.AllowShareChatResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatMessageListResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatRoomListResponse;
+import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.CreateChatRoomResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ShareChatRequest;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.UpdateChatRoomTitleRequest;
 import kr.dbdeep.dbdeep_BE.domain.chat.application.ChatMessageService;
@@ -46,6 +47,12 @@ public class ChatController {
         }
         ChatRoomListResponse chatRoomListResponse = chatRoomService.find(memberId, parsedCursor, size);
         return JSONResponse.onSuccess(chatRoomListResponse);
+    }
+
+    @PostMapping
+    public JSONResponse<CreateChatRoomResponse> createChatRoom(@CurrentMemberId Integer memberId) {
+        CreateChatRoomResponse response = chatRoomService.create(memberId);
+        return JSONResponse.onSuccess(response);
     }
 
     @GetMapping("/{chatRoomId}")
