@@ -54,7 +54,7 @@ public class MailService {
                     + "font-size: 16px;"
                     + "margin: 0 0 24px;"
                     + "\">"
-                    + "안녕하세요! 아래 인증 코드를 입력하시면 회원 가입이 완료됩니다."
+                    + "안녕하세요! 아래 인증 코드를 입력하시면 비밀번호 변경이 완료됩니다."
                     + "</p>"
                     + "<div style=\""
                     + "display: block;"
