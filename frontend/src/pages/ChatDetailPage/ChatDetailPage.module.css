@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 100vh;
   background-color: var(--background-color);
+  padding-bottom: 84px; /* input 영역 높이만큼 여유 */
 }
 
 .chatDetailPage-scrollArea {
@@ -14,47 +15,11 @@
   box-sizing: border-box;
 }
 
-.chatDetailPage-chatBox {
-  width: 100%;
-  max-width: 650px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.chatDetailPage-paragraph {
-  margin-bottom: 0.75rem;
-}
-
-.chatDetailPage-heading {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin: 0.75rem 0 0.5rem;
-}
-
-.chatDetailPage-hr {
-  border: 0;
-  border-top: 1px solid var(--light-gray);
-  margin: 0.5rem 0;
-}
-
-.chatDetailPage-chartPlaceholder {
-  padding: 1rem;
-  background: var(--primary-mid-blue);
-  color: white;
-  text-align: center;
-  border-radius: 8px;
-  cursor: pointer;
-  margin: 0.75rem 0;
-  transition: background 0.2s;
-  font-size: 0.9rem;
-}
-
-.chatDetailPage-chartPlaceholder:hover {
-  background: var(--primary-dark-blue);
-}
-
 .chatDetailPage-inputWrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   display: flex;
   justify-content: center;
   padding: 12px;
@@ -71,17 +36,4 @@
 
 .chatDetailPage-inputArea button {
   margin-top: 10px;
-}
-
-.chatDetailPage-shareButton:hover {
-  background-color: var(--icon-blue-hover);
-}
-
-@media (max-width: 600px) {
-  .chatDetailPage-shareButton {
-    position: static;
-    transform: none;
-    width: 100%;
-    margin-top: 8px;
-  }
 }

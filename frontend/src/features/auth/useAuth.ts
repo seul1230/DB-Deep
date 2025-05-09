@@ -34,7 +34,7 @@ export const useAuth = create<AuthState>()(
       clearTokens: () =>
         set({ accessToken: null, refreshToken: null, profile: null, isLoggedOut: true }),
       setLoggedOut: () => set({ isLoggedOut: true }),
-      setProfile: (profile) =>
+      setProfile: (profile: UserProfile) =>
         set({ profile })
     }),
     {

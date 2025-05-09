@@ -34,7 +34,6 @@ const Layout: React.FC = () => {
             width: SIDEBAR_WIDTH,
             flexShrink: 0,
             position: 'relative',
-            zIndex: 1000,
           }}
         >
           <Sidebar />

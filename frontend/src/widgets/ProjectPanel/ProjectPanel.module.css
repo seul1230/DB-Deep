@@ -14,7 +14,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 16px;
+    padding: 25px 16px 20px 16px;
     font-size: 16px;
     font-weight: 600;
     color: var(--text-color);

@@ -15,7 +15,7 @@
     outline: none;
     box-shadow: 0 2px 4px var(--modal-overlay-bg);
     transition: height 0.2s ease;
-    overflow-y: auto;
+    overflow-y: hidden;
     background-color: var(--background-color);
   }
   
