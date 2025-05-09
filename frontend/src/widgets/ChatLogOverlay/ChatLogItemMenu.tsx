@@ -11,10 +11,11 @@ interface Props {
   onSaveToProject: (projectId: string) => void;
   selectedChatId: string;
   onRequestTitleEdit: (chatId: string) => void;
+  onRequestDelete: (chatId: string) => void;
 }
 
 const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
-  ({ position, onClose, onSaveToProject, selectedChatId, onRequestTitleEdit }, ref) => {
+  ({ position, onClose, onSaveToProject, selectedChatId, onRequestTitleEdit, onRequestDelete }, ref) => {
     const [isHoveringProject, setIsHoveringProject] = useState(false);
 
     const closeMenu = useOverlayStore((state) => state.closeMenu);
@@ -76,8 +77,7 @@ const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
           className={styles.ChatLogItemMenuItemDanger}
           onClick={() => {
             closeMenu();
-            // 여기에 삭제 핸들러 연결 가능
-            console.log("채팅 삭제 클릭됨");
+            onRequestDelete(selectedChatId);
           }}
         >
           <RiDeleteBin6Line />

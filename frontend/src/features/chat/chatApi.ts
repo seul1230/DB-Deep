@@ -49,3 +49,9 @@ export const fetchChatDetail = async (
   const response = await axios.get<ChatApiResponse>(`/chats/${chatId}`);
   return response.data.result;
 };
+
+
+export const deleteChatRoom = async (chatId: string) => {
+  const response = await axios.delete(`/chats/${chatId}`);
+  return response.data;
+};
