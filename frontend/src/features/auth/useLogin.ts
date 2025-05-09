@@ -6,11 +6,13 @@ import { useAuth } from "./useAuth";
 
 export const useLogin = () => {
   const setTokens = useAuth((state) => state.setTokens);
+  const setProfile = useAuth((state) => state.setProfile);
 
   return useMutation<LoginResponse, AxiosError, LoginRequest>({
     mutationFn: login,
     onSuccess: (data) => {
-      setTokens(data.accessToken, data.refreshToken); // 저장
+      setTokens(data.accessToken, data.refreshToken);
+      setProfile(data.profile);
     },
   });
 };

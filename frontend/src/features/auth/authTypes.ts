@@ -3,17 +3,27 @@ export interface LoginRequest {
     password: string;
   }
   
+  export interface UserProfile {
+    email: string;
+    imageUrl: string | null;
+    passwordNotChanged: boolean;
+  }
+  
   export interface LoginResponse {
     accessToken: string;
     refreshToken: string;
-  }
+    profile: UserProfile;
+  }  
   
   export interface LoginApiResponse {
     isSuccess: boolean;
     code: number;
     message: string;
     result: {
-      accessToken: string;
-      refreshToken: string;
+      tokens: {
+        accessToken: string;
+        refreshToken: string;
+      };
+      profile: UserProfile;
     };
-  }
+  }  

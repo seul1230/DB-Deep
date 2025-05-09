@@ -1,18 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "@/shared/api/axios";
 import { AxiosError } from "axios";
+import { Notification } from "@/features/notifications/types";
 
 export const useNotifications = () => {
-  return useQuery({
+  return useQuery<Notification[], AxiosError>({
     queryKey: ["notifications"],
     queryFn: async () => {
       try {
         const { data } = await api.get("/notifications");
-        return data.notifications;
+        return data.result.map((n: any) => ({
+          notificationId: n.id,
+          content: n.content,
+          isRead: n.isRead,
+          readAt: n.readAt,
+          createdAt: n.createdAt,
+        }));
       } catch (error) {
         const axiosError = error as AxiosError;
         if (axiosError.response?.status === 400) {
-          return []; // 400이면 알림 없음 처리
+          return [];
         }
         throw error;
       }
