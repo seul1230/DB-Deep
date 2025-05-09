@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import styles from "./CardOverlay.module.css";
 import { FiCopy } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -25,7 +26,7 @@ const CardOverlay: React.FC<CardOverlayProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  return (
+  const overlayContent = (
     <div
       ref={ref}
       className={styles.CardOverlay}
@@ -39,14 +40,19 @@ const CardOverlay: React.FC<CardOverlayProps> = ({
     >
       <div className={styles.CardOverlayItem} onClick={() => onCopy(targetId)}>
         <FiCopy /> 복사
+      </div>
+      {showDelete && onDelete && (
+        <div
+          className={styles.CardOverlayItemDanger}
+          onClick={() => onDelete(targetId)}
+        >
+          <RiDeleteBin6Line /> 삭제
         </div>
-        {showDelete && onDelete && (
-        <div className={styles.CardOverlayItemDanger} onClick={() => onDelete(targetId)}>
-    <RiDeleteBin6Line /> 삭제
-  </div>
-)}
+      )}
     </div>
   );
+
+  return ReactDOM.createPortal(overlayContent, document.body);
 };
 
 export default CardOverlay;
