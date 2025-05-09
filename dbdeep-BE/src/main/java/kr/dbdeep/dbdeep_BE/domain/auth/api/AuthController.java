@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private static final String PASSWORD_RESET_SUBJECT = "dbdeep 비밀번호 재설정 인증번호";
-
     private final MailService mailService;
     private final AuthService authService;
 
@@ -40,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/email/code")
     public JSONResponse<Void> sendResetCode(@RequestBody SendAuthCodeRequest request) {
-        mailService.sendAuthenticationCode(PASSWORD_RESET_SUBJECT, request.getEmail());
+        mailService.sendAuthenticationCode(request.getEmail());
         return JSONResponse.onSuccess();
     }
 
