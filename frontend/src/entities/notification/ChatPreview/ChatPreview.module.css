@@ -1,0 +1,15 @@
+.ChatPreview-container {
+    display: flex;
+    flex-direction: column;
+    height: 400px; /* 모달 안에서 높이 제한 */
+  }
+  
+  .ChatPreview-scrollArea {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+  

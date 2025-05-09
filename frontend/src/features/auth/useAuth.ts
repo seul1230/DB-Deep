@@ -21,6 +21,7 @@ interface AuthState {
   setLoggedOut: () => void;
 }
 
+
 export const useAuth = create<AuthState>()(
   persist(
     (set) => ({
@@ -33,6 +34,8 @@ export const useAuth = create<AuthState>()(
       clearTokens: () =>
         set({ accessToken: null, refreshToken: null, profile: null, isLoggedOut: true }),
       setLoggedOut: () => set({ isLoggedOut: true }),
+      setProfile: (profile: UserProfile) =>
+        set({ profile })
     }),
     {
       name: "auth-storage",
