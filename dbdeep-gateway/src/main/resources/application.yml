@@ -16,6 +16,21 @@ spring:
           filters:
             - StripPrefix=1
 
+        # 로컬 테스트용
+        #        - id: fastapi-service
+        #          uri: http://dbdeep-da:8080
+        #          predicates:
+        #            - Path=/fast/api/**
+        #          filters:
+        #            - StripPrefix=1
+
+        - id: fastapi-service
+          uri: https://da.dbdeep.kr
+          predicates:
+            - Path=/fast/api/**
+          filters:
+            - StripPrefix=1
+
 eureka:
   client:
     register-with-eureka: true
