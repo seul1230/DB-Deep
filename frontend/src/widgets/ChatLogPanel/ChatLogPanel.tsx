@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./ChatLogPanel.module.css";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import { useChatRooms } from "@/features/chat/useChatRooms";
+import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
+import { updateChatTitle } from "@/features/chat/chatApi";
+import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import ChatLogItemMenu from "../ChatLogOverlay/ChatLogItemMenu";
-import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
 
 const ChatLogPanel: React.FC = () => {
   const { closePanel } = usePanelStore();
@@ -18,33 +20,53 @@ const ChatLogPanel: React.FC = () => {
     toggleMenuForChatId,
   } = useOverlayStore();
 
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editedTitle, setEditedTitle] = useState("");
 
   const handleClickChatRoom = (chatId: string) => {
     navigate(`/chat/${chatId}`);
   };
 
+  const handleEditComplete = async (chatId: string) => {
+    if (!editedTitle.trim()) {
+      setEditingId(null);
+      return;
+    }
+
+    try {
+      await updateChatTitle(chatId, editedTitle);
+      await queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
+    } catch (err) {
+      console.error("제목 수정 실패:", err);
+      alert("채팅방 제목 수정에 실패했습니다.");
+    } finally {
+      setEditingId(null);
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-  
+
       const clickedInsideMenu =
         menuRef.current && menuRef.current.contains(target);
-  
+
       const clickedTrigger = target.closest("[data-chat-menu-trigger]");
-  
+
       if (!clickedInsideMenu && !clickedTrigger) {
         closeMenu();
       }
     };
-  
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [closeMenu]);
-  
 
   return (
     <div className={styles.ChatLogPanel}>
@@ -71,7 +93,32 @@ const ChatLogPanel: React.FC = () => {
             tabIndex={0}
           >
             <div className={styles["ChatLogPanel-content"]}>
-              <span className={styles["ChatLogPanel-title"]}>{log.title}</span>
+              {editingId === log.id ? (
+                <input
+                  className={styles["ChatLogPanel-titleInput"]}
+                  value={editedTitle}
+                  autoFocus
+                  onChange={(e) => setEditedTitle(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  onBlur={() => handleEditComplete(log.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleEditComplete(log.id);
+                    if (e.key === "Escape") setEditingId(null);
+                  }}
+                />
+              ) : (
+                <span
+                  className={styles["ChatLogPanel-title"]}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingId(log.id);
+                    setEditedTitle(log.title);
+                  }}
+                >
+                  {log.title}
+                </span>
+              )}
+
               <span className={styles["ChatLogPanel-date"]}>
                 {dayjs(log.lastMessageAt).format("YYYY년 M월 D일")}
               </span>
@@ -101,6 +148,14 @@ const ChatLogPanel: React.FC = () => {
           onClose={closeMenu}
           onSaveToProject={() => {
             closeMenu();
+          }}
+          selectedChatId={selectedChatId}
+          onRequestTitleEdit={(chatId) => {
+            const chat = data?.chatRooms.find((c) => c.id === chatId);
+            if (chat) {
+              setEditingId(chatId);
+              setEditedTitle(chat.title);
+            }
           }}
         />
       )}

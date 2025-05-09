@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import styles from "./CardOverlay.module.css";
 import { FiCopy } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { CardOverlayProps } from "./Card.types";
+import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
 
 const CardOverlay: React.FC<CardOverlayProps> = ({
   position,
@@ -13,6 +15,8 @@ const CardOverlay: React.FC<CardOverlayProps> = ({
   onClose,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+
+  const closeOverlay = useCardOverlayStore((state) => state.closeOverlay);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -25,7 +29,7 @@ const CardOverlay: React.FC<CardOverlayProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  return (
+  const overlayContent = (
     <div
       ref={ref}
       className={styles.CardOverlay}
@@ -35,17 +39,29 @@ const CardOverlay: React.FC<CardOverlayProps> = ({
         position: "fixed",
         zIndex: 3000,
       }}
+      onClick={(e) => e.stopPropagation()}
     >
-      <div className={styles.CardOverlayItem} onClick={() => onCopy(targetId)}>
+      <div className={styles.CardOverlayItem} onClick={() => {
+        closeOverlay();
+        onCopy(targetId)
+        }}>
         <FiCopy /> 복사
+      </div>
+      {showDelete && onDelete && (
+        <div
+          className={styles.CardOverlayItemDanger}
+          onClick={() => {
+            closeOverlay();
+            onDelete(targetId)
+          }}
+        >
+          <RiDeleteBin6Line /> 삭제
         </div>
-        {showDelete && onDelete && (
-        <div className={styles.CardOverlayItemDanger} onClick={() => onDelete(targetId)}>
-    <RiDeleteBin6Line /> 삭제
-  </div>
-)}
+      )}
     </div>
   );
+
+  return ReactDOM.createPortal(overlayContent, document.body);
 };
 
 export default CardOverlay;

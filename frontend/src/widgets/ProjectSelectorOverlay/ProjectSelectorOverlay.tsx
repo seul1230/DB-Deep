@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./ProjectSelectorOverlay.module.css";
 import { FiFolder } from "react-icons/fi";
+import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
 
 const mockProjects = [
   "성과 요약 프로젝트",
@@ -17,14 +18,19 @@ interface Props {
   onClose: () => void;
 }
 
-const ProjectSelectorOverlay: React.FC<Props> = ({ onSelect, onClose }) => {
+const ProjectSelectorOverlay: React.FC<Props> = ({ onSelect }) => {
+  const closeMenu = useOverlayStore((state) => state.closeMenu);
+  
   return (
     <div className={styles.ProjectSelectorOverlay}>
       {mockProjects.map((title) => (
         <div
           key={title}
           className={styles.ProjectItem}
-          onClick={() => onSelect(title)}
+          onClick={() => {
+            closeMenu();
+            onSelect(title)
+          }}
         >
           <FiFolder /> {title}
         </div>

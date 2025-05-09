@@ -3,16 +3,21 @@ import styles from "./ChatLogItemMenu.module.css";
 import { FiEdit3, FiFolderPlus, FiChevronRight } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import ProjectSelectorOverlay from "../ProjectSelectorOverlay/ProjectSelectorOverlay";
+import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
 
 interface Props {
   position: { top: number; left: number } | null;
   onClose: () => void;
   onSaveToProject: (projectId: string) => void;
+  selectedChatId: string;
+  onRequestTitleEdit: (chatId: string) => void;
 }
 
 const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
-  ({ position, onClose, onSaveToProject }, ref) => {
+  ({ position, onClose, onSaveToProject, selectedChatId, onRequestTitleEdit }, ref) => {
     const [isHoveringProject, setIsHoveringProject] = useState(false);
+
+    const closeMenu = useOverlayStore((state) => state.closeMenu);
 
     return (
       <div
@@ -29,7 +34,13 @@ const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
         }
       >
         {/* 이름 바꾸기 */}
-        <div className={styles.ChatLogItemMenuItem} onClick={onClose}>
+        <div
+          className={styles.ChatLogItemMenuItem}
+          onClick={() => {
+            onClose();
+            onRequestTitleEdit(selectedChatId); // 인라인 수정 모드 요청
+          }}
+        >
           <FiEdit3 />
           <span>이름 바꾸기</span>
         </div>
@@ -64,6 +75,7 @@ const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
         <div
           className={styles.ChatLogItemMenuItemDanger}
           onClick={() => {
+            closeMenu();
             // 여기에 삭제 핸들러 연결 가능
             console.log("채팅 삭제 클릭됨");
           }}
