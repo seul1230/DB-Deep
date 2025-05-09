@@ -1,4 +1,3 @@
-// src/features/chat/hooks/useChatRooms.ts
 import { useQuery } from '@tanstack/react-query';
 import { fetchChatRooms } from './chatApi';
 

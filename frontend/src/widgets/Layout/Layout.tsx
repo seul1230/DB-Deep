@@ -1,11 +1,11 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "@/widgets/Sidebar/Sidebar";
-import Logo from "@/shared/ui/Logo/Logo";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import NotificationPanel from "../NotificationPanel/NotificationPanel";
 import ChatLogPanel from "../ChatLogPanel/ChatLogPanel";
 import ProjectPanel from "../ProjectPanel/ProjectPanel";
+import Header from "@/shared/ui/Header/Header";
 
 const SIDEBAR_WIDTH = 68;
 const PANEL_WIDTH = 240;
@@ -98,7 +98,7 @@ const Layout: React.FC = () => {
           minWidth: 0,
         }}
       >
-        <Logo />
+        <Header />
         <div style={{ flex: 1, overflowY: 'auto' }}>
           <Outlet />
         </div>

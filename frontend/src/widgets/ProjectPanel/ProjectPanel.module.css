@@ -3,6 +3,7 @@
     height: 100vh;
     background: var(--background-color);
     border-left: 1px solid var(--light-gray);
+    border-right: 1px solid var(--light-gray);
     display: flex;
     flex-direction: column;
     z-index: 5;
@@ -116,8 +117,15 @@
       border-left: none;
       border-top: 1px solid var(--light-gray);
       box-shadow: none;
+      z-index: 1000;
       padding: 16px;
       transition: transform 0.3s ease;
+    }
+
+    .ProjectPanel-list {
+      max-width: 720px;
+      width: 95%;
+      box-sizing: border-box;
     }
   }
   

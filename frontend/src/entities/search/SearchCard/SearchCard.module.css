@@ -10,6 +10,17 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%; /* 전체 resultList 너비에 맞춤 */
+    max-width: 680px;
+    box-sizing: border-box;
+  }
+
+  .card * {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
   }
   
   .card:hover {
@@ -58,7 +69,7 @@
   }
   
   .moreIcon {
-    color: var(--icon-blue);
+    color: var(--gray-text);
     margin-left: 8px;
     cursor: pointer;
   }
