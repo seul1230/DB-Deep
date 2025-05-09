@@ -48,6 +48,12 @@ public class ChatController {
         return JSONResponse.onSuccess(chatRoomListResponse);
     }
 
+    @PostMapping
+    public JSONResponse<Void> createChatRoom(@CurrentMemberId Integer memberId) {
+        chatRoomService.create(memberId);
+        return JSONResponse.onSuccess();
+    }
+
     @GetMapping("/{chatRoomId}")
     public JSONResponse<ChatMessageListResponse> findChatMessagesById(@PathVariable String chatRoomId) {
         ChatMessageListResponse response = chatMessageService.findByChatRoomId(chatRoomId);
