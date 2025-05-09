@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from api.router import router as api_router
 
 import json
 import logging
@@ -11,8 +12,12 @@ from llm.gemini import GeminiStreamingViaGMS
 from pipeline.rag_chain import set_rag_chain, get_prompt_for_insight
 from pipeline.sql_process import clean_sql_from_response, clean_json_from_response, SQLExecutor
 
+from middleware.member_id_middleware import MemberIdMiddleware  # 추가
 
 app = FastAPI()
+app.add_middleware(MemberIdMiddleware)
+app.include_router(api_router)
+
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
