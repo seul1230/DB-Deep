@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import styles from '../../../pages/ChatDetailPage/ChatDetailPage.module.css';
+import styles from '../../../../pages/ChatDetailPage/ChatDetailPage.module.css';
 import { Components } from 'react-markdown';
 
 interface TypewriterTextProps {

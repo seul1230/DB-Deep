@@ -17,7 +17,7 @@
     -webkit-appearance: none;
     width: 20px;
     height: 20px;
-    border: 2px solid var(--icon-blue);
+    border: 1px solid var(--icon-blue);
     border-radius: 4px;
     background-color: var(--background-color);
     position: relative;
@@ -44,7 +44,7 @@
     height: 40px;
     border-radius: 10px;
     margin-right: 14px;
-    border: 1px solid var(--icon-blue);
+    border: 1.5px solid var(--icon-blue);
     object-fit: cover;
   }
   

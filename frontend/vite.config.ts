@@ -8,4 +8,14 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          chart: ['plotly.js'],
+        }
+      }
+    }
+  }
 })

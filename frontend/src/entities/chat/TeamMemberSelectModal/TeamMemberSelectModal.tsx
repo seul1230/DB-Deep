@@ -2,20 +2,22 @@ import React, { useState } from "react";
 import styles from "./TeamMemberSelectModal.module.css";
 import { FiSearch, FiChevronDown } from "react-icons/fi";
 import Button from "@/shared/ui/Button/Button";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Member, fetchMembers } from "@/features/chat/memberApi";
 import TeamMemberList from "../TeamMemberList/TeamMemberList";
+import { shareChat } from "@/features/chat/chatApi";
+import { useParams } from "react-router-dom";
 
 interface Props {
   onClose: () => void;
   onSelect: (memberId: string) => void;
-  onShare: (selectedMembers: Member[]) => void;
 }
 
-const TeamMemberSelectModal: React.FC<Props> = ({ onClose, onShare }) => {
+const TeamMemberSelectModal: React.FC<Props> = ({ onClose }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState<"name" | "email" | "teamName">("name");
+  const { chatId } = useParams<{ chatId: string }>();
 
   const { data: members = [] } = useQuery<Member[]>({
     queryKey: ["members", searchQuery, searchType],
@@ -25,11 +27,29 @@ const TeamMemberSelectModal: React.FC<Props> = ({ onClose, onShare }) => {
     refetchOnWindowFocus: false,
   });
 
+  const { mutate: shareChatMutation, status } = useMutation({
+    mutationFn: () => shareChat(chatId!, selectedIds),
+    onSuccess: () => {
+      alert("채팅이 성공적으로 공유되었습니다!");
+      onClose();
+    },
+    onError: (error: unknown) => {
+      if (error instanceof Error) {
+        console.error(error.message);
+      } else {
+        console.error("예상치 못한 에러", error);
+      }
+      alert("공유 중 오류가 발생했습니다.");
+    },
+  });
+
   const handleToggleMember = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
     );
   };
+  
+  const isSharing = status === 'pending';  
 
   return (
     <div className={styles["TeamMemberSelectModal-overlay"]} onClick={onClose}>
@@ -89,15 +109,12 @@ const TeamMemberSelectModal: React.FC<Props> = ({ onClose, onShare }) => {
               textColor="var(--icon-blue)"
             />
             <Button
-              label="공유하기"
-              onClick={() => {
-                const selected = members.filter((m) => selectedIds.includes(m.id.toString()));
-                onShare(selected);
-              }}
+              label={isSharing ? "공유 중..." : "공유하기"}
+              onClick={() => shareChatMutation()}
               borderColor="var(--icon-blue)"
               backgroundColor="var(--icon-blue)"
               textColor="var(--background-color)"
-              disabled={selectedIds.length === 0}
+              disabled={selectedIds.length === 0 || isSharing}
             />
           </div>
         </div>

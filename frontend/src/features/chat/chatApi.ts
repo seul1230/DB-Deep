@@ -1,4 +1,5 @@
 import axios from '@/shared/api/axios';
+import { ChatApiResponse, ChatDetail } from './chatTypes';
 
 export interface ChatRoom {
   id: string;
@@ -40,4 +41,11 @@ export const shareChat = async (chatId: string, targetIds: string[]) => {
     targets: targetIds,
   });
   return response.data;
+};
+
+export const fetchChatDetail = async (
+  chatId: string
+): Promise<ChatDetail> => {
+  const response = await axios.get<ChatApiResponse>(`/chats/${chatId}`);
+  return response.data.result;
 };

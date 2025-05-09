@@ -5,6 +5,7 @@ import { FiEye, FiEyeOff, FiMail, FiLock } from "react-icons/fi";
 import { lazy, Suspense } from "react";
 import { AxiosError } from "axios";
 import { useLogin } from "@/features/auth/useLogin";
+import { useAuth } from "@/features/auth/useAuth";
 import { useNavigate } from "react-router-dom";
 import logoLight from "../../assets/logo.png";
 import logoDark from "../../assets/logo-dark.png";
@@ -28,8 +29,13 @@ const LoginPage: React.FC = () => {
       { email, password },
       {
         onSuccess: () => {
-          navigate("/main"); 
-        },
+          const profile = useAuth.getState().profile;
+          if (profile?.passwordNotChanged) {
+            navigate("/change-password");
+          } else {
+            navigate("/main");
+          }
+        },        
         onError: (error) => {
           const axiosError = error as AxiosError<{ message: string }>;
           const message = axiosError.response?.data?.message || "예상치 못한 오류가 발생했습니다.";

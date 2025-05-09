@@ -10,17 +10,17 @@ import ProfileOverlay from "../ProfileOverlay/ProfileOverlay";
 import { useAuth } from "@/features/auth/useAuth";
 import { usePanelStore } from "@/shared/store/usePanelStore"; //
 
-const profileImageUrl: string | null = null;
-
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useThemeStore();
-  const { clearTokens } = useAuth();
+  const { clearTokens, profile } = useAuth();
 
   const [showOverlay, setShowOverlay] = useState(false);
   const { hasNotification, toggleNotification, toggleChatLog, toggleProject } = usePanelStore();
 
+  const profileImageUrl = profile?.imageUrl;
+  
   useEffect(() => {
     document.body.classList.toggle("dark", theme === "dark");
   }, [theme]);
