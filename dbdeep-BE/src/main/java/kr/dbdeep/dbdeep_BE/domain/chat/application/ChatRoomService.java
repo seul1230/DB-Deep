@@ -3,6 +3,7 @@ package kr.dbdeep.dbdeep_BE.domain.chat.application;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.ChatRoomListResponse;
+import kr.dbdeep.dbdeep_BE.domain.chat.api.dto.CreateChatRoomResponse;
 import kr.dbdeep.dbdeep_BE.domain.chat.entity.ChatRoom;
 import kr.dbdeep.dbdeep_BE.domain.chat.exception.ChatRoomNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.chat.infrastructure.ChatRoomQueryRepository;
@@ -27,12 +28,13 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public void create(Integer memberId) {
+    public CreateChatRoomResponse create(Integer memberId) {
         ChatRoom chatRoom = ChatRoom.builder()
                 .id(UUID.randomUUID().toString())
                 .memberId(memberId)
                 .build();
-        save(chatRoom);
+        ChatRoom created = save(chatRoom);
+        return CreateChatRoomResponse.from(created);
     }
 
     public ChatRoom findById(String chatRoomId) {
@@ -53,8 +55,8 @@ public class ChatRoomService {
     }
 
     @Transactional
-    public void save(ChatRoom chatRoom) {
-        chatRoomRepository.save(chatRoom);
+    public ChatRoom save(ChatRoom chatRoom) {
+        return chatRoomRepository.save(chatRoom);
     }
 
 }
