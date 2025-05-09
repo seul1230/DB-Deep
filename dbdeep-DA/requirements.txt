@@ -32,6 +32,7 @@ tokenizers==0.21.1 ; python_version >= "3.11" and python_version < "3.12"
 # --- 문서 로딩, 전처리
 pandas==2.2.2
 tqdm==4.66.2
+# db-dtypes
 
 # --- Google BigQuery
 google-cloud-bigquery==3.17.2

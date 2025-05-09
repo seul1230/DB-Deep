@@ -1,3 +1,8 @@
+이 데이터베이스(hr_dataset)는 스타 스키마(Star Schema)로 구성되어 있으며, 중심에는 측정 데이터를 저장하는 fact 테이블이 있고, 이를 설명하는 여러 dimension 테이블과 연결되어 있습니다.
+
+- Fact Tables: fact_salary, fact_bonus, fact_attendance, fact_performance, fact_department_performance, fact_survey_response
+- Dimension Tables: dim_employee, dim_department, dim_position, dim_date, dim_survey_question
+
 ### [테이블명: dim_employee]
 
 dim_employee 테이블은 직원 기본 정보 및 조직 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:

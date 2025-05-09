@@ -4,6 +4,7 @@ from uuid import uuid4
 from dotenv import load_dotenv
 
 from config.setup import init_pinecone
+from llm.gemini import GeminiEmbeddingViaGMS
 
 from pinecone import Pinecone, ServerlessSpec
 from langchain_community.document_loaders import TextLoader
@@ -23,12 +24,13 @@ logging.info("📦 문서 임베딩 및 Pinecone 업로드 시작")
 
 init_pinecone()
 
-index_name = "schema-index"
+index_name = "schema-index" # "schema-index-google", "schema-index"
 pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
 if index_name not in pc.list_indexes().names():
+    dimension = 1024 if index_name=="schema-index" else 768
     pc_index = pc.create_index(
         name=index_name,
-        dimension=1024,  # 모델에 맞는 차원으로 설정 (예: 384, 768, 1536 등)
+        dimension=dimension,  # 모델에 맞는 차원으로 설정 (예: 384, 768, 1536 등)
         metric="cosine",
         spec=ServerlessSpec(
             cloud="gcp",
@@ -68,12 +70,16 @@ logging.info(f"🔢 총 split 문서 수: {len(splits)}")
 # ----------------------------
 #  KURE-v1 임베딩 (Hugging Face 모델 사용)
 # ----------------------------
-logging.info("🔍 KURE 임베딩 생성 중...")
+logging.info("🔍 임베딩 생성 중...")
+
 embedding = HuggingFaceEmbeddings(
     model_name="nlpai-lab/KURE-v1",
     model_kwargs={"device": "cpu"},  # GPU 사용 가능 시 "cuda"
     encode_kwargs={"normalize_embeddings": True}
 )
+
+# embedding = GeminiEmbeddingViaGMS(api_key=os.environ["GEMINI_API_KEY"])
+
 
 # ----------------------------
 #  Pinecone에 업로드

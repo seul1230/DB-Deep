@@ -8,7 +8,8 @@ from google.oauth2 import service_account
 # 인사팀 여부 판별
 # ----------------------------
 def is_hr_team(department: str) -> bool:
-    return department.strip() == "인사팀"
+    hr_keywords = {"인사팀", "인사관리", "인력개발"}
+    return department.strip() in hr_keywords
 
 # ----------------------------
 # GPT 응답에서 SQL 추출
@@ -60,13 +61,22 @@ class SQLExecutor:
         credentials = service_account.Credentials.from_service_account_file(credentials_path)
         self.bq_client = bigquery.Client(credentials=credentials, project=project_id)
 
-    def execute_with_retry(self, query: str, max_retry: int = 3, location: str = "asia-northeast3"):
-        for attempt in range(max_retry):
-            try:
-                logging.info(f"🚀 SQL 실행 시도 (시도 {attempt+1})...")
-                return self.bq_client.query(query, location=location).to_dataframe()
-            except Exception as e:
-                logging.warning(f"❌ SQL 실행 실패 (시도 {attempt+1}): {e}")
-                if attempt == max_retry - 1:
-                    raise RuntimeError("❌ 모든 재시도 실패: SQL 실행 불가")
-        return None
+    def validate(self, query: str, location: str = "asia-northeast3"):
+        """
+        SQL 유효성 검사만 수행합니다. (dry_run)
+        유효하지 않으면 BadRequest 예외 발생
+        """
+        job_config = bigquery.QueryJobConfig(dry_run=True, use_query_cache=False)
+        logging.info("🔍 SQL 유효성 검사(dry run) 수행 중...")
+        self.bq_client.query(query, job_config=job_config, location=location)
+
+    def execute(self, query: str, location: str = "asia-northeast3"):
+        """
+        실제 쿼리 실행 후 DataFrame 반환
+        """
+        try:
+            logging.info(f"🚀 SQL 실행 시도...")
+            return self.bq_client.query(query, location=location).to_dataframe()
+        except Exception as e:
+            logging.warning(f"❌ SQL 실행 실패: {e}")
+            return None

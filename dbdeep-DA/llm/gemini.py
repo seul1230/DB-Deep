@@ -77,7 +77,7 @@ class GeminiStreamingViaGMS(LLM):
                 
                 
 class GeminiSyncViaGMS(LLM):
-    model_name: str = "gemini-2.0-flash:generateContent"
+    model_name: str = "gemini-2.0-flash:generateContent" # "gemini-2.5-pro:generateContent", "gemini-2.0-flash:generateContent", "gemini-2.5-pro-preview-0409:generateContent"
     api_key: str = ""
     api_base: str = "https://gms.p.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta"
 
@@ -105,3 +105,40 @@ class GeminiSyncViaGMS(LLM):
                 return result['candidates'][0]['content']['parts'][0]['text']
             except Exception as e:
                 raise ValueError(f"응답 파싱 오류: {e}\n전체 응답: {result}")
+            
+
+class GeminiEmbeddingViaGMS:
+    model_name: str = "text-embedding-004"
+    api_key: str = ""
+    api_base: str = "https://gms.p.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta"
+
+    def __init__(self, api_key: str, api_base: Optional[str] = None):
+        self.api_key = api_key
+        if api_base:
+            self.api_base = api_base
+
+    def embed_text(self, text: str) -> List[float]:
+        url = f"{self.api_base}/models/{self.model_name}:embedContent?key={self.api_key}"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "model": self.model_name,
+            "content": {
+                "parts": [{"text": text}]
+            }
+        }
+
+        with httpx.Client(timeout=30.0) as client:
+            response = client.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            result = response.json()
+
+            try:
+                return result["embedding"]["values"]
+            except Exception as e:
+                raise ValueError(f"임베딩 파싱 오류: {e}\n전체 응답: {result}")
+    
+    def embed_query(self, text: str) -> List[float]:
+        return self.embed_text(text)
+    
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return [self.embed_text(text) for text in texts]
