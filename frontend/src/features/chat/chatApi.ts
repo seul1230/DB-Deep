@@ -27,16 +27,10 @@ export const fetchChatRooms = async (
 };
 
 export const updateChatTitle = async (chatId: string, newTitle: string) => {
-  const response = await axios.patch(
-    `/chats/${chatId}/title`,
-    { title: newTitle },
-    {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        'Content-Type': 'application/json',
-      },
-    }
-  );
+  const response = await axios.patch(`/chats/${chatId}/title`, {
+    title: newTitle,
+  });
+
   return response.data;
 };
 
