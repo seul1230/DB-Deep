@@ -81,6 +81,17 @@
     text-overflow: ellipsis;
     max-width: 170px;
   }
+
+  .ChatLogPanel-titleInput {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 4px;
+    border: 1px solid var(--light-gray);
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
   
   .ChatLogPanel-date {
     font-size: 11px;
