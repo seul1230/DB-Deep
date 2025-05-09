@@ -17,7 +17,7 @@ interface Props {
   onClose: () => void;
 }
 
-const ProjectSelectorOverlay: React.FC<Props> = ({ onSelect, onClose }) => {
+const ProjectSelectorOverlay: React.FC<Props> = ({ onSelect }) => {
   return (
     <div className={styles.ProjectSelectorOverlay}>
       {mockProjects.map((title) => (
