@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./MainPage.module.css";
 import QuestionInput from "@/shared/ui/QuestionInput/QuestionInput";
 import RecommendedList from "@/entities/chat/RecommendedList/RecommendedList";
+import axios from "@/shared/api/axios";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+
 
 const recommendedQuestions = [
   "마케팅 캠페인 전후의 전환율 차이를 알려줘",
@@ -12,6 +16,35 @@ const recommendedQuestions = [
 ];
 
 const MainPage: React.FC = () => {
+  const [input, setInput] = useState("");
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+
+  const createChatRoom = async (initialMessage: string) => {
+    if (!initialMessage.trim()) return;
+    try {
+      const res = await axios.post("/chats", {});
+      const chatRoomId = res.data.result.chatRoomId;
+
+      queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
+      navigate(`/chat/${chatRoomId}`, { state: { initialMessage } }); // state로 메시지 전달
+    } catch (err) {
+      console.error("채팅방 생성 실패", err);
+      alert("채팅방 생성에 실패했습니다.");
+    }
+  };
+
+  const handleSubmit = () => {
+    createChatRoom(input);
+    setInput("");
+  };
+
+  //추천 받은 질문이 구현되면 사용용
+  // const handleQuestionSelect = (question: string) => {
+  //   createChatRoom(question);
+  // };
+
   const handleQuestionSelect = (text: string) => {
     console.log("선택된 질문:", text);
   };
@@ -19,8 +52,15 @@ const MainPage: React.FC = () => {
   return (
     <div className={styles["MainPage-container"]}>
       <h1 className={styles["MainPage-title"]}>무엇을 도와드릴까요?</h1>
-      <QuestionInput onChange={(text) => console.log("입력 중:", text)} />
-      <RecommendedList questions={recommendedQuestions} onSelect={handleQuestionSelect} />
+      <QuestionInput
+        value={input}
+        onChange={setInput}
+        onSubmit={handleSubmit}
+      />
+      <RecommendedList
+        questions={recommendedQuestions}
+        onSelect={handleQuestionSelect}
+      />
     </div>
   );
 };
