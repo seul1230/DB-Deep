@@ -36,7 +36,7 @@
 /* 전송 버튼 */
 .sendButton {
   position: absolute;
-  top: 50%;
+  top: 54%;
   right: 16px;
   transform: translateY(-50%);
   background: transparent;
