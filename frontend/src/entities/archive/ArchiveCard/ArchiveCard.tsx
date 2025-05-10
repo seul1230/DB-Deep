@@ -3,6 +3,7 @@ import styles from "./ArchiveCard.module.css";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
 import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
 import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
+import { deleteArchive } from "@/features/archive/archiveApi";
 
 interface Props {
   id: string;
@@ -12,9 +13,10 @@ interface Props {
   tableData?: string[][];
   chartData?: { label: string; value: number }[];
   onClick?: () => void;
+  onDeleteSuccess?: (id: string) => void;
 }
 
-const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData, chartData, onClick }) => {
+const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData, chartData, onClick, onDeleteSuccess }) => {
   const moreIconRef = useRef<HTMLDivElement>(null);
   const { toggleOverlayForTarget, isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
 
@@ -26,6 +28,15 @@ const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData,
         { top: rect.bottom + window.scrollY, left: rect.left + window.scrollX + 8 },
         id
       );
+    }
+  };
+
+  const handleDelete = async (archiveId: string) => {
+    try {
+      await deleteArchive(archiveId);
+      onDeleteSuccess?.(archiveId); // 페이지에서 전달된 콜백 호출
+    } catch (e) {
+      console.error("삭제 실패:", e);
     }
   };
 
@@ -91,7 +102,7 @@ const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData,
           position={position}
           targetId={id}
           onCopy={(id) => console.log("복사:", id)}
-          onDelete={(id) => console.log("삭제:", id)}
+          onDelete={handleDelete}
           showDelete
           onClose={closeOverlay}
         />
