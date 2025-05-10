@@ -1,9 +1,10 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./ArchiveCard.module.css";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
 import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
 import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
 import { deleteArchive } from "@/features/archive/archiveApi";
+import DeleteConfirmModal from "@/shared/ui/DeleteConfirmModal/DeleteConfirmModal";
 
 interface Props {
   id: string;
@@ -19,6 +20,7 @@ interface Props {
 const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData, chartData, onClick, onDeleteSuccess }) => {
   const moreIconRef = useRef<HTMLDivElement>(null);
   const { toggleOverlayForTarget, isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleMoreClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -31,12 +33,14 @@ const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData,
     }
   };
 
-  const handleDelete = async (archiveId: string) => {
+  const handleDelete = async () => {
     try {
-      await deleteArchive(archiveId);
-      onDeleteSuccess?.(archiveId); // 페이지에서 전달된 콜백 호출
+      await deleteArchive(id);
+      onDeleteSuccess?.(id);
     } catch (e) {
       console.error("삭제 실패:", e);
+    } finally {
+      setShowDeleteModal(false);
     }
   };
 
@@ -102,9 +106,24 @@ const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData,
           position={position}
           targetId={id}
           onCopy={(id) => console.log("복사:", id)}
-          onDelete={handleDelete}
+          onDelete={() => setShowDeleteModal(true)}
           showDelete
           onClose={closeOverlay}
+        />
+      )}
+
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          title="아카이브 삭제"
+          message={
+            <>
+              <strong>{`"${title}"`}</strong> 아카이브를 삭제하시겠습니까?
+              <br />
+              삭제된 아카이브는 복구할 수 없습니다.
+            </>
+          }
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={handleDelete}
         />
       )}
     </div>
