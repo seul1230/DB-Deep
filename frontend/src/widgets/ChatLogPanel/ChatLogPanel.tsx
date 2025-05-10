@@ -183,18 +183,22 @@ const ChatLogPanel: React.FC = () => {
       )}
       {showDeleteModal && (
         <DeleteConfirmModal
+          title="채팅방 삭제"
+          message={
+            <>
+              <strong style={{ fontWeight: 700 }}>
+                "{data?.chatRooms.find((c) => c.id === chatIdToDelete)?.title}"
+              </strong>
+              &nbsp;채팅방을 삭제하시겠습니까?
+              <br />
+              삭제된 채팅방은 복구할 수 없습니다.
+            </>
+          }
           onCancel={() => {
             setShowDeleteModal(false);
             setChatIdToDelete(null);
           }}
           onConfirm={handleDeleteChatRoom}
-          message={
-            <>
-              <strong style={{ fontWeight: 700 }}>{`"${data?.chatRooms.find(c => c.id === chatIdToDelete)?.title}"`}</strong> 채팅방을 삭제하시겠습니까?
-              <br />
-              삭제된 채팅방은 복구할 수 없습니다.
-            </>
-          }
         />
       )}
     </div>
