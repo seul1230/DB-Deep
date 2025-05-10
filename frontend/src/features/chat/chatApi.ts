@@ -13,6 +13,11 @@ interface ChatRoomResponse {
   hasNext: boolean;
 }
 
+export const createChatRoom = async (): Promise<string> => {
+  const response = await axios.post("/chats", {});
+  return response.data.result.chatRoomId;
+};
+
 export const fetchChatRooms = async (
   cursor?: string,
   size = 30

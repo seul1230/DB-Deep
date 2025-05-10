@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./MainPage.module.css";
 import QuestionInput from "@/shared/ui/QuestionInput/QuestionInput";
 import RecommendedList from "@/entities/chat/RecommendedList/RecommendedList";
-import axios from "@/shared/api/axios";
+import { createChatRoom } from "@/features/chat/chatApi";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -21,11 +21,10 @@ const MainPage: React.FC = () => {
   const queryClient = useQueryClient();
 
 
-  const createChatRoom = async (initialMessage: string) => {
+  const createAndNavigateChatRoom  = async (initialMessage: string) => {
     if (!initialMessage.trim()) return;
     try {
-      const res = await axios.post("/chats", {});
-      const chatRoomId = res.data.result.chatRoomId;
+      const chatRoomId = await createChatRoom();
 
       queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
       navigate(`/chat/${chatRoomId}`, { state: { initialMessage } }); // state로 메시지 전달
@@ -36,13 +35,13 @@ const MainPage: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    createChatRoom(input);
+    createAndNavigateChatRoom (input);
     setInput("");
   };
 
   //추천 받은 질문이 구현되면 사용용
   // const handleQuestionSelect = (question: string) => {
-  //   createChatRoom(question);
+  //   createAndNavigateChatRoom (question);
   // };
 
   const handleQuestionSelect = (text: string) => {
