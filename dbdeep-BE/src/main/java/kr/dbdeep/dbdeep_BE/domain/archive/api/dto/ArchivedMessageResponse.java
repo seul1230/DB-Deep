@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public record ArchivedMessageResponse(
         Integer archiveId,
+        String chatName,
         String messageId,
         String lastMessage,
 
@@ -17,10 +18,11 @@ public record ArchivedMessageResponse(
     public static ArchivedMessageResponse from(
             Integer archiveId,
             String messageId,
+            String chatName,
             String lastMessage,
             LocalDateTime chatSentAt,
             LocalDateTime archivedAt
     ) {
-        return new ArchivedMessageResponse(archiveId, messageId, lastMessage, chatSentAt, archivedAt);
+        return new ArchivedMessageResponse(archiveId, messageId, chatName, lastMessage, chatSentAt, archivedAt);
     }
 }
