@@ -36,4 +36,8 @@ public class MemberService {
         return memberRepository.findByEmail(email).orElseThrow(() -> new CommonException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
+    public List<Member> findAllByIds(Iterable<Integer> ids) {
+        return memberRepository.findAllById(ids);
+    }
+
 }

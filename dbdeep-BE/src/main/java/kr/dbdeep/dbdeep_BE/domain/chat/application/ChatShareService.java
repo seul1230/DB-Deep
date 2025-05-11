@@ -34,11 +34,14 @@ public class ChatShareService {
         Member member = memberService.findById(memberId);
         ChatRoom chatRoom = chatRoomService.findById(chatroomId);
 
-        List<Notification> notifications = targetMemberIds.stream()
-                .map(targetId -> Notification.builder()
-                        .memberId(targetId)
-                        .content(member.getName() + "님이 " + chatRoom.getChatroomName() + "를 공유했습니다")
+        List<Member> targets = memberService.findAllByIds(targetMemberIds);
+
+        List<Notification> notifications = targets.stream()
+                .map(target -> Notification.builder()
+                        .member(member)
+                        .target(target)
                         .chatroomId(chatroomId)
+                        .chatName(chatRoom.getChatroomName())
                         .isRead(false)
                         .build())
                 .collect(Collectors.toList());
@@ -78,7 +81,7 @@ public class ChatShareService {
                         .id(UUID.randomUUID().toString())
                         .chatRoomId(newChatRoomId)
                         .content(m.getContent())
-                        .memberId((int) memberId.longValue())
+                        .memberId(memberId)
                         .senderType(m.getSenderType())
                         .timestamp(m.getTimestamp())
                         .build())

@@ -11,4 +11,6 @@ public interface MemberRepository extends JpaRepository<Member, Integer> {
     Optional<Member> findByEmail(String email);
 
     List<Member> findAllByDeletedAtIsNull();
+
+    Iterable<Integer> id(Integer id);
 }

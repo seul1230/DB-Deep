@@ -7,7 +7,8 @@ import lombok.Builder;
 @Builder
 public record NotificationResponse(
         Integer id,
-        String content,
+        String memberName,
+        String chatName,
         Boolean isRead,
         String chatId,
         LocalDateTime readAt,
@@ -16,7 +17,8 @@ public record NotificationResponse(
     public static NotificationResponse from(Notification notification) {
         return NotificationResponse.builder().
                 id(notification.getId())
-                .content(notification.getContent())
+                .memberName(notification.getMember().getName())
+                .chatName(notification.getChatName())
                 .isRead(notification.getIsRead())
                 .chatId(notification.getChatroomId())
                 .readAt(notification.getReadAt())

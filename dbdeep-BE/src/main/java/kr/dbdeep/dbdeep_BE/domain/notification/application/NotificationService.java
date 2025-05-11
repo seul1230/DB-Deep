@@ -2,6 +2,8 @@ package kr.dbdeep.dbdeep_BE.domain.notification.application;
 
 import java.util.Comparator;
 import java.util.List;
+import kr.dbdeep.dbdeep_BE.domain.member.application.MemberService;
+import kr.dbdeep.dbdeep_BE.domain.member.entity.Member;
 import kr.dbdeep.dbdeep_BE.domain.notification.api.dto.NotificationResponse;
 import kr.dbdeep.dbdeep_BE.domain.notification.entity.Notification;
 import kr.dbdeep.dbdeep_BE.domain.notification.exception.NotificationException;
@@ -15,11 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NotificationService {
 
+    private final MemberService memberService;
     private final NotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
     public List<NotificationResponse> getAll(Integer memberId) {
-        List<Notification> notifications = notificationRepository.findByMemberId(memberId);
+        List<Notification> notifications = notificationRepository.findByTargetId(memberId);
         if (notifications.isEmpty()) {
             throw new NotificationException(ErrorCode.NOTIFICATION_IS_EMPTY);
         }
@@ -34,7 +37,9 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new NotificationException(ErrorCode.NOTIFICATION_NOT_FOUND));
 
-        if (!notification.getMemberId().equals(memberId)) {
+        Member member = memberService.findById(memberId);
+
+        if (!notification.getTarget().equals(member)) {
             throw new NotificationException(ErrorCode.NOTIFICATION_NOT_FOUND);
         }
 
@@ -46,7 +51,9 @@ public class NotificationService {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new NotificationException(ErrorCode.NOTIFICATION_NOT_FOUND));
 
-        if (!notification.getMemberId().equals(memberId)) {
+        Member member = memberService.findById(memberId);
+
+        if (!notification.getTarget().equals(member)) {
             throw new NotificationException(ErrorCode.NOTIFICATION_NOT_FOUND);
         }
         notificationRepository.delete(notification);
