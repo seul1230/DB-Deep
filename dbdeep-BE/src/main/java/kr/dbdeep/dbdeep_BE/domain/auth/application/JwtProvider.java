@@ -1,10 +1,7 @@
 package kr.dbdeep.dbdeep_BE.domain.auth.application;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
@@ -30,23 +27,6 @@ public class JwtProvider {
     public JwtProvider(@Value("${jwt.secretKey}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
-        } catch (MalformedJwtException e) {
-            throw new MalformedJwtException("위조된 토큰");
-        } catch (ExpiredJwtException e) {
-            throw new ExpiredJwtException(e.getHeader(), e.getClaims(), e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            throw new UnsupportedJwtException(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("토큰 에러");
-        } catch (io.jsonwebtoken.security.SecurityException e) {
-            throw new SecurityException("security exception");
-        }
     }
 
     public String generateToken(Authentication authentication, long expireMills) {
