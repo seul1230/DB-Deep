@@ -1,8 +1,12 @@
 from fastapi import APIRouter, Request, HTTPException
-from api.dto.glossary import SaveGlossaryTermListRequest
+from api.dto.glossary import (
+    SaveGlossaryTermListRequest,
+    UpdateGlossaryTermRequest
+)
 from service.glossary_service import (
     save_glossary_terms_batch,
-    get_glossary_terms_by_member_id
+    get_glossary_terms_by_member_id,
+    update_glossary_term
 )
 
 router = APIRouter()
@@ -23,5 +27,18 @@ def get_glossary_terms(request: Request):
         member_id = request.state.member_id
         terms = get_glossary_terms_by_member_id(member_id)
         return terms
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.put("/api/glossary/{term_id}")
+def update_glossary(request: Request, term_id: str, body: UpdateGlossaryTermRequest):
+    try:
+        member_id = request.state.member_id
+        update_glossary_term(member_id, term_id, body.key, body.value)
+        return {"message": "수정되었습니다"}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except PermissionError as pe:
+        raise HTTPException(status_code=403, detail=str(pe))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

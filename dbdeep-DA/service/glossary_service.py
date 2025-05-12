@@ -41,3 +41,21 @@ def get_glossary_terms_by_member_id(member_id: str) -> list[dict]:
         })
 
     return terms
+
+def update_glossary_term(member_id: str, term_id: str, key: str, value: str):
+    db = get_firestore_client()
+    doc_ref = db.collection("glossary_terms").document(term_id)
+    doc = doc_ref.get()
+
+    if not doc.exists:
+        raise ValueError("해당 용어가 존재하지 않습니다.")
+
+    data = doc.to_dict()
+    if data.get("member_id") != str(member_id):
+        raise PermissionError("수정 권한이 없습니다.")
+
+    doc_ref.update({
+        "key": key,
+        "value": value,
+        "updated_at": datetime.utcnow()
+    })
