@@ -4,21 +4,28 @@ import ChatPreview from "../ChatPreview/ChatPreview";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/shared/api/axios";
 import Button from "@/shared/ui/Button/Button";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
+  notificationId: number;
   chatId: string;
+  chatName: string;
+  memberName: string;
   onClose: () => void;
 }
 
-const NotificationModal: React.FC<Props> = ({ chatId, onClose }) => {
+const NotificationModal: React.FC<Props> = ({ notificationId, chatId, chatName, memberName, onClose }) => {
+  const navigate = useNavigate();
   const { mutate: acceptChat, isPending } = useMutation({
     mutationFn: () =>
-      api.post("/chats/allow", {
+      api.post("/chats/share/allow", {
+        notificationId,
         accepted: true,
       }),
     onSuccess: () => {
       alert("채팅이 내 채팅으로 저장되었습니다!");
       onClose();
+      navigate(`/chat/${chatId}`);
     },
   });
 
@@ -28,9 +35,16 @@ const NotificationModal: React.FC<Props> = ({ chatId, onClose }) => {
         className={styles["NotificationModal-content"]}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className={styles["NotificationModal-title"]}>분기별 성과 보고서</h2>
-        <Suspense fallback={<div>로딩 중...</div>}>
-          <ChatPreview chatId={chatId} />
+        <h2 className={styles["NotificationModal-title"]}>
+          {chatName || "채팅 제목 없음"}
+          <span className={styles["NotificationModal-subtitle"]}>
+            ({memberName || "이름 없음"}님이 공유)
+          </span>
+        </h2>
+        <Suspense fallback={null}>
+          <div className={styles["NotificationModal-previewWrapper"]}>
+            <ChatPreview chatId={chatId} />
+          </div>
         </Suspense>
          <div className={styles["NotificationModal-buttonRow"]}>
           <Button
