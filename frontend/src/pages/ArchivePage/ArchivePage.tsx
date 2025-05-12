@@ -69,7 +69,8 @@ const ArchivePage = () => {
               <ArchiveCard
                 key={item.archiveId}
                 id={item.archiveId.toString()}
-                title={item.lastMessage}
+                title={item.chatName}
+                description={item.lastMessage}
                 date={dayjs(item.archivedAt).format("YYYY년 M월 D일 A h시 m분")}
                 onClick={() => console.log(`ArchiveCard ${item.archiveId} clicked`)}
                 onDeleteSuccess={handleDeleteSuccess}

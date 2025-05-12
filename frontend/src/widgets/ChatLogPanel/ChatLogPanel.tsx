@@ -117,7 +117,7 @@ const ChatLogPanel: React.FC = () => {
                   value={editedTitle}
                   autoFocus
                   onChange={(e) => setEditedTitle(e.target.value)}
-                  onClick={(e) => e.stopPropagation()}
+                  onDoubleClick={(e) => e.stopPropagation()}
                   onBlur={() => handleEditComplete(log.id)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleEditComplete(log.id);
@@ -127,7 +127,7 @@ const ChatLogPanel: React.FC = () => {
               ) : (
                 <span
                   className={styles["ChatLogPanel-title"]}
-                  onClick={(e) => {
+                  onDoubleClick={(e) => {
                     e.stopPropagation();
                     setEditingId(log.id);
                     setEditedTitle(log.title);
