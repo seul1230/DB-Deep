@@ -1,56 +1,57 @@
 pipeline {
-    agent any
-    environment {
-        GCP_PROJECT = 'dbdeep-458113'
-        REGION      = 'us-central1'
-        SERVICE     = 'dbdeep-da'
-        REPO        = 'dbdeep-da-repo'
-        IMAGE       = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
+  agent any
+  environment {
+    GCP_PROJECT = 'dbdeep-458113'
+    REGION      = 'us-central1'
+    SERVICE     = 'dbdeep-da'
+    REPO        = 'dbdeep-da-repo'
+    IMAGE       = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        git branch: 'DA-dev',
+            url: 'https://lab.ssafy.com/s12-final/S12P31S104',
+            credentialsId: 'gitlab_api'
+      }
     }
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'DA-dev', 
-                    url: 'https://lab.ssafy.com/s12-final/S12P31S104', 
-                    credentialsId: 'gitlab_api'
-            }
+    stage('Build Docker Image') {
+      steps {
+        script {
+          docker.build("${IMAGE}", "dbdeep-DA/")
         }
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("${IMAGE}", "dbdeep-DA/")
-                }
-            }
-        }
-        stage('Authenticate with GCP') {
-            steps {
-                withCredentials([file(credentialsId: 'gcp-service-account-json', variable: 'GCP_KEY')]) {
-                    sh '''
-                      gcloud auth activate-service-account --key-file=$GCP_KEY
-                      gcloud config set project $GCP_PROJECT
-                      gcloud auth configure-docker asia-northeast3-docker.pkg.dev
-                    '''
-                }
-            }
-        }
-        stage('Push Docker Image') {
-            steps {
-                sh "docker push ${IMAGE}"
-            }
-        }
-        stage('Deploy to Cloud Run') {
-            steps {
-                withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
-                    sh '''
-                        gcloud run deploy $SERVICE \
-                          --image ${IMAGE} \
-                          --platform managed \
-                          --region ${REGION} \
-                          --allow-unauthenticated \
-                          --set-env-vars ${ENV_VARS}
-                    '''
-                }
-            }
-        }
+      }
     }
+    stage('Authenticate with GCP') {
+      steps {
+        withCredentials([file(credentialsId: 'gcp-service-account-json', variable: 'GCP_KEY')]) {
+          sh '''
+            gcloud auth activate-service-account --key-file=$GCP_KEY
+            gcloud config set project $GCP_PROJECT
+            gcloud auth configure-docker asia-northeast3-docker.pkg.dev
+          '''
+        }
+      }
+    }
+    stage('Push Docker Image') {
+      steps {
+        sh "docker push ${IMAGE}"
+      }
+    }
+    stage('Deploy to Cloud Run') {
+      steps {
+        withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
+          sh '''
+            echo "$ENV_VARS" > env_vars.yml
+            gcloud run deploy $SERVICE \
+              --image ${IMAGE} \
+              --platform managed \
+              --region ${REGION} \
+              --allow-unauthenticated \
+              --env-vars-file=env_vars.yml
+          '''
+        }
+      }
+    }
+  }
 }
