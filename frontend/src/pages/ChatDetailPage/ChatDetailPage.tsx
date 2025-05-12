@@ -22,7 +22,7 @@ const ChatDetailPage = () => {
   const { openPanel } = usePanelStore();
 
   const isAnyPanelOpen = !!openPanel;
-  const rightOffset = isAnyPanelOpen ? PANEL_WIDTH : 0;
+  const leftOffset = isAnyPanelOpen ? PANEL_WIDTH+68 : 0;
   
   useEffect(() => {
     if (chatId) {
@@ -42,7 +42,9 @@ const ChatDetailPage = () => {
 
       <div
         className={styles['chatDetailPage-inputWrapper']}
-        style={{ paddingLeft: `${rightOffset}px` }}
+        style={{
+          paddingLeft: `${leftOffset}px`
+        }}
       >
         <div className={styles['chatDetailPage-inputContainer']}>
           <div className={styles['chatDetailPage-inputArea']}>
