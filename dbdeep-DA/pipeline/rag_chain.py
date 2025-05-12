@@ -14,7 +14,7 @@ from pinecone import Pinecone, ServerlessSpec
 from langchain_pinecone import PineconeVectorStore
 
 from llm.gemini import GeminiStreamingViaGMS, GeminiSyncViaGMS
-from pipeline.propmt_templates import get_prompt, get_prompt_for_insight
+from pipeline.prompt_templates import get_prompt, get_prompt_for_insight
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
