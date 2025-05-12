@@ -40,13 +40,17 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
           sh '''
-            gcloud beta run deploy $SERVICE \
+            gcloud run deploy $SERVICE \
               --image ${IMAGE} \
               --platform managed \
               --region ${REGION} \
               --allow-unauthenticated \
-              --readiness-probe-path=/api/hello \
               --set-env-vars $ENV_VARS
+
+            gcloud run services update $SERVICE \
+              --region $REGION \
+              --readiness-probe-http-get-path=/api/hello \
+              --project $GCP_PROJECT
           '''
         }
       }
