@@ -45,6 +45,7 @@ pipeline {
               --platform managed \
               --region ${REGION} \
               --allow-unauthenticated \
+              --readiness-probe-path=/api/hello \
               --set-env-vars $ENV_VARS
           '''
         }
