@@ -40,8 +40,9 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
           sh '''
-            echo "$ENV_VARS" \
-              | sed 's/,/\\n/g; s/\\([^=]*\\)=\\(.*\\)/\\1: "\2"/' \
+            printf "%s" "$ENV_VARS" \
+              | sed 's/,/\\n/g' \
+              | sed -E 's/^([^=]+)=(.*)$/\\1: "\\2"/' \
               > env_vars.yml
             gcloud run deploy $SERVICE \
               --image ${IMAGE} \
