@@ -43,15 +43,12 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
                     sh '''
-                        # 기존 ENV_VARS 시크릿 뒤에 PORT 항목을 추가
-                        echo "${ENV_VARS},PORT=${PORT}" > env_vars.json
-
                         gcloud run deploy $SERVICE \
-                          --image ${IMAGE} \
-                          --platform managed \
-                          --region ${REGION} \
-                          --allow-unauthenticated \
-                          --env-vars-file=env_vars.json
+                            --image ${IMAGE} \
+                            --platform managed \
+                            --region ${REGION} \
+                            --allow-unauthenticated \
+                            --set-env-vars ${ENV_VARS},PORT=${PORT}
                     '''
                 }
             }
