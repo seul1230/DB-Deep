@@ -6,16 +6,24 @@ import Button from '@/shared/ui/Button/Button';
 import styles from './ChatDetailPage.module.css';
 import { fetchChatDetail } from '@/features/chat/chatApi';
 import { ChatMessage } from '@/features/chat/chatTypes';
+import { usePanelStore } from '@/shared/store/usePanelStore';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
 );
+
+const PANEL_WIDTH = 240;
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showModal, setShowModal] = useState(false);
 
+  const { openPanel } = usePanelStore();
+
+  const isAnyPanelOpen = !!openPanel;
+  const rightOffset = isAnyPanelOpen ? PANEL_WIDTH : 0;
+  
   useEffect(() => {
     if (chatId) {
       fetchChatDetail(chatId).then((detail) => setMessages(detail.messages));
@@ -30,19 +38,25 @@ const ChatDetailPage = () => {
     <div className={styles['chatDetailPage-outer']}>
       <div className={styles['chatDetailPage-contentWrapper']}>
         <ChatList chatList={messages} onChartClick={handleChartClick} scrollToBottom />
-        <div className={styles['chatDetailPage-inputWrapper']}>
+      </div>
+
+      <div
+        className={styles['chatDetailPage-inputWrapper']}
+        style={{ paddingLeft: `${rightOffset}px` }}
+      >
+        <div className={styles['chatDetailPage-inputContainer']}>
           <div className={styles['chatDetailPage-inputArea']}>
-            <QuestionInput onChange={(text) => console.log('입력:', text)} />
+            <QuestionInput onChange={(text) => console.log(text)} />
             <Button
               label="지금까지의 채팅 공유"
               onClick={() => setShowModal(true)}
               borderColor="var(--icon-blue)"
               backgroundColor="var(--icon-blue)"
-              textColor="var(--background-color)"
-            />
+              textColor="var(--background-color)" />
           </div>
         </div>
       </div>
+      
       <Suspense fallback={<div style={{ display: 'none' }} />}>
         {showModal && (
           <TeamMemberSelectModal

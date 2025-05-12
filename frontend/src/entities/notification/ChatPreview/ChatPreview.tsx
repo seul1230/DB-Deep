@@ -20,7 +20,7 @@ const ChatPreview: React.FC<Props> = ({ chatId }) => {
   return (
     <div className={styles['ChatPreview-container']}>
       <div className={styles['ChatPreview-scrollArea']}>
-        <ChatList chatList={messages} />
+        <ChatList chatList={messages} showMenu={false} />
       </div>
     </div>
   );

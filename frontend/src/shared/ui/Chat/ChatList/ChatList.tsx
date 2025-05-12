@@ -8,9 +8,10 @@ interface Props {
   chatList: ChatMessage[];
   onChartClick?: (chartId: string) => void;
   scrollToBottom?: boolean;
+  showMenu?: boolean;
 }
 
-const ChatList: React.FC<Props> = ({ chatList, onChartClick, scrollToBottom }) => {
+const ChatList: React.FC<Props> = ({ chatList, onChartClick, scrollToBottom, showMenu = true, }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,6 +38,7 @@ const ChatList: React.FC<Props> = ({ chatList, onChartClick, scrollToBottom }) =
               text={msg.content}
               onChartClick={onChartClick || (() => {})}
               isLive={isLive}
+              showMenu={showMenu}
             />
           );
         })}
