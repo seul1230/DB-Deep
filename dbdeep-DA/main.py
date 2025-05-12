@@ -40,6 +40,11 @@ class InsightRequest(BaseModel):
     chat_history: str | None = None
     user_department: str | None = None
 
+# root handler
+@app.get("/")
+async def liveness_probe():
+    return {"status": "ok"}
+
 # NL2SQL + Vega-Lite JSON 반환
 @app.post("/api/nl2sql")
 def run_nl2sql(request: QueryRequest):
