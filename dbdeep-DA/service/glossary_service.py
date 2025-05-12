@@ -22,3 +22,22 @@ def save_glossary_terms_batch(member_id: str, terms: list[dict]):
         })
 
     batch.commit()
+
+def get_glossary_terms_by_member_id(member_id: str) -> list[dict]:
+    db = get_firestore_client()
+
+    query = (
+        db.collection("glossary_terms")
+        .where("member_id", "==", str(member_id))
+    )
+
+    terms = []
+    for doc in query.stream():
+        data = doc.to_dict()
+        terms.append({
+            "id": doc.id,
+            "key": data.get("key"),
+            "value": data.get("value")
+        })
+
+    return terms
