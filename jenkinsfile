@@ -40,7 +40,7 @@ pipeline {
       steps {
         withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
           sh '''
-            gcloud run deploy $SERVICE \
+            gcloud beta run deploy $SERVICE \
               --image ${IMAGE} \
               --platform managed \
               --region ${REGION} \
