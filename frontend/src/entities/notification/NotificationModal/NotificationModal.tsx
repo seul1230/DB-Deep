@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import api from "@/shared/api/axios";
 import Button from "@/shared/ui/Button/Button";
 import { useNavigate } from "react-router-dom";
+import { showSuccessToast } from "@/shared/toast";
 
 interface Props {
   notificationId: number;
@@ -23,7 +24,7 @@ const NotificationModal: React.FC<Props> = ({ notificationId, chatId, chatName, 
         accepted: true,
       }),
     onSuccess: () => {
-      alert("채팅이 내 채팅으로 저장되었습니다!");
+      showSuccessToast("채팅이 내 채팅으로 저장되었습니다!");
       onClose();
       navigate(`/chat/${chatId}`);
     },

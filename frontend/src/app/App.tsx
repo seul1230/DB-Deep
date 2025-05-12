@@ -2,6 +2,7 @@ import { useThemeStore } from "@/shared/store/themeStore";
 import { BrowserRouter } from "react-router-dom";
 import { Suspense, useEffect } from "react";
 import AppRoutes from "../app/Router";
+import CustomToastContainer from "@/shared/ui/CustomToastContainer/CustomToastContainer";
 
 const App = () => {
   const theme = useThemeStore((state) => state.theme);
@@ -16,6 +17,7 @@ const App = () => {
     <BrowserRouter>
       <Suspense fallback={<div>페이지 로딩 중...</div>}>
         <AppRoutes />
+        <CustomToastContainer />
       </Suspense>
     </BrowserRouter>
   );
