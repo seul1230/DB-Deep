@@ -13,6 +13,7 @@ interface ChatBubbleDBDeepProps {
   onChartClick: (chartId: string) => void;
   onTyping?: () => void;
   isLive?: boolean;
+  showMenu?: boolean;
 }
 
 export const ChatBubbleDBDeep = ({
@@ -20,6 +21,7 @@ export const ChatBubbleDBDeep = ({
   onChartClick,
   onTyping,
   isLive = false,
+  showMenu = true,
 }: ChatBubbleDBDeepProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -58,21 +60,23 @@ export const ChatBubbleDBDeep = ({
           )}
         </div>
 
-        <div className={styles['chatBubbleDBDeep-menuArea']} ref={menuRef}>
-          <button
-            className={styles['chatBubbleDBDeep-menuButton']}
-            onClick={() => setMenuOpen((prev) => !prev)}
-          >
-            <FiMoreVertical size={18} />
-          </button>
-          {menuOpen && (
-            <ChatBubbleMenuOverlay
-              onCopy={() => navigator.clipboard.writeText(text)}
-              onArchive={() => alert('아카이브에 저장했습니다. (API 연동 예정)')}
-              onClose={() => setMenuOpen(false)}
-            />
-          )}
-        </div>
+        {showMenu && ( 
+          <div className={styles['chatBubbleDBDeep-menuArea']} ref={menuRef}>
+            <button
+              className={styles['chatBubbleDBDeep-menuButton']}
+              onClick={() => setMenuOpen((prev) => !prev)}
+            >
+              <FiMoreVertical size={18} />
+            </button>
+            {menuOpen && (
+              <ChatBubbleMenuOverlay
+                onCopy={() => navigator.clipboard.writeText(text)}
+                onArchive={() => alert('아카이브에 저장했습니다. (API 연동 예정)')}
+                onClose={() => setMenuOpen(false)}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

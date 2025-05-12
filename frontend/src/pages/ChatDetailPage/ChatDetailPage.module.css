@@ -1,29 +1,42 @@
 .chatDetailPage-outer {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   background-color: var(--background-color);
-  padding-bottom: 84px; /* input 영역 높이만큼 여유 */
+  align-items: center;
+  position: relative;
 }
 
-.chatDetailPage-scrollArea {
+.chatDetailPage-contentWrapper {
   flex: 1;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
+  width: 100%;
+  max-width: 1000px;
   padding: 24px 16px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .chatDetailPage-inputWrapper {
   position: fixed;
   bottom: 0;
-  left: 0;
-  width: 100%;
+  right: 0;
+  left: 68px;
+  background-color: var(--background-color);
+  padding: 12px 16px;
+  box-sizing: border-box;
   display: flex;
   justify-content: center;
-  padding: 12px;
-  background-color: var(--background-color);
+  width: 100%;
+  transition: padding-left 0.3s ease;
+  z-index: 1;
+}
+
+.chatDetailPage-inputContainer {
+  width: 100%;
+  max-width: 650px;
+  transition: width 0.3s ease;
 }
 
 .chatDetailPage-inputArea {
@@ -31,7 +44,7 @@
   flex-direction: column;
   align-items: flex-end;
   width: 100%;
-  max-width: 650px;
+  gap: 10px;
 }
 
 .chatDetailPage-inputArea button {

@@ -12,9 +12,14 @@ interface Props {
 }
 
 const NotificationList: React.FC<Props> = ({ notifications }) => {
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const queryClient = useQueryClient();
+  const [selectedInfo, setSelectedInfo] = useState<{
+    notificationId: number;
+    chatId: string;
+    chatName: string;
+    memberName: string;
+  } | null>(null);
 
   const { mutate: markAsRead } = useMutation({
     mutationFn: (notificationId: number) =>
@@ -25,15 +30,20 @@ const NotificationList: React.FC<Props> = ({ notifications }) => {
   });
 
   const handleClick = (n: Notification) => {
-    if (!n.isRead) {
-      markAsRead(n.id);
-    }
-    setSelectedChatId(n.chatId);
-    setShowModal(true);
-  };
+  if (!n.isRead) {
+    markAsRead(n.id);
+  }
+  setSelectedInfo({
+    notificationId: n.id,
+    chatId: n.chatId,
+    chatName: n.chatName,
+    memberName: n.memberName,
+  });
+  setShowModal(true);
+};
 
   return (
-    <>
+    <div className={styles["NotificationList-wrapper"]}>
       {notifications.length === 0 ? (
         <p style={{ fontStyle: "italic", textAlign: "center", fontSize: "12px" }}>
           알림이 없습니다.
@@ -47,7 +57,7 @@ const NotificationList: React.FC<Props> = ({ notifications }) => {
             }`}
             onClick={() => handleClick(n)}
           >
-            <FiBell size={16} className={styles["NotificationList-icon"]} />
+            <FiBell size={14} className={styles["NotificationList-icon"]} />
             <div className={styles["NotificationList-content"]}>
               <div className={styles["NotificationList-headerRow"]}>
                 <strong>공유 알림</strong>
@@ -55,18 +65,21 @@ const NotificationList: React.FC<Props> = ({ notifications }) => {
                   {dayjs(n.createdAt).fromNow()}
                 </span>
               </div>
-              <p>{n.content}</p>
+              <p>{n.memberName}님이 {n.chatName}을(를) 공유했습니다.</p>
             </div>
           </div>
         ))
       )}
-      {showModal && selectedChatId && (
+      {showModal && selectedInfo && (
         <NotificationModal
-          chatId={selectedChatId}
+          notificationId={selectedInfo.notificationId}
+          chatId={selectedInfo.chatId}
+          chatName={selectedInfo.chatName}
+          memberName={selectedInfo.memberName}
           onClose={() => setShowModal(false)}
         />
       )}
-    </>
+    </div>
   );
 };
 

@@ -88,3 +88,7 @@
     box-sizing: border-box;
   }
 }
+
+.NotificationPanel-list::-webkit-scrollbar {
+  display: none;
+}
