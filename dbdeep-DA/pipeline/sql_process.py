@@ -1,6 +1,8 @@
 import os
 import re
+import json
 import logging
+
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
@@ -14,11 +16,53 @@ def is_hr_team(department: str) -> bool:
 # ----------------------------
 # GPT 응답에서 SQL 추출
 # ----------------------------
+# def clean_sql_from_response(response_text: str) -> str:
+#     match = re.search(r"```sql\s*(.*?)```", response_text, re.DOTALL)
+#     sql_code = match.group(1) if match else response_text
+#     lines = sql_code.splitlines()
+#     return "\n".join([line for line in lines if not line.strip().startswith("--")]).strip()
+
 def clean_sql_from_response(response_text: str) -> str:
-    match = re.search(r"```sql\s*(.*?)```", response_text, re.DOTALL)
-    sql_code = match.group(1) if match else response_text
+    """
+    LLM 응답에서 SQL 코드만 추출하고 실행 가능하도록 정제
+    """
+    sql_code = None
+
+    # 0. 사전 정리: JSON 문자열로 보이는데 escape가 섞인 경우
+    response_text = response_text.strip()
+    if response_text.startswith("```json"):
+        response_text = re.sub(r"^```json", "", response_text)
+        response_text = re.sub(r"```$", "", response_text).strip()
+
+    # 1. JSON 파싱 시도
+    try:
+        json_obj = json.loads(response_text)
+        if isinstance(json_obj, dict):
+            sql_code = json_obj.get("query", {}).get("sql_code") or json_obj.get("sql_code")
+    except json.JSONDecodeError:
+        pass  # 아래 단계로 fallback
+
+    # 2. 코드블록에서 추출
+    if not sql_code:
+        match = re.search(r"```(?:sql)?\s*(.*?)```", response_text, re.DOTALL)
+        sql_code = match.group(1) if match else response_text
+
+    # 3. 이스케이프 및 마크다운 정리
+    sql_code = sql_code.replace("\\n", "\n").replace("\\t", "\t").replace("\\\\", "\\")
+    sql_code = sql_code.replace("``", "").replace("`", "")
+
+    # 4. 주석 제거
     lines = sql_code.splitlines()
-    return "\n".join([line for line in lines if not line.strip().startswith("--")]).strip()
+    cleaned_lines = [line for line in lines if not line.strip().startswith("--")]
+    cleaned_sql = "\n".join(cleaned_lines).strip()
+
+    # 5. SQL 시작 검증
+    if not re.match(r"^\s*(SELECT|WITH)", cleaned_sql, re.IGNORECASE):
+        logging.warning("⚠️ SQL이 SELECT 또는 WITH로 시작하지 않음. 포맷 오류 가능성 있음.")
+
+    return cleaned_sql
+
+
 
 # GPT 응답에서 JSON 블록 추출
 def clean_json_from_response(response_text: str) -> str:
@@ -49,6 +93,7 @@ def remove_json_line_comments(json_str):
             cleaned_lines.append(new_line.rstrip())
         else:
             cleaned_lines.append(line.rstrip())
+            
     return '\n'.join(cleaned_lines)
 
 # ----------------------------

@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import logging
 from pydantic import BaseModel
@@ -12,7 +13,8 @@ from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from llm.gemini import GeminiStreamingViaGMS, GeminiSyncViaGMS, GeminiEmbeddingViaGMS
-from pipeline.prompt_templates import get_prompt_for_sql, get_prompt_for_chart, get_prompt_for_insight
+from modules.chat_summary import build_additional_prompt_with_history
+from pipeline.prompt_templates import get_prompt_for_sql, get_prompt_for_chart, get_prompt_for_insight, get_prompt_for_chart_summary
 
 from config.setup import init_pinecone
 from pipeline.sql_process import clean_sql_from_response, clean_json_from_response, SQLExecutor
@@ -20,6 +22,22 @@ from pipeline.sql_process import clean_sql_from_response, clean_json_from_respon
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
+
+# 환경 변수
+GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
+GEMINI_API_BASE = os.environ["GEMINI_API_BASE"]
+
+# Pinecone 클라이언트
+pc = init_pinecone()
+
+import decimal
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            return float(o)  # 또는 int(o) if o == int(o) else float(o)
+        return super().default(o)
+    
 # -----------------------------------------------
 #  1. NL2SQL - RAG 체인 구성 함수
 # -----------------------------------------------
@@ -83,19 +101,10 @@ def set_rag_chain_for_sql(question, user_department, vectorstore):
 
     return rag_chain, inputs
 
+
 # -----------------------------------------------
 #  2. NL2SQL - SQL validation & Run BigQuery
 # -----------------------------------------------
-
-load_dotenv()
-logging.basicConfig(level=logging.INFO)
-
-# 환경 변수
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-GEMINI_API_BASE = os.environ["GEMINI_API_BASE"]
-
-# Pinecone 클라이언트
-pc = init_pinecone()
 
 def run_bigquery(question, response_text):
     try:
@@ -113,8 +122,6 @@ def run_bigquery(question, response_text):
         return None
 
 
-
-
 # -----------------------------------------------
 #  3. NL2Chart 
 # -----------------------------------------------
@@ -127,7 +134,8 @@ def set_rag_chain_for_chart(question, data):
 
     llm = GeminiSyncViaGMS(api_key=GEMINI_API_KEY, api_base=GEMINI_API_BASE)
 
-    prompt = get_prompt_for_chart()  # get_prompt_for_chart()로 정의된 프롬프트 함수
+    # prompt = get_prompt_for_chart()
+    prompt = get_prompt_for_chart_summary()
 
     chart_chain = (
         {
@@ -141,7 +149,7 @@ def set_rag_chain_for_chart(question, data):
 
     inputs = {
         "question": question,
-        "data": json.dumps(data, ensure_ascii=False)  # 데이터는 JSON 문자열로 넘김
+        "data": json.dumps(data, cls=DecimalEncoder, ensure_ascii=False)
     }
 
     return chart_chain, inputs
@@ -166,8 +174,9 @@ def set_rag_chain_for_insight(input_dict):
             "question": RunnableLambda(lambda x: x["question"]),
             "user_department": RunnableLambda(lambda x: x["user_department"]),
             "chat_history": RunnableLambda(lambda x: x.get("chat_history", "")),
-            "data": RunnableLambda(lambda x: json.dumps(x["data"], ensure_ascii=False)),
-            "chart_spec": RunnableLambda(lambda x: json.dumps(x["chart_spec"], ensure_ascii=False))
+            "data_summary": RunnableLambda(lambda x: x.get("data_summary", "")),
+            # "data": RunnableLambda(lambda x: json.dumps(x["data"], cls=DecimalEncoder, ensure_ascii=False)),
+            "chart_spec": RunnableLambda(lambda x: json.dumps(x["chart_spec"], cls=DecimalEncoder, ensure_ascii=False))
         }
         | prompt
         | llm
@@ -243,6 +252,11 @@ def run_nl2chartInfo(result_dict, user_department):
 
         chart_chain, inputs = set_rag_chain_for_chart(question, data)
         response_text = chart_chain.invoke(inputs)
+        print(response_text)
+        
+        text_match = re.search(r"```text\s*(.*?)```", response_text, re.DOTALL)
+        text_block = text_match.group(1).strip() if text_match else ""
+        print(text_block)
         
         chart_spec_raw = clean_json_from_response(response_text)
         chart_spec = None
@@ -253,13 +267,14 @@ def run_nl2chartInfo(result_dict, user_department):
             logging.warning(f"⚠️ JSON 파싱 실패: {e}")
 
         print("\n[차트 JSON 출력]")
-        print(json.dumps(chart_spec, indent=2, ensure_ascii=False))
+        print(json.dumps(chart_spec, indent=2, cls=DecimalEncoder, ensure_ascii=False))
         
         return {
             "question": result_dict["question"],
             "sql_query": result_dict["sql_query"],
             "user_department": user_department,
             "data": result_dict["data"],
+            "data_summary": text_block,
             "chart_spec": chart_spec
         }
 
@@ -285,7 +300,6 @@ def run_nl2insight(result_dict):
 if __name__ == "__main__":
     
     user_department = "인사팀"
-    
     result_dict = run_nl2sql(max_retry=5)
     if result_dict is not None and result_dict.get("data") is not None:
         input_dict = run_nl2chartInfo(result_dict, user_department)
