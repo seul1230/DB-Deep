@@ -46,15 +46,32 @@ logging.info("📦 Pinecone 초기화")
 # ----------------------------
 root_dir = "assets/RAG_docs"
 # text_files = ["1.card_members.txt", "2.card_credit.txt", "3.card_sales.txt"]  # 다중 문서 목록
-text_files = ["hr_dataset_description.txt", "business_term.txt"]
+text_files = ["hr_dataset_description.txt", "business_term.txt", "bigquery_sql.txt"]
+
+document_types = {
+    "hr_dataset_description.txt": "schema_description",
+    "business_term.txt": "business_term",
+    "bigquery_sql.txt": "sql_guide"
+}
+
 docs = []
 
-for file_path in text_files:
-    logging.info(f"📄 문서 로드 중: {file_path}")
-    loader = TextLoader(f"{root_dir}/{file_path}", encoding="utf-8")
+# for file_path in text_files:
+#     logging.info(f"📄 문서 로드 중: {file_path}")
+#     loader = TextLoader(f"{root_dir}/{file_path}", encoding="utf-8")
+#     loaded_docs = loader.load()
+#     for doc in loaded_docs:
+#         doc.metadata["source"] = os.path.basename(file_path)
+#     docs.extend(loaded_docs)
+
+for filename, doc_type in document_types.items():
+    filepath = os.path.join(root_dir, filename)
+    logging.info(f"📄 문서 로드 중: {filename}")
+    loader = TextLoader(filepath, encoding="utf-8")
     loaded_docs = loader.load()
     for doc in loaded_docs:
-        doc.metadata["source"] = os.path.basename(file_path)
+        doc.metadata["source"] = filename
+        doc.metadata["type"] = doc_type
     docs.extend(loaded_docs)
 
 # ----------------------------

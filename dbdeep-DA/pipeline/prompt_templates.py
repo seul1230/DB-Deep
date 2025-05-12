@@ -32,13 +32,17 @@ def get_prompt_for_sql(user_department):
        - → 각 부서별 부진 직원 비율을 기준으로 5% 삭감, 10% 삭감, 유지 등으로 구분
     4. **정책 판단 기준**이 질문에 명확히 제시되지 않은 경우, 다음과 같은 일반 기준을 가정해도 좋습니다:
        - 하위 10% 미만이면 ‘위험’, 하위 5% 이하면 ‘심각’ 등
-    5. SQL은 BigQuery 기준으로 작성하며:
-       - NTILE, MEDIAN 등은 사용 금지
-       - 대신 `APPROX_QUANTILES(score, 100)[OFFSET(n)]` 사용
-       - 반드시 dataset.table 형식(예: hr_dataset.dim_employee, card_dataset.card_members) 명시
+    5. SQL은 BigQuery 기준으로 작성하며 아래 BigQuery SQL 문법 가이드와 용어를 참고하세요.
+        - NTILE, MEDIAN 등은 사용 금지
+        - 반드시 dataset.table 형식(예: hr_dataset.dim_employee, card_dataset.card_members) 명시
+        - "BigQuery에서는 OVER 절과 GROUP BY를 함께 사용할 수 없습니다. 둘 중 하나를 선택하세요."
+        - "NTILE, MEDIAN, PERCENTILE_CONT는 BigQuery에서 지원되지 않습니다. 대신 APPROX_QUANTILES(column, 100)[OFFSET(n)]을 사용하세요."
+        - "APPROX_QUANTILES(...)는 단순 컬럼에만 적용해야 하며, 복잡한 표현식이나 집계된 값에는 사용할 수 없습니다."
+        - "PARTITION BY에 포함된 컬럼은 반드시 GROUP BY나 SELECT에 포함되어야 합니다."
     6. 쿼리 결과에는 다음을 포함해야 합니다:
        - 원본 필드 + 새로 계산된 판단 기준 필드
        - 최종 결과를 요약해주는 부서별/카테고리별 행
+       - 의미 있는 결과를 이끌어내야 합니다. 다 같은 값이면 다시 한 번 생각해보세요.
     7. 질문이 데이터 분석과 무관할 경우, "데이터와 관련된 질문만 이해할 수 있어요!"를 반환하세요.
     {hr_rule}
 
@@ -54,6 +58,9 @@ def get_prompt_for_sql(user_department):
 
     [데이터셋 및 용어 설명]
     {context_schema}
+    
+    [BigQuery SQL 문법 가이드 및 용어 정의]
+    {context_sql}
 
     ## 출력 형식
     아래와 같은 순서로 작성하세요.
@@ -64,15 +71,12 @@ def get_prompt_for_sql(user_department):
     
     ```sql
     -- 판단 기준과 분석 로직이 포함된 쿼리
-    SELECT ...
-    FROM ...
-    WHERE ...
     ```
 
     """
 
     prompt_template = PromptTemplate(
-        input_variables=["question", "chat_history", "user_department", "context_schema"],
+        input_variables=["question", "chat_history", "user_department", "context_schema", "context_sql"],
         template=base_template.replace("{hr_rule}", hr_rule)
     )
 
@@ -126,40 +130,56 @@ def get_prompt_for_chart():
 
     human_prompt = HumanMessagePromptTemplate(prompt=prompt_template)
     return ChatPromptTemplate.from_messages([human_prompt])
-    
 
-def get_prompt_for_insight(request):
-    prompt = f"""
+
+
+
+def get_prompt_for_insight():
+    logging.info("🧠 인사이트 요약용 프롬프트 생성 중...")
+
+    base_template = """
     당신은 데이터 분석가입니다. 
     당신의 역할은 비전문가도 쉽게 이해할 수 있도록, 시각화 차트와 데이터 분석 결과를 해석하고 통찰력 있는 인사이트를 제공하는 것입니다.
 
     ## 입력 정보
 
     ### 1. 사용자 질문
-    {request.question}
+    {question}
 
     ### 2. 사용자 소속 부서
-    {request.user_department or "(알 수 없음)"}
+    {user_department}
 
     ### 3. 대화 맥락
-    {request.chat_history or "(없음)"}
-    
-    ### 4. 조회된 데이터
-    
+    {chat_history}
 
-    ### 5. 시각화 차트 (Vega-Lite JSON)
+    ### 4. 조회된 데이터
+    {data}
+
+    ### 5. 시각화 차트 (plotly.js JSON)
     ```json
-    {json.dumps(request.chart_spec, indent=2, ensure_ascii=False)}
+    {chart_spec}
     ```
 
     ## 출력 형식 (마크다운으로 작성)
     사용자의 질문에 기반하여 다음을 포함해 분석 결과를 작성하세요:
 
-    1. 차트 설명: 차트가 시각적으로 어떤 정보를 보여주는지 간단히 요약합니다. 예: "월별 판매량 추이를 보여주는 선형 차트입니다."
-    2. 핵심 인사이트 요약: 조회된 데이터 기반으로 유의미한 패턴, 변화, 차이 등을 서술합니다. 예: "3월 이후 급격한 감소세", "A팀이 평균보다 20% 높은 실적을 기록함"
-    3. 추천 및 해석: 사용자 부서와 질문을 고려하여, 어떤 의사결정이나 행동이 가능할지 제안합니다. 예: "성과 부진 부서에는 추가 교육 프로그램이 필요할 수 있습니다."
-    
-    문장은 리포트에 그대로 사용할 수 있을 정도로 명확하고 포멀하게 작성하세요. 분석 전문가의 시각으로, 수치와 근거 기반으로 설명하는 것이 좋습니다.
+    1. 차트 설명: 차트가 시각적으로 어떤 정보를 보여주는지 간단히 요약합니다.  
+       예: "월별 판매량 추이를 보여주는 선형 차트입니다."
+
+    2. 핵심 인사이트 요약: 조회된 데이터 기반으로 유의미한 패턴, 변화, 차이 등을 서술합니다.  
+       예: "3월 이후 급격한 감소세", "A팀이 평균보다 20% 높은 실적을 기록함"
+
+    3. 추천 및 해석: 사용자 부서와 질문을 고려하여, 어떤 의사결정이나 행동이 가능할지 제안합니다.  
+       예: "성과 부진 부서에는 추가 교육 프로그램이 필요할 수 있습니다."
+
+    문장은 리포트에 그대로 사용할 수 있을 정도로 명확하고 포멀하게 작성하세요.  
+    분석 전문가의 시각으로, 수치와 근거 기반으로 설명하는 것이 좋습니다.
     """
 
-    return prompt
+    prompt_template = PromptTemplate(
+        input_variables=["question", "user_department", "chat_history", "data", "chart_spec"],
+        template=base_template
+    )
+
+    human_prompt = HumanMessagePromptTemplate(prompt=prompt_template)
+    return ChatPromptTemplate.from_messages([human_prompt])

@@ -12,7 +12,7 @@ from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from llm.gemini import GeminiStreamingViaGMS, GeminiSyncViaGMS, GeminiEmbeddingViaGMS
-from pipeline.propmt_templates import get_prompt_for_sql, get_prompt_for_chart, get_prompt_for_insight
+from pipeline.prompt_templates import get_prompt_for_sql, get_prompt_for_chart, get_prompt_for_insight
 
 from config.setup import init_pinecone
 from pipeline.sql_process import clean_sql_from_response, clean_json_from_response, SQLExecutor
@@ -24,15 +24,20 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 #  1. NL2SQL - RAG 체인 구성 함수
 # -----------------------------------------------
 
-def set_rag_chain_for_sql(question, user_department, schema_vectorstore):
+def set_rag_chain_for_sql(question, user_department, vectorstore):
     logging.info("📥 RAG 체인 구성 시작")
 
     # Pinecone + Embedding
     logging.info("🔗 Pinecone VectorStore 초기화 중...")
 
-    schema_retriever = schema_vectorstore.as_retriever(
+    schema_retriever = vectorstore.as_retriever(
         search_type='mmr',
         search_kwargs={"k": 3}
+    )
+    
+    sql_retriever = vectorstore.as_retriever(
+        search_type="mmr",
+        search_kwargs={"k": 5, "filter": {"type": {"$in": ["schema_description", "sql_guide"]}}}
     )
 
     # Reranker + Retriever 압축기 구성
@@ -42,6 +47,11 @@ def set_rag_chain_for_sql(question, user_department, schema_vectorstore):
     schema_retriever_compression = ContextualCompressionRetriever(
         base_compressor=compressor,
         base_retriever=schema_retriever
+    )
+    
+    sql_retriever_compression = ContextualCompressionRetriever(
+        base_compressor=compressor,
+        base_retriever=sql_retriever
     )
 
     # Gemini LLM
@@ -58,7 +68,8 @@ def set_rag_chain_for_sql(question, user_department, schema_vectorstore):
             "question": RunnableLambda(lambda x: x["question"]),
             "chat_history": RunnableLambda(lambda x: ""),  # 현재 대화 기록이 없으면 빈 문자열
             "user_department": RunnableLambda(lambda x: x["user_department"]),
-            "context_schema": RunnableLambda(lambda x: schema_retriever_compression.invoke(x["question"]))
+            "context_schema": RunnableLambda(lambda x: schema_retriever_compression.invoke(x["question"])),
+            "context_sql": RunnableLambda(lambda x: sql_retriever_compression.invoke(x["question"]))
         }
         | get_prompt_for_sql(user_department)
         | llm
@@ -86,19 +97,6 @@ GEMINI_API_BASE = os.environ["GEMINI_API_BASE"]
 # Pinecone 클라이언트
 pc = init_pinecone()
 
-# 요청 모델
-class QueryRequest(BaseModel):
-    question: str
-    department: str
-
-class InsightRequest(BaseModel):
-    question: str
-    chart_spec: dict
-    data: list
-    chat_history: str | None = None
-    user_department: str | None = None
-
-
 def run_bigquery(question, response_text):
     try:
         query = clean_sql_from_response(response_text)
@@ -118,7 +116,7 @@ def run_bigquery(question, response_text):
 
 
 # -----------------------------------------------
-#  NL2Chart 
+#  3. NL2Chart 
 # -----------------------------------------------
 
 def set_rag_chain_for_chart(question, data):
@@ -147,6 +145,36 @@ def set_rag_chain_for_chart(question, data):
     }
 
     return chart_chain, inputs
+
+
+# -----------------------------------------------
+#  4. Insight
+# -----------------------------------------------
+
+def set_rag_chain_for_insight(input_dict):
+    logging.info("🧠 인사이트 요약용 RAG 체인 구성 시작")
+
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+    GEMINI_API_BASE = os.environ.get("GEMINI_API_BASE")
+
+    llm = GeminiSyncViaGMS(api_key=GEMINI_API_KEY, api_base=GEMINI_API_BASE)
+
+    prompt = get_prompt_for_insight()  # ChatPromptTemplate 형태
+
+    insight_chain = (
+        {
+            "question": RunnableLambda(lambda x: x["question"]),
+            "user_department": RunnableLambda(lambda x: x["user_department"]),
+            "chat_history": RunnableLambda(lambda x: x.get("chat_history", "")),
+            "data": RunnableLambda(lambda x: json.dumps(x["data"], ensure_ascii=False)),
+            "chart_spec": RunnableLambda(lambda x: json.dumps(x["chart_spec"], ensure_ascii=False))
+        }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    return insight_chain, input_dict
 
 
 # -----------------------------------------------
@@ -194,7 +222,7 @@ def run_nl2sql(question="성과가 부진한 부서의 성과급을 조금 조�
             
             result_dict = run_bigquery(question, answer)
             
-            if result_dict.get("data") is not None or result_dict.get("data")==[]:
+            if result_dict.get("data") is not None and result_dict.get("data")!=[]:
                 print(result_dict)
                 break  # ✅ 성공하면 반복 중단
             
@@ -206,7 +234,7 @@ def run_nl2sql(question="성과가 부진한 부서의 성과급을 조금 조�
     return result_dict
 
 
-def run_nl2chartInfo(result_dict):
+def run_nl2chartInfo(result_dict, user_department):
     try:
         logging.info("📈 차트 정보 생성 중...")
         
@@ -226,13 +254,41 @@ def run_nl2chartInfo(result_dict):
 
         print("\n[차트 JSON 출력]")
         print(json.dumps(chart_spec, indent=2, ensure_ascii=False))
-        return chart_spec
+        
+        return {
+            "question": result_dict["question"],
+            "sql_query": result_dict["sql_query"],
+            "user_department": user_department,
+            "data": result_dict["data"],
+            "chart_spec": chart_spec
+        }
 
     except Exception as e:
         logging.exception("❌ 차트 JSON 생성 실패:")
         return None
 
+def run_nl2insight(result_dict):
+    try:
+        insight_chain, inputs = set_rag_chain_for_insight(result_dict)
+        insight_text = insight_chain.invoke(inputs)
+
+        print("\n📌 인사이트 요약 결과:")
+        print(insight_text)
+
+        return insight_text
+
+    except Exception as e:
+        logging.exception("❌ 인사이트 생성 실패:")
+        return None
+
+
 if __name__ == "__main__":
+    
+    user_department = "인사팀"
+    
     result_dict = run_nl2sql(max_retry=5)
-    if result_dict is not None:
-        run_nl2chartInfo(result_dict)
+    if result_dict is not None and result_dict.get("data") is not None:
+        input_dict = run_nl2chartInfo(result_dict, user_department)
+        if input_dict is not None:
+            run_nl2insight(input_dict)
+            
