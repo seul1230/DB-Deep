@@ -2,11 +2,11 @@ pipeline {
     agent any
     environment {
         GCP_PROJECT = 'dbdeep-458113'
-        REGION = 'us-central1'
-        SERVICE = 'dbdeep-da'
-        REPO = 'dbdeep-da-repo' // Artifact Registry 이름
-        IMAGE = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
-        PORT = '8080'
+        REGION      = 'us-central1'
+        SERVICE     = 'dbdeep-da'
+        REPO        = 'dbdeep-da-repo'
+        IMAGE       = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
+        PORT        = '8080'
     }
     stages {
         stage('Checkout') {
@@ -43,13 +43,15 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
                     sh '''
-                        echo "$ENV_VARS" > env_vars.json
+                        # 기존 ENV_VARS 시크릿 뒤에 PORT 항목을 추가
+                        echo "${ENV_VARS},PORT=${PORT}" > env_vars.json
+
                         gcloud run deploy $SERVICE \
-                        --image ${IMAGE} \
-                        --platform managed \
-                        --region ${REGION} \
-                        --allow-unauthenticated \
-                        --env-vars-file=env_vars.json
+                          --image ${IMAGE} \
+                          --platform managed \
+                          --region ${REGION} \
+                          --allow-unauthenticated \
+                          --env-vars-file=env_vars.json
                     '''
                 }
             }
