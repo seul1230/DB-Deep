@@ -108,6 +108,7 @@
   
   /* 스크롤바 */
   .ChatLogPanel-list::-webkit-scrollbar {
+    display: none;
     width: 6px;
   }
   .ChatLogPanel-list::-webkit-scrollbar-thumb {

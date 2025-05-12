@@ -1,4 +1,5 @@
-import React from "react";
+import { FiMoreVertical } from "react-icons/fi";
+import { useState, useRef, useEffect } from "react";
 import styles from "./ProjectDetailPage.module.css";
 import { FiTrash, FiClock, FiRefreshCw, FiFolderMinus } from "react-icons/fi";
 //삭제
@@ -22,7 +23,7 @@ const dummyCards = [
   { id: 9, title: "발표용 요약 정리본", date: "2024년 12월 24일" },
 ];
 
-// 채팅 데이터 생성되면 활성화화
+// 채팅 데이터 생성되면 활성화
 // const formatDate = (iso: string) => {
 //   const date = new Date(iso);
 //   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
@@ -79,6 +80,29 @@ const dummyCards = [
 // const PROJECT_ID = "p1";
 
 const ProjectDetailPage: React.FC = () => {
+  const [showProjectMenu, setShowProjectMenu] = useState(false);
+  const projectMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (projectMenuRef.current && !projectMenuRef.current.contains(e.target as Node)) {
+        setShowProjectMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleEditProjectName = () => {
+    setShowProjectMenu(false);
+    alert("이름 수정 클릭됨");
+  };
+  
+  const handleDeleteProject = () => {
+    setShowProjectMenu(false);
+    alert("프로젝트 삭제 클릭됨");
+  };
+
   const handleCardClick = (chatId: number) => {
     // 추후 라우팅 예정
     console.log("Clicked card id:", chatId);
@@ -110,9 +134,33 @@ const ProjectDetailPage: React.FC = () => {
       <div className={styles.container}>
         <div className={styles.inner}>
           <div className={styles.projectHeader}>
+            <div className={styles.projectTitleWrap}>
               <FiFolderMinus size={24} className={styles.folderIcon} />
               <h2 className={styles.title}>성과 요약 프로젝트</h2>
+            </div>
+
+            <div
+              className={styles.projectMoreIcon}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowProjectMenu((prev) => !prev);
+              }}
+            >
+              <FiMoreVertical size={20} />
+              {showProjectMenu && (
+                <div className={styles.projectOverlay}>
+                  <div className={styles.projectOverlayItem} onClick={handleEditProjectName}>
+                    이름 수정
+                  </div>
+                  <div className={styles.projectOverlayItemDanger} onClick={handleDeleteProject}>
+                    삭제
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+
+
           <div className={styles.metaRow}>
               <span className={styles.meta}>
                   <FiRefreshCw size={14} className={styles.metaIcon} />

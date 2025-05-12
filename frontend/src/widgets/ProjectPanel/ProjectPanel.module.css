@@ -97,6 +97,7 @@
   /* 스크롤바 */
   .ProjectPanel-list::-webkit-scrollbar {
     width: 6px;
+    display: none;
   }
   .ProjectPanel-list::-webkit-scrollbar-thumb {
     background: var(--gray-text);
