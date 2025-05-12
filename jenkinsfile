@@ -6,7 +6,6 @@ pipeline {
         SERVICE     = 'dbdeep-da'
         REPO        = 'dbdeep-da-repo'
         IMAGE       = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
-        PORT        = '8080'
     }
     stages {
         stage('Checkout') {
@@ -44,11 +43,11 @@ pipeline {
                 withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
                     sh '''
                         gcloud run deploy $SERVICE \
-                            --image ${IMAGE} \
-                            --platform managed \
-                            --region ${REGION} \
-                            --allow-unauthenticated \
-                            --set-env-vars ${ENV_VARS},PORT=${PORT}
+                          --image ${IMAGE} \
+                          --platform managed \
+                          --region ${REGION} \
+                          --allow-unauthenticated \
+                          --set-env-vars ${ENV_VARS}
                     '''
                 }
             }
