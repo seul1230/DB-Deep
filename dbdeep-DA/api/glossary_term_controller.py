@@ -3,7 +3,7 @@ from api.dto.glossary import (
     SaveGlossaryTermListRequest,
     UpdateGlossaryTermRequest
 )
-from service.glossary_service import (
+from services.glossary_service import (
     save_glossary_terms_batch,
     get_glossary_terms_by_member_id,
     update_glossary_term,
