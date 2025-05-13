@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import logoLight from "../../assets/logo.png";
 import logoDark from "../../assets/logo-dark.png";
 import { useThemeStore } from "@/shared/store/themeStore";
+import { connectSocket } from "@/shared/api/socketManager";
 
 const TempPasswordModal = lazy(() => import("@/entities/auth/TempPasswordModal/TempPasswordModal"));
 
@@ -29,6 +30,7 @@ const LoginPage: React.FC = () => {
       { email, password },
       {
         onSuccess: () => {
+          connectSocket();
           const profile = useAuth.getState().profile;
           if (profile?.passwordNotChanged) {
             navigate("/change-password");

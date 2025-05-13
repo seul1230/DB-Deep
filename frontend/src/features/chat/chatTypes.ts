@@ -5,6 +5,7 @@ export interface ChatTimestamp {
   
   export interface ChatMessage {
     id: string;
+    uuid: string;
     content: string;
     memberId: number;
     senderType: 'AI' | 'USER';

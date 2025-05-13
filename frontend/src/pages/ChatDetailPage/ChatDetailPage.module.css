@@ -22,6 +22,7 @@
   position: fixed;
   bottom: 0;
   right: 0;
+  left: 0;
   background-color: var(--background-color);
   padding: 12px 0px;
   box-sizing: border-box;
@@ -37,6 +38,7 @@
   padding: auto 0;
   max-width: 650px;
   transition: width 0.3s ease;
+  margin-left: 68px;
 }
 
 .chatDetailPage-inputArea {

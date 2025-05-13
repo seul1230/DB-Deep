@@ -5,7 +5,7 @@ import RecommendedList from "@/entities/chat/RecommendedList/RecommendedList";
 import { createChatRoom } from "@/features/chat/chatApi";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { sendMessage } from "@/shared/api/socketManager";
 
 const recommendedQuestions = [
   "마케팅 캠페인 전후의 전환율 차이를 알려줘",
@@ -21,22 +21,27 @@ const MainPage: React.FC = () => {
   const queryClient = useQueryClient();
 
 
-  const createAndNavigateChatRoom  = async (initialMessage: string) => {
-    if (!initialMessage.trim()) return;
+  const handleSubmit = async () => {
+    const text = input.trim();
+    if (!text) return;
+
     try {
-      const chatRoomId = await createChatRoom();
+      const chatId = await createChatRoom();
 
+      // 👉 WebSocket으로 메시지 전송
+      sendMessage({
+        uuid: chatId,
+        question: text,
+        department: "마케팅팀", // 사용자의 부서 (하드코딩 or user 상태에서 가져오기)
+      });
+
+      // ✅ 캐시 갱신 및 이동
       queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
-      navigate(`/chat/${chatRoomId}`, { state: { initialMessage } }); // state로 메시지 전달
-    } catch (err) {
-      console.error("채팅방 생성 실패", err);
-      alert("채팅방 생성에 실패했습니다.");
+      navigate(`/chat/${chatId}`);
+      setInput("");
+    } catch {
+      alert("채팅방 생성 실패");
     }
-  };
-
-  const handleSubmit = () => {
-    createAndNavigateChatRoom (input);
-    setInput("");
   };
 
   //추천 받은 질문이 구현되면 사용용

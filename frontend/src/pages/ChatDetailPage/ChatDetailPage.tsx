@@ -5,8 +5,11 @@ import QuestionInput from '@/shared/ui/QuestionInput/QuestionInput';
 import Button from '@/shared/ui/Button/Button';
 import styles from './ChatDetailPage.module.css';
 import { fetchChatDetail } from '@/features/chat/chatApi';
-import { ChatMessage } from '@/features/chat/chatTypes';
 import { usePanelStore } from '@/shared/store/usePanelStore';
+import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
+import { useQuestionInput } from '@/features/chat/useChatInput';
+import { useChatSocket } from '@/features/chat/useChatSocket';
+import { sendMessage } from '@/shared/api/socketManager';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -16,19 +19,35 @@ const PANEL_WIDTH = 240;
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { messages, setMessages } = useChatMessageStore();
+  const chatMessages = messages[chatId || ""] || [];
+
   const [showModal, setShowModal] = useState(false);
 
   const { openPanel } = usePanelStore();
 
   const isAnyPanelOpen = !!openPanel;
-  const leftOffset = isAnyPanelOpen ? PANEL_WIDTH+68 : 0;
+  const leftOffset = isAnyPanelOpen ? PANEL_WIDTH + 68 : 0;
   
+  // ✅ 메시지 전송
+  const { value, onChange, onSubmit } = useQuestionInput((text) => {
+    if (!chatId) return;
+    sendMessage({
+      uuid: chatId,
+      question: text,
+      department: "마케팅팀",
+    });
+  });
+
+  // ✅ 초기 채팅 불러오기
   useEffect(() => {
     if (chatId) {
-      fetchChatDetail(chatId).then((detail) => setMessages(detail.messages));
+      fetchChatDetail(chatId).then((res) => setMessages(chatId, res.messages));
     }
-  }, [chatId]);
+  }, [chatId, setMessages]);
+
+  // ✅ 실시간 수신
+  useChatSocket(chatId);
 
   const handleChartClick = (chartId: string) => {
     console.log(`Chart clicked: ${chartId}`);
@@ -37,7 +56,7 @@ const ChatDetailPage = () => {
   return (
     <div className={styles['chatDetailPage-outer']}>
       <div className={styles['chatDetailPage-contentWrapper']}>
-        <ChatList chatList={messages} onChartClick={handleChartClick} scrollToBottom />
+        <ChatList chatList={chatMessages} onChartClick={handleChartClick} scrollToBottom />
       </div>
 
       <div
@@ -48,7 +67,7 @@ const ChatDetailPage = () => {
       >
         <div className={styles['chatDetailPage-inputContainer']}>
           <div className={styles['chatDetailPage-inputArea']}>
-            <QuestionInput onChange={(text) => console.log(text)} />
+            <QuestionInput value={value} onChange={onChange} onSubmit={onSubmit} />
             <Button
               label="지금까지의 채팅 공유"
               onClick={() => setShowModal(true)}
