@@ -16,7 +16,6 @@ public record ChatMessageDto(
         return ChatMessageDto.builder()
                 .id(chatMessage.getId())
                 .content(chatMessage.getContent())
-                .memberId(chatMessage.getMemberId())
                 .senderType(chatMessage.getSenderType())
                 .timestamp(chatMessage.getTimestamp())
                 .build();
