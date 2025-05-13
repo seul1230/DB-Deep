@@ -2,15 +2,16 @@ from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePr
 from utils.policy_utils import is_hr_team
 import logging
 
-def get_prompt_for_sql(user_department: str) -> ChatPromptTemplate:
+def get_prompt_for_sql(user_department):
     logging.info("🧱 프롬프트 생성 중...")
+    
     hr_rule = (
-        "9. 단, hr_dataset 내 테이블(position, salary 등)은 인사팀만 접근할 수 있습니다."
+        "9. 단, hr_dataset 내 테이블(position, salary 등)은 인사팀만 접근할 수 있습니다. 질문자가 인사팀이 아니면 hr_dataset에 있는 테이블은 절대 사용하지 마세요."
         if not is_hr_team(user_department)
         else "(질문자가 인사팀이므로 hr_dataset 사용 가능)"
     )
 
-    template = """
+    base_template = """
     당신은 데이터 분석 및 시각화 전문가입니다.
     아래의 지침을 따라, 단순 데이터 조회가 아니라 **의사결정에 활용 가능한 분석적 SQL 쿼리**를 생성하세요.
 
@@ -32,6 +33,11 @@ def get_prompt_for_sql(user_department: str) -> ChatPromptTemplate:
         - "NTILE, MEDIAN, PERCENTILE_CONT는 BigQuery에서 지원되지 않습니다. 대신 APPROX_QUANTILES(column, 100)[OFFSET(n)]을 사용하세요."
         - "APPROX_QUANTILES(...)는 단순 컬럼에만 적용해야 하며, 복잡한 표현식이나 집계된 값에는 사용할 수 없습니다."
         - "PARTITION BY에 포함된 컬럼은 반드시 GROUP BY나 SELECT에 포함되어야 합니다."
+        - 반환되는 JSON 내 모든 숫자 타입은 반드시 소수점 이하를 포함하지 않는 **Python의 float 또는 int 형식**으로 작성해주세요.
+            - Decimal, Fraction, 기타 특수한 숫자 타입은 절대 사용하지 마세요.
+            - 숫자는 항상 JSON에서 직렬화 가능한 형식으로 작성되어야 하며, 예: 123.0, 45 등으로 표현되어야 합니다.
+        - 사용자가 의도한 바가 잘 보일 수 있도록 정렬하고 데이터 행이 50개가 넘어간다면 제한하세요.
+
     6. 쿼리 결과에는 다음을 포함해야 합니다:
        - 원본 필드 + 새로 계산된 판단 기준 필드
        - 최종 결과를 요약해주는 부서별/카테고리별 행
@@ -49,9 +55,12 @@ def get_prompt_for_sql(user_department: str) -> ChatPromptTemplate:
     [대화 내역]
     {chat_history}
 
-    [데이터셋 및 용어 설명]
+    [데이터셋 및 스키마 설명]
     {context_schema}
     
+    [비즈니스 용어 및 판단 기준 정의]
+    {context_term}
+
     [BigQuery SQL 문법 가이드 및 용어 정의]
     {context_sql}
 
@@ -69,8 +78,10 @@ def get_prompt_for_sql(user_department: str) -> ChatPromptTemplate:
     """
 
     prompt_template = PromptTemplate(
-        input_variables=["question", "chat_history", "user_department", "context_schema", "context_sql"],
-        template=template.replace("{hr_rule}", hr_rule)
+        input_variables=["question", "chat_history", "user_department", "context_schema", "context_term", "context_sql"],
+        template=base_template.replace("{hr_rule}", hr_rule)
     )
 
-    return ChatPromptTemplate.from_messages([HumanMessagePromptTemplate(prompt=prompt_template)])
+    human_prompt = HumanMessagePromptTemplate(prompt=prompt_template)
+    return ChatPromptTemplate.from_messages([human_prompt])
+

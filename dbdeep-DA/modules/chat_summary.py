@@ -14,9 +14,7 @@ nltk.download('punkt')
 logging.info("🔄 모델 및 토크나이저 로딩 중...")
 tokenizer = AutoTokenizer.from_pretrained('eenzeenee/t5-base-korean-summarization') # 'eenzeenee/t5-base-korean-summarization', 'eenzeenee/t5-small-korean-summarization'
 model = AutoModelForSeq2SeqLM.from_pretrained('eenzeenee/t5-base-korean-summarization') # 'eenzeenee/t5-base-korean-summarization', 'eenzeenee/t5-small-korean-summarization'
-
 logging.info("✅ 모델 로딩 완료")
-
 
 def summarize_text(text: str) -> str:
     logging.info("📝 텍스트 요약 시작")
