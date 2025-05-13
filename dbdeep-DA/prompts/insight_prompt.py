@@ -1,10 +1,10 @@
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePromptTemplate
 import logging
 
-def get_prompt_for_insight() -> ChatPromptTemplate:
+def get_prompt_for_insight():
     logging.info("🧠 인사이트 요약용 프롬프트 생성 중...")
 
-    template = """
+    base_template = """
     당신은 데이터 분석가입니다. 
     당신의 역할은 비전문가도 쉽게 이해할 수 있도록, 시각화 차트와 데이터 분석 결과를 해석하고 통찰력 있는 인사이트를 제공하는 것입니다.
 
@@ -19,8 +19,8 @@ def get_prompt_for_insight() -> ChatPromptTemplate:
     ### 3. 대화 맥락
     {chat_history}
 
-    ### 4. 조회된 데이터
-    {data}
+    ### 4. 조회된 데이터 요약
+    {data_summary}
 
     ### 5. 시각화 차트 (plotly.js JSON)
     ```json
@@ -37,13 +37,16 @@ def get_prompt_for_insight() -> ChatPromptTemplate:
        예: "3월 이후 급격한 감소세", "A팀이 평균보다 20% 높은 실적을 기록함"
 
     3. 추천 및 해석: 사용자 부서와 질문을 고려하여, 어떤 의사결정이나 행동이 가능할지 제안합니다.  
-       예: "성과 부진 부서에는 추가 교육 프로그램이 필요할 수 있습니다."
+       예: "성과 부진 부서(예: 기획팀)에는 추가 교육 프로그램을 추천합니다."
 
     문장은 리포트에 그대로 사용할 수 있을 정도로 명확하고 포멀하게 작성하세요.  
     분석 전문가의 시각으로, 수치와 근거 기반으로 설명하는 것이 좋습니다.
     """
+
     prompt_template = PromptTemplate(
-        input_variables=["question", "user_department", "chat_history", "data", "chart_spec"],
-        template=template
+        input_variables=["question", "user_department", "chat_history", "data_summary", "chart_spec"],
+        template=base_template
     )
-    return ChatPromptTemplate.from_messages([HumanMessagePromptTemplate(prompt=prompt_template)])
+
+    human_prompt = HumanMessagePromptTemplate(prompt=prompt_template)
+    return ChatPromptTemplate.from_messages([human_prompt])

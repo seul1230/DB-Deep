@@ -21,8 +21,17 @@ def get_pinecone_client():
     return _pinecone_client
 
 
-def get_vectorstore(index_name: str = "schema-index"):
+def get_vectorstore(index_name: str = "schema-index", dimension : int = 1024):
     pc = get_pinecone_client()
+    
+    if index_name not in pc.list_indexes().names():
+        pc.create_index(
+            name=index_name,
+            dimension=dimension,
+            metric="cosine",
+            spec=ServerlessSpec(cloud="gcp", region=settings.PINECONE_ENV)
+        )
+    
     index = pc.Index(index_name)
 
     embedding = HuggingFaceEmbeddings(
