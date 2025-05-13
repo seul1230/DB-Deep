@@ -22,6 +22,7 @@ class Settings(BaseSettings):
         port = self.MYSQL_PORT
         db = self.MYSQL_DB
         return f"mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+    
     # Gemini
     GEMINI_API_KEY: str
     GEMINI_API_BASE: str

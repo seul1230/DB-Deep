@@ -1,21 +1,19 @@
-import os
-import time
 import httpx
 import asyncio
-from dotenv import load_dotenv
-
 from typing import Optional, List, AsyncIterator
+
 from langchain_core.callbacks.manager import CallbackManagerForLLMRun
 from langchain_core.outputs import GenerationChunk
 from langchain_core.language_models.llms import LLM
 
+from config.settings import settings
+
 class GeminiStreamingViaGMS(LLM):
     model_name: str = "gemini-2.0-flash:streamGenerateContent"
-    api_key: str = ""
-    api_base: str = "https://gms.p.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta"
-    
-    n: int = 10
-    """The number of characters from the last message of the prompt to be echoed."""
+    api_key: str = settings.GEMINI_API_KEY
+    api_base: str = settings.GEMINI_API_BASE
+
+    n: int = 10  # 텍스트 echo 수
 
     @property
     def _llm_type(self) -> str:
@@ -31,22 +29,20 @@ class GeminiStreamingViaGMS(LLM):
                 }
             ]
         }
-        timeout = httpx.Timeout(120.0)
-        with httpx.Client(timeout=timeout) as client:
+
+        with httpx.Client(timeout=120.0) as client:
             response = client.post(url, headers=headers, json=payload)
             response.raise_for_status()
             result = response.json()
-            text = result['candidates'][0]['content']['parts'][0]['text']
-            return text
-        
+            return result['candidates'][0]['content']['parts'][0]['text']
+
     def _stream(self, prompt: str, stop: Optional[List[str]] = None, run_manager: Optional[CallbackManagerForLLMRun] = None):
         for char in prompt[:self.n]:
             chunk = GenerationChunk(text=char)
             if run_manager:
                 run_manager.on_llm_new_token(chunk.text, chunk=chunk)
-                
             yield chunk
-            
+
     async def _astream(
         self,
         prompt: str,
@@ -74,12 +70,12 @@ class GeminiStreamingViaGMS(LLM):
                     await asyncio.sleep(0.2)
                 except Exception:
                     continue
-                
-                
+
+
 class GeminiSyncViaGMS(LLM):
-    model_name: str = "gemini-2.0-flash:generateContent" # "gemini-2.5-pro:generateContent", "gemini-2.0-flash:generateContent", "gemini-2.5-pro-preview-0409:generateContent"
-    api_key: str = ""
-    api_base: str = "https://gms.p.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta"
+    model_name: str = "gemini-2.0-flash:generateContent"
+    api_key: str = settings.GEMINI_API_KEY
+    api_base: str = settings.GEMINI_API_BASE
 
     @property
     def _llm_type(self) -> str:
@@ -95,8 +91,8 @@ class GeminiSyncViaGMS(LLM):
                 }
             ]
         }
-        timeout = httpx.Timeout(60.0)
-        with httpx.Client(timeout=timeout) as client:
+
+        with httpx.Client(timeout=60.0) as client:
             response = client.post(url, headers=headers, json=payload)
             response.raise_for_status()
             result = response.json()
@@ -105,17 +101,12 @@ class GeminiSyncViaGMS(LLM):
                 return result['candidates'][0]['content']['parts'][0]['text']
             except Exception as e:
                 raise ValueError(f"응답 파싱 오류: {e}\n전체 응답: {result}")
-            
+
 
 class GeminiEmbeddingViaGMS:
     model_name: str = "text-embedding-004"
-    api_key: str = ""
-    api_base: str = "https://gms.p.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta"
-
-    def __init__(self, api_key: str, api_base: Optional[str] = None):
-        self.api_key = api_key
-        if api_base:
-            self.api_base = api_base
+    api_key: str = settings.GEMINI_API_KEY
+    api_base: str = settings.GEMINI_API_BASE
 
     def embed_text(self, text: str) -> List[float]:
         url = f"{self.api_base}/models/{self.model_name}:embedContent?key={self.api_key}"
@@ -136,9 +127,9 @@ class GeminiEmbeddingViaGMS:
                 return result["embedding"]["values"]
             except Exception as e:
                 raise ValueError(f"임베딩 파싱 오류: {e}\n전체 응답: {result}")
-    
+
     def embed_query(self, text: str) -> List[float]:
         return self.embed_text(text)
-    
+
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         return [self.embed_text(text) for text in texts]
