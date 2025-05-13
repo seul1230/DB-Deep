@@ -1,85 +1,94 @@
-import React from "react";
+import { FiMoreVertical } from "react-icons/fi";
+import { useState, useRef, useEffect } from "react";
 import styles from "./ProjectDetailPage.module.css";
 import { FiTrash, FiClock, FiRefreshCw, FiFolderMinus } from "react-icons/fi";
-//삭제
-// import { deleteChatInProject } from "@/features/project/projectApi";
-// import { useMutation, useQueryClient } from "@tanstack/react-query";
-//추가
-// import { useParams } from "react-router-dom";
-// import { useQuery } from "@tanstack/react-query";
-// import { fetchProjectDetail } from "@/features/project/projectApi";
-// import { ProjectDetail } from "@/features/project/projectTypes";
-
-const dummyCards = [
-  { id: 1, title: "3월 매출 요약", date: "2025년 4월 23일" },
-  { id: 2, title: "설문 응답 요약", date: "2025년 4월 11일" },
-  { id: 3, title: "주간 지표 정리", date: "2025년 3월 29일" },
-  { id: 4, title: "리포트 초안 자동화", date: "2025년 3월 15일" },
-  { id: 5, title: "주요 지표만 뽑기", date: "2025년 2월 27일" },
-  { id: 6, title: "채널별 전환 분석", date: "2025년 2월 02일" },
-  { id: 7, title: "성장률 변화 요약", date: "2025년 1월 18일" },
-  { id: 8, title: "수치 기반 인사이트 정리", date: "2025년 1월 11일" },
-  { id: 9, title: "발표용 요약 정리본", date: "2024년 12월 24일" },
-];
-
-// 채팅 데이터 생성되면 활성화화
-// const formatDate = (iso: string) => {
-//   const date = new Date(iso);
-//   return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-// };
-
-// const ProjectDetailPage: React.FC = () => {
-//   const { projectId } = useParams<{ projectId: string }>();
-//   const { data, isLoading, isError } = useQuery<ProjectDetail>({
-//     queryKey: ["projectDetail", projectId],
-//     queryFn: () => fetchProjectDetail(projectId!),
-//     enabled: !!projectId,
-//   });
-
-//   if (isLoading) return <div>불러오는 중...</div>;
-//   if (isError || !data) return <div>에러가 발생했습니다.</div>;
-
-//   return (
-//     <div className={styles.container}>
-//       <div className={styles.inner}>
-//         <div className={styles.projectHeader}>
-//           <FiFolderMinus size={24} className={styles.folderIcon} />
-//           <h2 className={styles.title}>{data.projectTitle}</h2>
-//         </div>
-//         <div className={styles.metaRow}>
-//           <span className={styles.meta}>
-//             <FiRefreshCw size={14} className={styles.metaIcon} />
-//             업데이트 : {formatDate(data.chats[0]?.updatedAt || data.createdAt)}
-//           </span>
-//           <span className={styles.meta}>
-//             <FiClock size={14} className={styles.metaIcon} />
-//             생성 : {formatDate(data.createdAt)}
-//           </span>
-//         </div>
-//         <p className={styles.description}>이 프로젝트의 채팅 내역을 정리한 목록입니다.</p>
-//         <div className={styles.divider}></div>
-
-//         <div className={styles.cardList}>
-//           {data.chats.map((chat) => (
-//             <div key={chat.messageId} className={styles.card}>
-//               <div className={styles.cardHeader}>
-//                 <span className={styles.cardTitle}>{chat.message}</span>
-//                 <FiTrash className={styles.deleteIcon} />
-//               </div>
-//               <div className={styles.cardDate}>{formatDate(chat.updatedAt)}</div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// 실제 API 연동 시 필요
-// const PROJECT_ID = "p1";
+import EditProjectModal from "@/shared/ui/CreateProjectModal/EditProjectModal";
+import DeleteConfirmModal from "@/shared/ui/DeleteConfirmModal/DeleteConfirmModal";
+import { useParams, useNavigate  } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { fetchProjectDetail, updateProjectTitle, deleteProject } from "@/features/project/projectApi";
+import { ProjectDetail } from "@/features/project/projectTypes";
+import dayjs from "dayjs";
 
 const ProjectDetailPage: React.FC = () => {
-  const handleCardClick = (chatId: number) => {
+  const { projectId } = useParams<{ projectId: string }>();
+  const [showProjectMenu, setShowProjectMenu] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  const navigate = useNavigate();
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError } = useQuery<ProjectDetail>({
+    queryKey: ["projectDetail", projectId],
+    queryFn: () => fetchProjectDetail(projectId!),
+    enabled: !!projectId,
+  });
+  
+  const updateTitleMutation = useMutation({
+    mutationFn: (params: { title: string; description: string }) =>
+      updateProjectTitle(projectId!, params.title, params.description),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projectDetail", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+    onError: () => {
+      alert("프로젝트 수정에 실패했습니다.");
+    },
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: () => deleteProject(projectId!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      alert("프로젝트가 삭제되었습니다.");
+      navigate("/main");
+    },
+    onError: () => {
+      alert("프로젝트 삭제에 실패했습니다.");
+    },
+  });
+  
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
+        setShowProjectMenu(false);
+      }
+    };
+  
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowProjectMenu(false);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+   
+  const handleDeleteProject = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteProject = () => {
+    setShowDeleteModal(false);
+    deleteProjectMutation.mutate();
+  };
+
+  const cancelDeleteProject = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleCardClick = (chatId: string) => {
     // 추후 라우팅 예정
     console.log("Clicked card id:", chatId);
   };
@@ -89,56 +98,111 @@ const ProjectDetailPage: React.FC = () => {
     console.log("Deleted card id: ", chatId);
   };
 
-  //실제 삭제 api를 사용할 때 사용용
-  // const queryClient = useQueryClient();
+  
+  if (isLoading) return <div>불러오는 중...</div>;
+  if (isError || !data) return <div>에러가 발생했습니다.</div>;
 
-  // const deleteMutation = useMutation({
-  //   mutationFn: (chatId: string) => deleteChatInProject(PROJECT_ID, chatId),
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["projectDetail", PROJECT_ID] });
-  //   },
-  // });
-
-  // const handleDelete = (e: React.MouseEvent, chatId: string) => {
-  //   e.stopPropagation();
-  //   if (confirm("정말로 이 채팅을 삭제하시겠습니까?")) {
-  //     deleteMutation.mutate(chatId);
-  //   }
-  // };
+  const updatedAt = data.chatRooms.length > 0
+  ? data.chatRooms[0].lastMessageAt
+  : data.createdAt;
 
   return (
       <div className={styles.container}>
         <div className={styles.inner}>
           <div className={styles.projectHeader}>
+            <div className={styles.projectTitleWrap}>
               <FiFolderMinus size={24} className={styles.folderIcon} />
-              <h2 className={styles.title}>성과 요약 프로젝트</h2>
-          </div>
-          <div className={styles.metaRow}>
-              <span className={styles.meta}>
-                  <FiRefreshCw size={14} className={styles.metaIcon} />
-                  업데이트 : 2025년 4월 23일 오후 2시 38분
-              </span>
-              <span className={styles.meta}>
-                  <FiClock size={14} className={styles.metaIcon} />
-                  생성 : 2025년 4월 20일 오후 12시 02분
-              </span>
-          </div>
-          <p className={styles.description}>2024년의 성과를 요약하는 프로젝트입니다.</p>
-          <div className={styles.divider}></div>
-          <div className={styles.cardList}>
-            {dummyCards.map((card) => (
-              <div key={card.id} className={styles.card} onClick={() => handleCardClick(card.id)}>
-                <div className={styles.cardHeader}>
-                  <span className={styles.cardTitle}>{card.title}</span>
-                  <FiTrash className={styles.deleteIcon} onClick={(e) => handleDelete(e, String(card.id))}/>
-                </div>
-                <div className={styles.cardDate}>{card.date}</div>
+              <h2 className={styles.title}>{data.name}</h2>
+            </div>
+
+            <div className={styles.projectMoreWrapper} ref={wrapperRef}>
+              <div
+                className={styles.projectMoreIcon}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowProjectMenu((prev) => !prev);
+                }}
+              >
+                <FiMoreVertical size={20} />
               </div>
-            ))}
+              {showProjectMenu && (
+                <div className={styles.projectOverlay}>
+                  <div
+                    className={styles.projectOverlayItem}
+                    onClick={() => {
+                      setShowProjectMenu(false);
+                      setShowEditModal(true);
+                    }}
+                  >
+                    이름 수정
+                  </div>
+                  <div
+                    className={styles.projectOverlayItemDanger}
+                    onClick={() => {
+                      setShowProjectMenu(false);
+                      handleDeleteProject();
+                    }}
+                  >
+                    삭제
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
+
+          <div className={styles.metaRow}>
+          <span className={styles.meta}>
+            <FiRefreshCw size={14} className={styles.metaIcon} />
+            업데이트 : {dayjs(updatedAt).format("YYYY년 M월 D일 A h시 m분")}
+          </span>
+          <span className={styles.meta}>
+            <FiClock size={14} className={styles.metaIcon} />
+            생성 : {dayjs(data.createdAt).format("YYYY년 M월 D일 A h시 m분")}
+          </span>
+        </div>
+        <p className={styles.description}>{data.description}</p>
+        <div className={styles.divider}></div>
+        <div className={styles.cardList}>
+          {data.chatRooms.map((chat) => (
+            <div
+              key={chat.id}
+              className={styles.card}
+              onClick={() => handleCardClick(chat.id)}
+            >
+              <div className={styles.cardHeader}>
+                <span className={styles.cardTitle}>{chat.title}</span>
+                <FiTrash
+                  className={styles.deleteIcon}
+                  onClick={(e) => handleDelete(e, chat.id)}
+                />
+              </div>
+              <div className={styles.cardDate}>
+                {dayjs(chat.lastMessageAt).format("YYYY년 M월 D일 A h시 m분")}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-      );
+      {showEditModal && (
+        <EditProjectModal
+          initialName={data.name}
+          initialDescription={data.description}
+          onClose={() => setShowEditModal(false)}
+          onEdit={(name, description) => {
+            updateTitleMutation.mutate({ title: name, description });
+          }}
+        />
+      )}
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          title="프로젝트 삭제"
+          message={<><strong>"{data.name}"</strong> 프로젝트를 삭제하시겠습니까?<br />삭제된 프로젝트는 복구할 수 없습니다.</>}
+          onCancel={cancelDeleteProject}
+          onConfirm={confirmDeleteProject}
+        />
+      )}
+    </div>
+  );
 };
 
 export default ProjectDetailPage;
