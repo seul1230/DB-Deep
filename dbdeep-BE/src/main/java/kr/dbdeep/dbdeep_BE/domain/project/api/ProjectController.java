@@ -62,8 +62,8 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}")
-    public JSONResponse<List<ProjectChatRoomResponse>> getChatRooms(@CurrentMemberId Integer memberId,
-                                                                    @PathVariable Integer projectId) {
+    public JSONResponse<ProjectChatRoomResponse> getChatRooms(@CurrentMemberId Integer memberId,
+                                                              @PathVariable Integer projectId) {
         var chatRooms = projectService.getChatRooms(memberId, projectId);
         return JSONResponse.onSuccess(chatRooms);
     }
