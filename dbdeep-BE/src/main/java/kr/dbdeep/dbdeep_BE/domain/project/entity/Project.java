@@ -9,8 +9,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.List;
+import kr.dbdeep.dbdeep_BE.domain.chat.entity.ChatRoom;
 import kr.dbdeep.dbdeep_BE.domain.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,6 +43,10 @@ public class Project {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private List<ChatRoom> chatRooms;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
