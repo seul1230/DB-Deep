@@ -28,7 +28,7 @@ public class ProjectController {
     @PostMapping
     public JSONResponse<CreateProjectResponse> create(@CurrentMemberId Integer memberId,
                                                       @RequestBody CreateProjectRequest request) {
-        var created = projectService.create(memberId, request.title());
+        var created = projectService.create(memberId, request.title(), request.description());
         return JSONResponse.onSuccess(created);
     }
 

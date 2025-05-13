@@ -29,11 +29,13 @@ public class ProjectService {
     private final ChatRoomRepository chatRoomRepository;
 
     @Transactional
-    public CreateProjectResponse create(Integer memberId, String title) {
+    public CreateProjectResponse create(Integer memberId, String title, String description) {
         Project project = Project.builder()
                 .member(memberRepository.findById(memberId)
                         .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND)))
-                .title(title).build();
+                .title(title)
+                .description(description)
+                .build();
         Project saved = projectRepository.save(project);
         return new CreateProjectResponse(saved.getId(), saved.getTitle());
     }
