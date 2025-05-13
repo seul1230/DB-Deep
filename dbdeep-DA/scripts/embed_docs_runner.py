@@ -6,8 +6,6 @@ from langchain_core.documents import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain_pinecone import PineconeVectorStore
-from pinecone import Pinecone, ServerlessSpec
 
 from config.settings import settings
 from db.pinecone import get_vectorstore
@@ -65,17 +63,6 @@ def embed_and_upload_documents(
     # ----------------------------
     #  Pinecone 초기화
     # ----------------------------
-    # pinecone = Pinecone(api_key=settings.PINECONE_API_KEY)
-    # if index_name not in pinecone.list_indexes().names():
-    #     pinecone.create_index(
-    #         name=index_name,
-    #         dimension=1024,
-    #         metric="cosine",
-    #         spec=ServerlessSpec(cloud="gcp", region=settings.PINECONE_ENV)
-    #     )
-    # index = pinecone.Index(index_name)
-
-    # vectorstore = PineconeVectorStore(index=index, embedding=embedding)
     vectorstore = get_vectorstore()
 
     # ----------------------------
