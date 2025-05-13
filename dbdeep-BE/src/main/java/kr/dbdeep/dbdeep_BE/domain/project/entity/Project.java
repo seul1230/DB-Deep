@@ -56,7 +56,12 @@ public class Project {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public void updateTitle(String title) {
-        this.title = title;
+    public void update(String title, String description) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (description != null) {
+            this.description = description;
+        }
     }
 }

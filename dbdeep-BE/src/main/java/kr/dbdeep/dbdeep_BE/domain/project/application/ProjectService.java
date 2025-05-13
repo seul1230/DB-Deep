@@ -60,13 +60,13 @@ public class ProjectService {
     }
 
     @Transactional
-    public void updateTitle(Integer memberId, Integer projectId, String title) {
+    public void update(Integer memberId, Integer projectId, String title, String description) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
         if (!project.getMember().getId().equals(memberId)) {
             throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
         }
-        project.updateTitle(title);
+        project.update(title, description);
     }
 
     @Transactional

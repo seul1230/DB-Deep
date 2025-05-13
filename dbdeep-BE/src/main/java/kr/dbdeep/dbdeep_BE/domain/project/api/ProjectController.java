@@ -49,7 +49,7 @@ public class ProjectController {
     public JSONResponse<Void> updateTitle(@CurrentMemberId Integer memberId,
                                           @PathVariable Integer projectId,
                                           @RequestBody CreateProjectRequest request) {
-        projectService.updateTitle(memberId, projectId, request.title());
+        projectService.update(memberId, projectId, request.title(), request.description());
         return JSONResponse.onSuccess();
     }
 
