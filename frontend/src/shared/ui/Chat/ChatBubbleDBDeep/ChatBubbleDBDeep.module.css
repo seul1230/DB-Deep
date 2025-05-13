@@ -8,7 +8,6 @@
 .chatBubbleDBDeep-bubbleWithMenu {
   display: flex;
   align-items: flex-start;
-  
 }
 
 .chatBubbleDBDeep-bubble {
@@ -31,6 +30,11 @@
   position: static;
 }
 
+.chatBubbleDBDeep-menuButtonWrapper {
+  position: relative; /* 오버레이 기준 위치 */
+  display: inline-block;
+}
+
 /* 점3개 버튼 */
 .chatBubbleDBDeep-menuButton {
   background: none;
@@ -41,6 +45,13 @@
   padding: 4px;
   border-radius: 50%;
   transition: background 0.2s ease;
+}
+
+.chatBubbleDBDeep-menuOverlayContainer {
+  position: absolute;
+  top: 100%; /* 버튼 아래로 */
+  left: 0; /* 왼쪽 정렬 */
+  z-index: 30;
 }
 
 /* .chatBubbleDBDeep-menuButton:hover {

@@ -5,13 +5,14 @@ import { ChatMessage } from '@/features/chat/chatTypes';
 import styles from './ChatList.module.css';
 
 interface Props {
+  chatId: string;
   chatList: ChatMessage[];
   onChartClick?: (chartId: string) => void;
   scrollToBottom?: boolean;
   showMenu?: boolean;
 }
 
-const ChatList: React.FC<Props> = ({ chatList, onChartClick, scrollToBottom, showMenu = true, }) => {
+const ChatList: React.FC<Props> = ({ chatId, chatList, onChartClick, scrollToBottom, showMenu = true, }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,6 +40,8 @@ const ChatList: React.FC<Props> = ({ chatList, onChartClick, scrollToBottom, sho
               onChartClick={onChartClick || (() => {})}
               isLive={isLive}
               showMenu={showMenu}
+              uuid={chatId || ''}
+              messageId={Number(msg.id)}
             />
           );
         })}
