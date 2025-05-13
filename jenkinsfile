@@ -51,7 +51,7 @@ pipeline {
               --allow-unauthenticated \
               --port ${PORT} \
               --add-cloudsql-instances ${CLOUDSQL_INSTANCE} \
-              --set-env-vars MYSQL_HOST=127.0.0.1,MYSQL_PORT=3306,${ENV_VARS}
+              --set-env-vars ${ENV_VARS}
           '''
         }
       }
