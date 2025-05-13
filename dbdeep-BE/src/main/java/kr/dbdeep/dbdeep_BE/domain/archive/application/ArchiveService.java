@@ -1,6 +1,5 @@
 package kr.dbdeep.dbdeep_BE.domain.archive.application;
 
-import java.time.ZoneId;
 import java.util.List;
 import kr.dbdeep.dbdeep_BE.domain.archive.api.dto.ArchivedMessageResponse;
 import kr.dbdeep.dbdeep_BE.domain.archive.dto.RedirectResponse;
@@ -35,14 +34,7 @@ public class ArchiveService {
             ChatMessage message = chatMessageRepository.findById(archive.getMessageId());
             ChatRoom chatRoom = chatRoomService.findById(message.getChatRoomId());
 
-            return ArchivedMessageResponse.from(
-                    archive.getId(),
-                    message.getId(),
-                    chatRoom.getChatroomName(),
-                    message.getContent(),
-                    message.getTimestamp().toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
-                    archive.getCreatedAt()
-            );
+            return ArchivedMessageResponse.from(archive, message, chatRoom);
         }).toList();
     }
 
