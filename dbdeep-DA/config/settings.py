@@ -4,7 +4,7 @@ from urllib.parse import quote_plus
 
 class Settings(BaseSettings):
     # Google Firestore
-    GOOGLE_APPLICATION_CREDENTIALS: str
+    GOOGLE_APPLICATION_CREDENTIALS: str | None=None
     GOOGLE_CLOUD_PROJECT: str
 
     # MySQL

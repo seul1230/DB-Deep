@@ -1,12 +1,14 @@
 pipeline {
   agent any
   environment {
-    GCP_PROJECT = 'dbdeep-458113'
-    REGION      = 'us-central1'
-    SERVICE     = 'dbdeep-da'
-    REPO        = 'dbdeep-da-repo'
-    IMAGE       = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
-    PORT        = '8080'
+    GCP_PROJECT        = 'dbdeep-458113'
+    REGION             = 'us-central1'
+    SERVICE            = 'dbdeep-da'
+    REPO               = 'dbdeep-da-repo'
+    IMAGE              = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
+    PORT               = '8080'
+    CLOUDRUN_SA        = 'dbdeep-cloudrun-deployer@dbdeep-458113.iam.gserviceaccount.com'
+    CLOUDSQL_INSTANCE  = 'dbdeep-458113:asia-northeast3:dbdeep-app'
   }
   stages {
     stage('Checkout') {
@@ -45,9 +47,12 @@ pipeline {
               --image ${IMAGE} \
               --platform managed \
               --region ${REGION} \
+              --service-account ${CLOUDRUN_SA} \
               --allow-unauthenticated \
+              --memory 4Gi \
               --port ${PORT} \
-              --set-env-vars $ENV_VARS
+              --add-cloudsql-instances ${CLOUDSQL_INSTANCE} \
+              --set-env-vars ${ENV_VARS}
           '''
         }
       }
