@@ -6,7 +6,8 @@ from api.dto.glossary import (
 from service.glossary_service import (
     save_glossary_terms_batch,
     get_glossary_terms_by_member_id,
-    update_glossary_term
+    update_glossary_term,
+    delete_glossary_term
 )
 
 router = APIRouter()
@@ -36,6 +37,19 @@ def update_glossary(request: Request, term_id: str, body: UpdateGlossaryTermRequ
         member_id = request.state.member_id
         update_glossary_term(member_id, term_id, body.key, body.value)
         return {"message": "수정되었습니다"}
+    except ValueError as ve:
+        raise HTTPException(status_code=404, detail=str(ve))
+    except PermissionError as pe:
+        raise HTTPException(status_code=403, detail=str(pe))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.delete("/api/glossary/{term_id}")
+def delete_glossary(request: Request, term_id: str):
+    try:
+        member_id = request.state.member_id
+        delete_glossary_term(member_id, term_id)
+        return {"message": "삭제되었습니다"}
     except ValueError as ve:
         raise HTTPException(status_code=404, detail=str(ve))
     except PermissionError as pe:
