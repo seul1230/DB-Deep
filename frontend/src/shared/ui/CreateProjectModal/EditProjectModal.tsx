@@ -1,28 +1,35 @@
 import React, { useState } from "react";
-import styles from "./ProjectModal.module.css";
+import styles from "./ProjectModal.module.css"; // 같은 스타일 재사용
 
-interface Props {
+interface EditProjectModalProps {
+  initialName: string;
+  initialDescription?: string;
   onClose: () => void;
-  onCreate: (name: string, description: string) => void;
+  onEdit: (newName: string, newDescription: string) => void;
 }
 
-const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
+const EditProjectModal: React.FC<EditProjectModalProps> = ({
+  initialName,
+  initialDescription = "",
+  onClose,
+  onEdit,
+}) => {
+  const [name, setName] = useState(initialName);
+  const [description, setDescription] = useState(initialDescription);
 
   const handleSubmit = () => {
     if (!name.trim()) {
       alert("프로젝트 이름을 입력해주세요.");
       return;
     }
-    onCreate(name.trim(), description.trim());
+    onEdit(name.trim(), description.trim());
     onClose();
   };
 
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <h2 className={styles.title}>새 프로젝트 생성</h2>
+        <h2 className={styles.title}>프로젝트 이름 수정</h2>
         <input
           className={styles.input}
           type="text"
@@ -41,7 +48,7 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate }) => {
             취소
           </button>
           <button className={styles.confirm} onClick={handleSubmit}>
-            생성
+            수정
           </button>
         </div>
       </div>
@@ -49,4 +56,4 @@ const CreateProjectModal: React.FC<Props> = ({ onClose, onCreate }) => {
   );
 };
 
-export default CreateProjectModal;
+export default EditProjectModal;

@@ -27,9 +27,9 @@ const ProjectPanel: React.FC = () => {
 
   const queryClient = useQueryClient();
 
-  const handleCreateProject = async (name: string) => {
+  const handleCreateProject = async (name: string, description: string) => {
     try {
-      await createProject(name); // description은 보내지 않음
+      await createProject(name, description);
       await queryClient.invalidateQueries({ queryKey: ["projects"] });
     } catch (err) {
       alert("프로젝트 생성 중 오류가 발생했습니다.");
@@ -69,7 +69,7 @@ const ProjectPanel: React.FC = () => {
               <span className={styles["ProjectPanel-title"]}>{project.projectName}</span>
               <div className={styles["ProjectPanel-info"]}>
                 <FiMessageSquare className={styles["ProjectPanel-MessageCount"]} />
-                <span>1개의 채팅</span>
+                <span>{project.chatCount}개의 채팅</span>
               </div>
             </div>
             <FiChevronRight className={styles["ProjectPanel-arrow"]} />
