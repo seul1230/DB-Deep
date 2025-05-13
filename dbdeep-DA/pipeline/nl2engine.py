@@ -13,7 +13,7 @@ from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from llm.gemini import GeminiStreamingViaGMS, GeminiSyncViaGMS, GeminiEmbeddingViaGMS
-from modules.chat_summary import build_additional_prompt_with_history
+from modules.chat_summary import summarize_history_if_needed
 from pipeline.prompt_templates import get_prompt_for_sql, get_prompt_for_chart, get_prompt_for_insight, get_prompt_for_chart_summary
 
 from config.setup import init_pinecone
@@ -42,6 +42,9 @@ class DecimalEncoder(json.JSONEncoder):
 #  1. NL2SQL - RAG 체인 구성 함수
 # -----------------------------------------------
 
+with open("assets/RAG_docs/bigquery_sql.txt", "r", encoding="utf-8") as f:
+    STATIC_SQL_GUIDE = f.read()
+
 def set_rag_chain_for_sql(question, user_department, vectorstore):
     logging.info("📥 RAG 체인 구성 시작")
 
@@ -50,12 +53,17 @@ def set_rag_chain_for_sql(question, user_department, vectorstore):
 
     schema_retriever = vectorstore.as_retriever(
         search_type='mmr',
-        search_kwargs={"k": 3}
+        search_kwargs={"k": 3, "filter": {"type": {"$in": ["schema_description", "sql_guide"]}}}
     )
     
-    sql_retriever = vectorstore.as_retriever(
+    # sql_retriever = vectorstore.as_retriever(
+    #     search_type="mmr",
+    #     search_kwargs={"k": 5, "filter": {"type": {"$in": ["schema_description", "sql_guide"]}}}
+    # )
+    
+    term_retriever = vectorstore.as_retriever(
         search_type="mmr",
-        search_kwargs={"k": 5, "filter": {"type": {"$in": ["schema_description", "sql_guide"]}}}
+        search_kwargs={"k": 5, "filter": {"type": {"$in": ["business_term"]}}}
     )
 
     # Reranker + Retriever 압축기 구성
@@ -67,9 +75,14 @@ def set_rag_chain_for_sql(question, user_department, vectorstore):
         base_retriever=schema_retriever
     )
     
-    sql_retriever_compression = ContextualCompressionRetriever(
+    # sql_retriever_compression = ContextualCompressionRetriever(
+    #     base_compressor=compressor,
+    #     base_retriever=sql_retriever
+    # )
+    
+    term_retriever_compression = ContextualCompressionRetriever(
         base_compressor=compressor,
-        base_retriever=sql_retriever
+        base_retriever=term_retriever
     )
 
     # Gemini LLM
@@ -84,10 +97,11 @@ def set_rag_chain_for_sql(question, user_department, vectorstore):
     rag_chain = (
         {
             "question": RunnableLambda(lambda x: x["question"]),
-            "chat_history": RunnableLambda(lambda x: ""),  # 현재 대화 기록이 없으면 빈 문자열
-            "user_department": RunnableLambda(lambda x: x["user_department"]),
+            "chat_history": RunnableLambda(lambda x: summarize_history_if_needed(x.get("chat_history", ""))),
+            "user_department": RunnableLambda(lambda x: x.get("user_department", "없음")),
             "context_schema": RunnableLambda(lambda x: schema_retriever_compression.invoke(x["question"])),
-            "context_sql": RunnableLambda(lambda x: sql_retriever_compression.invoke(x["question"]))
+            "context_term": RunnableLambda(lambda x: term_retriever_compression.invoke(x["question"])),
+            "context_sql": RunnableLambda(lambda x: STATIC_SQL_GUIDE)
         }
         | get_prompt_for_sql(user_department)
         | llm
@@ -300,7 +314,8 @@ def run_nl2insight(result_dict):
 if __name__ == "__main__":
     
     user_department = "인사팀"
-    result_dict = run_nl2sql(max_retry=5)
+    question = "성과가 부진한 부서의 성과급을 조금 조정해야할 것 같아. 얼마 정도가 적당할까?"
+    result_dict = run_nl2sql(question=question, user_department=user_department, max_retry=5)
     if result_dict is not None and result_dict.get("data") is not None:
         input_dict = run_nl2chartInfo(result_dict, user_department)
         if input_dict is not None:

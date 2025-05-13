@@ -42,6 +42,7 @@ def get_prompt_for_sql(user_department):
         - 반환되는 JSON 내 모든 숫자 타입은 반드시 소수점 이하를 포함하지 않는 **Python의 float 또는 int 형식**으로 작성해주세요.
             - Decimal, Fraction, 기타 특수한 숫자 타입은 절대 사용하지 마세요.
             - 숫자는 항상 JSON에서 직렬화 가능한 형식으로 작성되어야 하며, 예: 123.0, 45 등으로 표현되어야 합니다.
+        - 사용자가 의도한 바가 잘 보일 수 있도록 정렬하고 LIMIT 50으로 제한하세요.
 
     6. 쿼리 결과에는 다음을 포함해야 합니다:
        - 원본 필드 + 새로 계산된 판단 기준 필드
@@ -60,9 +61,12 @@ def get_prompt_for_sql(user_department):
     [대화 내역]
     {chat_history}
 
-    [데이터셋 및 용어 설명]
+    [데이터셋 및 스키마 설명]
     {context_schema}
     
+    [비즈니스 용어 및 판단 기준 정의]
+    {context_term}
+
     [BigQuery SQL 문법 가이드 및 용어 정의]
     {context_sql}
 
@@ -80,7 +84,7 @@ def get_prompt_for_sql(user_department):
     """
 
     prompt_template = PromptTemplate(
-        input_variables=["question", "chat_history", "user_department", "context_schema", "context_sql"],
+        input_variables=["question", "chat_history", "user_department", "context_schema", "context_term", "context_sql"],
         template=base_template.replace("{hr_rule}", hr_rule)
     )
 
@@ -230,7 +234,7 @@ def get_prompt_for_insight():
        예: "3월 이후 급격한 감소세", "A팀이 평균보다 20% 높은 실적을 기록함"
 
     3. 추천 및 해석: 사용자 부서와 질문을 고려하여, 어떤 의사결정이나 행동이 가능할지 제안합니다.  
-       예: "성과 부진 부서에는 추가 교육 프로그램이 필요할 수 있습니다."
+       예: "성과 부진 부서(예: 기획팀)에는 추가 교육 프로그램을 추천합니다."
 
     문장은 리포트에 그대로 사용할 수 있을 정도로 명확하고 포멀하게 작성하세요.  
     분석 전문가의 시각으로, 수치와 근거 기반으로 설명하는 것이 좋습니다.
