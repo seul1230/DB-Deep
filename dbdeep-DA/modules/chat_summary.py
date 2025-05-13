@@ -111,6 +111,12 @@ def build_additional_prompt_with_history(history: List[Dict]) -> str:
     return final_prompt
 
 
+def summarize_history_if_needed(history: str, TOKEN_LIMIT: int = 3000) -> str:
+    token_count = len(tokenizer.encode(history))
+    if token_count < TOKEN_LIMIT:
+        return history  # 요약 필요 없음
+    else:
+        return summarize_chat_history(history)  # 요약 모델 호출
 
 # 테스트 코드
 if __name__ == "__main__":
@@ -144,12 +150,6 @@ if __name__ == "__main__":
         {"role": "assistant", "content": "시를 다양한 방법으로 감상하는 방법을 배웠어요."},
         {"role": "user", "content": "그럼 내일 수업은 뭐야?"}
     ]
-
-    # if should_use_context(history[-1]["content"]):
-    #     context_prompt = build_context_prompt(history[:-1])
-    #     final_prompt = f"[Current User Query]\n{history[-1]['content']}\n {context_prompt}"
-    # else:
-    #     final_prompt = history[-1]['content']
     
     final_prompt = build_additional_prompt_with_history(history)
 
