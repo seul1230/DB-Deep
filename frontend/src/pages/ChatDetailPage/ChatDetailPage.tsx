@@ -11,6 +11,7 @@ import { useQuestionInput } from '@/features/chat/useChatInput';
 import { useChatSocket } from '@/features/chat/useChatSocket';
 import { sendMessage } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
+import { useAuth } from '@/features/auth/useAuth';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -22,6 +23,7 @@ const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const { messages, setMessages } = useChatMessageStore();
   const { openPanel } = usePanelStore();
+  const { profile } = useAuth();
 
   const [showModal, setShowModal] = useState(false);
   const chatMessages = chatId ? messages[chatId] || [] : [];
@@ -35,7 +37,7 @@ const ChatDetailPage = () => {
     sendMessage({
       uuid: chatId,
       question: text,
-      department: "마케팅팀",
+      department: profile?.teamName ?? '알 수 없음',
     });
   });
 

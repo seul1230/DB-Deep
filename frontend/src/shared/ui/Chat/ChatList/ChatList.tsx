@@ -9,9 +9,10 @@ interface Props {
   chatList: ChatStreamMessage[]; // ✅ 타입 수정
   onChartClick?: (chartId: string) => void;
   scrollToBottom?: boolean;
+  showMenu?: boolean;
 }
 
-const ChatList: React.FC<Props> = ({ chatId, chatList, onChartClick, scrollToBottom }) => {
+const ChatList: React.FC<Props> = ({ chatId, chatList, onChartClick, scrollToBottom, showMenu = true }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,6 +46,7 @@ const ChatList: React.FC<Props> = ({ chatId, chatList, onChartClick, scrollToBot
               uuid={chatId}
               messageId={msg.id}
               onChartClick={onChartClick ?? (() => {})}
+              showMenu={showMenu}
             />
           );
         })}

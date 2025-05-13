@@ -1,11 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-interface UserProfile {
-  email: string;
-  imageUrl: string | null;
-  passwordNotChanged: boolean;
-}
+import { UserProfile } from "./authTypes";
 
 interface AuthState {
   accessToken: string | null;
@@ -19,8 +14,8 @@ interface AuthState {
   ) => void;
   clearTokens: () => void;
   setLoggedOut: () => void;
+  setProfile: (profile: UserProfile) => void; // ✅ 타입 정의 추가
 }
-
 
 export const useAuth = create<AuthState>()(
   persist(
@@ -34,8 +29,7 @@ export const useAuth = create<AuthState>()(
       clearTokens: () =>
         set({ accessToken: null, refreshToken: null, profile: null, isLoggedOut: true }),
       setLoggedOut: () => set({ isLoggedOut: true }),
-      setProfile: (profile: UserProfile) =>
-        set({ profile })
+      setProfile: (profile) => set({ profile }), 
     }),
     {
       name: "auth-storage",

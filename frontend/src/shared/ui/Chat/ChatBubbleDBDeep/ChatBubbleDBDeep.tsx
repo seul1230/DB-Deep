@@ -17,6 +17,7 @@ interface Props {
   uuid: string;
   messageId: string;
   onChartClick: (chartId: string) => void;
+  showMenu?: boolean;
 }
 
 export const ChatBubbleDBDeep = ({
@@ -24,6 +25,7 @@ export const ChatBubbleDBDeep = ({
   isLive,
   messageId,
   onChartClick,
+  showMenu = true,
 }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -68,42 +70,44 @@ export const ChatBubbleDBDeep = ({
           )}
         </div>
 
-        <div className={styles['chatBubbleDBDeep-menuArea']} ref={menuRef}>
-          <div className={styles['chatBubbleDBDeep-menuButtonWrapper']}>
-            <button
-              className={styles['chatBubbleDBDeep-menuButton']}
-              onClick={() => setMenuOpen(prev => !prev)}
-            >
-              <FiMoreVertical size={18} />
-            </button>
-            {menuOpen && (
-              <div className={styles['chatBubbleDBDeep-menuOverlayContainer']}>
-                <ChatBubbleMenuOverlay
-                  onCopy={() => {
-                    navigator.clipboard.writeText(text);
-                    showSuccessToast('채팅이 복사되었습니다.');
-                  }}
-                  onArchive={async () => {
-                    if (!messageId) {
-                      console.log(messageId)
-                      showErrorToast("이 메시지는 아카이브할 수 없습니다.");
-                      return;
-                    }
+        {showMenu && (
+  <div className={styles['chatBubbleDBDeep-menuArea']} ref={menuRef}>
+    <div className={styles['chatBubbleDBDeep-menuButtonWrapper']}>
+      <button
+        className={styles['chatBubbleDBDeep-menuButton']}
+        onClick={() => setMenuOpen(prev => !prev)}
+      >
+        <FiMoreVertical size={18} />
+        </button>
+        {menuOpen && (
+          <div className={styles['chatBubbleDBDeep-menuOverlayContainer']}>
+            <ChatBubbleMenuOverlay
+              onCopy={() => {
+                navigator.clipboard.writeText(text);
+                showSuccessToast('채팅이 복사되었습니다.');
+              }}
+              onArchive={async () => {
+                if (!messageId) {
+                  console.log(messageId);
+                  showErrorToast("이 메시지는 아카이브할 수 없습니다.");
+                  return;
+                }
 
-                    try {
-                      await archiveChatMessage(messageId); // ✅ 단일 인자 전달
-                      showSuccessToast("채팅이 아카이브에 저장되었습니다.");
-                    } catch (err) {
-                      console.error(err);
-                      showErrorToast("아카이브 저장에 실패했습니다.");
-                    }
-                  }}
-                  onClose={() => setMenuOpen(false)}
-                />
-              </div>
-            )}
+                try {
+                  await archiveChatMessage(messageId);
+                  showSuccessToast("채팅이 아카이브에 저장되었습니다.");
+                } catch (err) {
+                  console.error(err);
+                  showErrorToast("아카이브 저장에 실패했습니다.");
+                }
+              }}
+              onClose={() => setMenuOpen(false)}
+            />
           </div>
-        </div>
+        )}
+      </div>
+    </div>
+  )}
       </div>
     </div>
   );
