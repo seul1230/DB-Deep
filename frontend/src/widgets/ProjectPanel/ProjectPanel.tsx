@@ -7,12 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { createProject, fetchProjects } from "@/features/project/projectApi";
 import { Project } from "@/features/project/projectTypes";
 import CreateProjectModal from "@/shared/ui/CreateProjectModal/CreateProjectModal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
-const formatDate = (iso: string) => {
-  const date = new Date(iso);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
 
 const ProjectPanel: React.FC = () => {
   const { closePanel } = usePanelStore();
