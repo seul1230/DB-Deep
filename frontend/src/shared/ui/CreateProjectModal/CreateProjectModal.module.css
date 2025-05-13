@@ -1,0 +1,99 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--modal-overlay-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 4000;
+}
+
+.modal {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-radius: 16px;
+  width: 420px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: -8px;
+}
+
+.input,
+.textarea {
+  width: 95%;
+  border: 1px solid var(--light-gray);
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--primary-dark-blue);
+}
+
+.textarea {
+  resize: none;
+  height: 80px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: -8px;
+}
+
+.cancel {
+  background-color: transparent;
+  color: var(--text-color);
+  border: 1px solid var(--light-gray);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancel:hover {
+  background-color: var(--primary-light-blue);
+}
+
+.confirm {
+  background-color: var(--primary-dark-blue);
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.confirm:hover {
+  background-color: var(--icon-blue-hover);
+}

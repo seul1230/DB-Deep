@@ -9,7 +9,7 @@
     z-index: 5;
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05);
   }
-  
+
   .ProjectPanel-header {
     display: flex;
     justify-content: space-between;
@@ -19,6 +19,35 @@
     font-weight: 600;
     color: var(--text-color);
     border-bottom: 1px solid var(--light-gray);
+  }
+  
+  .ProjectPanel-headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+  
+  .ProjectPanel-add {
+    background: none;
+    border: none;
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--icon-blue);
+    transition: background-color 0.2s, transform 0.2s;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .ProjectPanel-add:hover {
+    background-color: var(--primary-light-blue);
+    transform: scale(1.05);
   }
   
   .ProjectPanel-close {
@@ -88,6 +117,11 @@
     color: var(--gray-text);
   }
   
+  .ProjectPanel-MessageCount{
+    font-size: 12px;
+    padding-top: 3px;
+  }
+  
   .ProjectPanel-arrow {
     font-size: 16px;
     color: var(--icon-blue);
@@ -97,6 +131,7 @@
   /* 스크롤바 */
   .ProjectPanel-list::-webkit-scrollbar {
     width: 6px;
+    display: none;
   }
   .ProjectPanel-list::-webkit-scrollbar-thumb {
     background: var(--gray-text);
@@ -104,6 +139,14 @@
   }
   .ProjectPanel-list::-webkit-scrollbar-track {
     background: transparent;
+  }
+
+  .emptyMessage {
+    text-align: center;
+    color: var(--gray-text);
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 8px;
   }
   
   /* 반응형 */

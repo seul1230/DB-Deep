@@ -33,9 +33,23 @@
   .projectHeader {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
   }
+
+  .projectTitleWrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .projectMoreWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }  
   
   .folderIcon {
     color: var(--icon-blue);
@@ -81,7 +95,7 @@
     padding: 16px;
     border-radius: 12px;
     border: 1px solid var(--primary-light-blue);
-    background-color: white;
+    background-color: var(--background-color);
     box-shadow: 0 1px 4px rgba(0,0,0,0.03);
     cursor: pointer;
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
@@ -113,5 +127,52 @@
   .deleteIcon {
     color: var(--icon-blue);
     cursor: pointer;
+  }
+  
+  .projectMoreIcon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .projectOverlay {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 108px;
+    background: var(--background-color);
+    border: 1px solid var(--light-gray);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    z-index: 3000;
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .projectOverlayItem,
+  .projectOverlayItemDanger {
+    padding: 8px 12px;
+    margin: 2px 6px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  
+  .projectOverlayItem:hover {
+    background-color: var(--primary-light-blue);
+  }
+  
+  .projectOverlayItemDanger {
+    color: var(--red-alert);
+  }
+  
+  .projectOverlayItemDanger:hover {
+    background-color: var(--yellow);
   }
   
