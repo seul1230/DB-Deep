@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import logoLight from "../../assets/logo.png";
 import logoDark from "../../assets/logo-dark.png";
 import { useThemeStore } from "@/shared/store/themeStore";
+import { connectSocket } from "@/shared/api/socketManager";
 
 const TempPasswordModal = lazy(() => import("@/entities/auth/TempPasswordModal/TempPasswordModal"));
 
@@ -28,14 +29,21 @@ const LoginPage: React.FC = () => {
     loginMutation.mutate(
       { email, password },
       {
-        onSuccess: () => {
+        onSuccess: async () => {
           const profile = useAuth.getState().profile;
+
+          try {
+            await connectSocket(); // 여기서 대기
+          } catch (e) {
+            console.warn("[Login] 소켓 연결 실패", e);
+          }
+
           if (profile?.passwordNotChanged) {
             navigate("/change-password");
           } else {
             navigate("/main");
           }
-        },        
+        },
         onError: (error) => {
           const axiosError = error as AxiosError<{ message: string }>;
           const message = axiosError.response?.data?.message || "예상치 못한 오류가 발생했습니다.";

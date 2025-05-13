@@ -9,3 +9,7 @@ export const fetchArchiveList = async (): Promise<ArchiveItem[]> => {
 export const deleteArchive = async (archiveId: string): Promise<void> => {
   await axios.delete(`/archives/${archiveId}`);
 };
+
+export const archiveChatMessage = async (messageId: string): Promise<void> => {
+  await axios.post(`/archives`, { messageId });
+};

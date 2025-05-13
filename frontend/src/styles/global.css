@@ -39,3 +39,70 @@ body.dark {
   --text-color: #f3f4f6;
   --modal-overlay-bg: rgba(255, 255, 255, 0.2);
 }
+
+/* ✅ 토스트 기본 스타일 */
+.app-toast__container {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+  border-radius: 12px !important;
+  padding: 20px 24px !important;
+  font-weight: 400 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.app-toast__body {
+  font-size: 0.90rem !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+.app-toast__progress {
+  height: 4px !important;
+  border-radius: 4px !important;
+}
+
+/* ✅ 토스트 타입별 진행바 색상 */
+.Toastify__progress-bar--success {
+  background: var(--icon-blue) !important;
+}
+
+.Toastify__progress-bar--error {
+  background: var(--red-alert) !important;
+}
+
+.Toastify__progress-bar--warning {
+  background: var(--yellow) !important;
+}
+
+.Toastify__progress-bar--info {
+  background: var(--icon-blue) !important;
+}
+
+/* ✅ 기본 스크롤바 스타일 모든 요소에 적용 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--icon-blue) var(--background-color);
+}
+
+/* ✅ WebKit 브라우저용 */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--background-color);
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--icon-blue);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}

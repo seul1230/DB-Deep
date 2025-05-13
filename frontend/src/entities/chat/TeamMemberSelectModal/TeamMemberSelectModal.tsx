@@ -7,6 +7,7 @@ import { Member, fetchMembers } from "@/features/chat/memberApi";
 import TeamMemberList from "../TeamMemberList/TeamMemberList";
 import { shareChat } from "@/features/chat/chatApi";
 import { useParams } from "react-router-dom";
+import { showSuccessToast, showErrorToast } from "@/shared/toast";
 
 interface Props {
   onClose: () => void;
@@ -30,16 +31,11 @@ const TeamMemberSelectModal: React.FC<Props> = ({ onClose }) => {
   const { mutate: shareChatMutation, status } = useMutation({
     mutationFn: () => shareChat(chatId!, selectedIds),
     onSuccess: () => {
-      alert("채팅이 성공적으로 공유되었습니다!");
+      showSuccessToast("채팅이 성공적으로 공유되었습니다!");
       onClose();
     },
-    onError: (error: unknown) => {
-      if (error instanceof Error) {
-        console.error(error.message);
-      } else {
-        console.error("예상치 못한 에러", error);
-      }
-      alert("공유 중 오류가 발생했습니다.");
+    onError: () => {
+      showErrorToast("공유 중 오류가 발생했습니다.");
     },
   });
 

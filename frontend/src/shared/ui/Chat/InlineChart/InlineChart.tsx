@@ -1,5 +1,5 @@
-import React from 'react';
-import Plot, { PlotParams } from 'react-plotly.js';
+import { ChartData } from '@/features/chat/chatTypes';
+import Plot from 'react-plotly.js';
 import { PlotType } from 'plotly.js';
 
 interface InlineChartProps {
@@ -7,26 +7,38 @@ interface InlineChartProps {
 }
 
 export const InlineChart: React.FC<InlineChartProps> = ({ chartJson }) => {
-  const dummyChartData: Partial<PlotParams>['data'] = [
-    {
-      type: 'bar' as PlotType,
-      x: ['A', 'B', 'C'],
-      y: [10, 20, 30],
-      name: '더미 데이터',
-    },
-  ];
+  let parsedChart: ChartData | null = null;
 
   try {
-    JSON.parse(chartJson);
-    // 추후 parsed 사용 예정
+    parsedChart = JSON.parse(chartJson);
   } catch {
-    // invalid JSON → fallback to dummy chart
+    // fallback to dummy
   }
+
+  const data = parsedChart
+    ? [{
+        type: parsedChart.chart_type as PlotType,
+        x: parsedChart.x,
+        y: parsedChart.y,
+        name: parsedChart.title,
+      }]
+    : [{
+        type: 'bar' as PlotType,
+        x: ['A', 'B', 'C'],
+        y: [10, 20, 30],
+        name: '더미 데이터',
+      }];
+
+  const layout = {
+    title: parsedChart?.title || '더미 차트',
+    xaxis: { title: parsedChart?.x_label || '' },
+    yaxis: { title: parsedChart?.y_label || '' },
+  };
 
   return (
     <Plot
-      data={dummyChartData}
-      layout={{ title: '더미 차트' }}
+      data={data}
+      layout={layout}
       style={{ width: '100%', height: '300px', marginTop: '10px' }}
       config={{ responsive: true }}
     />

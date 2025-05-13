@@ -7,6 +7,8 @@ export interface UserProfile {
   email: string;
   imageUrl: string | null;
   passwordNotChanged: boolean;
+  name: string;
+  teamName: string;
 }
 
 export interface LoginResponse {
