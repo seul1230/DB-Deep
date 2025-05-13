@@ -1,6 +1,7 @@
 export interface Project {
     projectId: string;
     projectName: string;
+    chatCount: number;
     createdAt: string;
   }
   

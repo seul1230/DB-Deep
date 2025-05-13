@@ -69,7 +69,7 @@ const ProjectPanel: React.FC = () => {
               <span className={styles["ProjectPanel-title"]}>{project.projectName}</span>
               <div className={styles["ProjectPanel-info"]}>
                 <FiMessageSquare className={styles["ProjectPanel-MessageCount"]} />
-                <span>1개의 채팅</span>
+                <span>{project.chatCount}개의 채팅</span>
               </div>
             </div>
             <FiChevronRight className={styles["ProjectPanel-arrow"]} />
