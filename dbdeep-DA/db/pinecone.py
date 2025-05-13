@@ -21,9 +21,9 @@ def get_pinecone_client():
     return _pinecone_client
 
 
-def get_vectorstore():
+def get_vectorstore(index_name: str = "schema-index"):
     pc = get_pinecone_client()
-    index = pc.Index("schema-index")
+    index = pc.Index(index_name)
 
     embedding = HuggingFaceEmbeddings(
         model_name="nlpai-lab/KURE-v1",
