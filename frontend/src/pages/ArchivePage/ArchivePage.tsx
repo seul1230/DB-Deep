@@ -62,7 +62,11 @@ const ArchivePage = () => {
       <div className={styles.inner}>
         <SectionTitle text="아카이브" />
         {loading ? (
-          <div>불러오는 중...</div>
+          <div className={styles.loading}>불러오는 중...</div>
+        ) : archives.length === 0 ? (
+          <div className={styles.empty}>
+            <p className={styles.emptyText}>아카이브가 존재하지 않습니다.</p>
+          </div>
         ) : (
           <div className={styles.cardList}>
             {archives.map((item) => (

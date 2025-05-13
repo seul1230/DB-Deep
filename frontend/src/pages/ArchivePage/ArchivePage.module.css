@@ -26,3 +26,23 @@
   flex-direction: column;
   gap: 16px;
 }
+
+.loading {
+  width: 100%;
+  text-align: center;
+  padding: 60px 0;
+  font-size: 16px;
+  color: var(--gray-text);
+}
+
+.empty {
+  width: 100%;
+  text-align: center;
+  padding: 80px 0;
+}
+
+.emptyText {
+  color: var(--gray-text);
+  font-size: 16px;
+  font-style: italic;
+}

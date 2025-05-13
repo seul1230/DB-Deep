@@ -43,7 +43,13 @@
     align-items: center;
     gap: 12px;
   }
-  
+
+  .projectMoreWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }  
   
   .folderIcon {
     color: var(--icon-blue);

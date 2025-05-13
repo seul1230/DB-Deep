@@ -118,6 +118,15 @@
   .ChatLogPanel-list::-webkit-scrollbar-track {
     background: transparent;
   }
+
+  .emptyMessage {
+    text-align: center;
+    color: var(--gray-text);
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 8px;
+  }
+  
   
   /* 반응형 */
   @media (max-width: 768px) {

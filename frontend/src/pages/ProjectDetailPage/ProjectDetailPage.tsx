@@ -2,6 +2,7 @@ import { FiMoreVertical } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 import styles from "./ProjectDetailPage.module.css";
 import { FiTrash, FiClock, FiRefreshCw, FiFolderMinus } from "react-icons/fi";
+
 //삭제
 // import { deleteChatInProject } from "@/features/project/projectApi";
 // import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -81,17 +82,32 @@ const dummyCards = [
 
 const ProjectDetailPage: React.FC = () => {
   const [showProjectMenu, setShowProjectMenu] = useState(false);
-  const projectMenuRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (projectMenuRef.current && !projectMenuRef.current.contains(e.target as Node)) {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(e.target as Node)
+      ) {
         setShowProjectMenu(false);
       }
     };
+  
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowProjectMenu(false);
+      }
+    };
+  
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
+   
 
   const handleEditProjectName = () => {
     setShowProjectMenu(false);
@@ -113,7 +129,7 @@ const ProjectDetailPage: React.FC = () => {
     console.log("Deleted card id: ", chatId);
   };
 
-  //실제 삭제 api를 사용할 때 사용용
+  //실제 삭제 api를 사용할 때 사용
   // const queryClient = useQueryClient();
 
   // const deleteMutation = useMutation({
@@ -123,7 +139,7 @@ const ProjectDetailPage: React.FC = () => {
   //   },
   // });
 
-  // const handleDelete = (e: React.MouseEvent, chatId: string) => {
+  // const handleDeleteChat = (e: React.MouseEvent, chatId: string) => {
   //   e.stopPropagation();
   //   if (confirm("정말로 이 채팅을 삭제하시겠습니까?")) {
   //     deleteMutation.mutate(chatId);
@@ -139,20 +155,34 @@ const ProjectDetailPage: React.FC = () => {
               <h2 className={styles.title}>성과 요약 프로젝트</h2>
             </div>
 
-            <div
-              className={styles.projectMoreIcon}
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowProjectMenu((prev) => !prev);
-              }}
-            >
-              <FiMoreVertical size={20} />
+            <div className={styles.projectMoreWrapper} ref={wrapperRef}>
+              <div
+                className={styles.projectMoreIcon}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowProjectMenu((prev) => !prev);
+                }}
+              >
+                <FiMoreVertical size={20} />
+              </div>
               {showProjectMenu && (
                 <div className={styles.projectOverlay}>
-                  <div className={styles.projectOverlayItem} onClick={handleEditProjectName}>
+                  <div
+                    className={styles.projectOverlayItem}
+                    onClick={() => {
+                      setShowProjectMenu(false);
+                      handleEditProjectName();
+                    }}
+                  >
                     이름 수정
                   </div>
-                  <div className={styles.projectOverlayItemDanger} onClick={handleDeleteProject}>
+                  <div
+                    className={styles.projectOverlayItemDanger}
+                    onClick={() => {
+                      setShowProjectMenu(false);
+                      handleDeleteProject();
+                    }}
+                  >
                     삭제
                   </div>
                 </div>

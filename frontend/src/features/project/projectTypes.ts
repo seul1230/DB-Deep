@@ -14,5 +14,6 @@ export interface Project {
     projectId: string;
     projectTitle: string;
     createdAt: string;
+    updatedAt: string;
     chats: ChatItem[];
   }

@@ -36,7 +36,7 @@ const Router = () => {
         <Route path="/chat/:chatId" element={<ChatDetailPage />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/archive" element={<ArchivePage />} />
-        <Route path="/project/:id" element={<ProjectDetailPage />} />
+        <Route path="/project/:projectId" element={<ProjectDetailPage />} />
         {/* 여기에 더 추가 가능 */}
       </Route>
     </Routes>

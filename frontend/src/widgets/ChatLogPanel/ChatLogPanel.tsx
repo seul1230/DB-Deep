@@ -101,6 +101,9 @@ const ChatLogPanel: React.FC = () => {
       <div className={styles["ChatLogPanel-list"]}>
         {isLoading && <p>로딩 중...</p>}
         {isError && <p>채팅방을 불러오는 데 실패했습니다.</p>}
+        {!isLoading && !isError && data?.chatRooms.length === 0 && (
+          <p className={styles.emptyMessage}>채팅방이 없습니다.</p>
+        )}
 
         {data?.chatRooms.map((log) => (
           <div
