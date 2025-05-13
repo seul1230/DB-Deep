@@ -10,11 +10,17 @@ export interface Project {
     message: string;
     updatedAt: string;
   }
+
+  export interface ChatRoom {
+    id: string;
+    title: string;
+    lastMessageAt: string;
+  }
   
   export interface ProjectDetail {
-    projectId: string;
-    projectTitle: string;
+    id: number;
+    name: string;
+    description: string;
     createdAt: string;
-    updatedAt: string;
-    chats: ChatItem[];
+    chatRooms: ChatRoom[];
   }
