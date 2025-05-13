@@ -75,6 +75,4 @@ public class ProjectController {
         projectService.deleteChatRoom(memberId, projectId, request);
         return JSONResponse.onSuccess();
     }
-
-
 }
