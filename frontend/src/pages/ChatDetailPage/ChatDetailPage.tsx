@@ -10,6 +10,7 @@ import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 import { useQuestionInput } from '@/features/chat/useChatInput';
 import { useChatSocket } from '@/features/chat/useChatSocket';
 import { sendMessage } from '@/shared/api/socketManager';
+import { convertToStreamMessage } from '@/features/chat/chatTypes';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -20,16 +21,15 @@ const PANEL_WIDTH = 240;
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
   const { messages, setMessages } = useChatMessageStore();
-  const chatMessages = messages[chatId || ""] || [];
+  const { openPanel } = usePanelStore();
 
   const [showModal, setShowModal] = useState(false);
-
-  const { openPanel } = usePanelStore();
+  const chatMessages = chatId ? messages[chatId] || [] : [];
 
   const isAnyPanelOpen = !!openPanel;
   const leftOffset = isAnyPanelOpen ? PANEL_WIDTH + 68 : 0;
-  
-  // ✅ 메시지 전송
+
+  // ✅ useQuestionInput은 무조건 실행되어야 함
   const { value, onChange, onSubmit } = useQuestionInput((text) => {
     if (!chatId) return;
     sendMessage({
@@ -39,15 +39,16 @@ const ChatDetailPage = () => {
     });
   });
 
-  // ✅ 초기 채팅 불러오기
-  useEffect(() => {
-    if (chatId) {
-      fetchChatDetail(chatId).then((res) => setMessages(chatId, res.messages));
-    }
-  }, [chatId, setMessages]);
+  useChatSocket(chatId); // 내부에서 chatId 없으면 처리하도록
 
-  // ✅ 실시간 수신
-  useChatSocket(chatId);
+  // ✅ useEffect도 무조건 호출되도록!
+  useEffect(() => {
+    if (!chatId) return;
+    fetchChatDetail(chatId).then((res) => {
+      const converted = res.messages.map(convertToStreamMessage);
+      setMessages(chatId, converted);
+    });
+  }, [chatId, setMessages]);
 
   const handleChartClick = (chartId: string) => {
     console.log(`Chart clicked: ${chartId}`);
@@ -56,14 +57,19 @@ const ChatDetailPage = () => {
   return (
     <div className={styles['chatDetailPage-outer']}>
       <div className={styles['chatDetailPage-contentWrapper']}>
-        <ChatList chatList={chatMessages} onChartClick={handleChartClick} scrollToBottom />
+        {chatId && (
+          <ChatList
+            chatId={chatId}
+            chatList={chatMessages}
+            onChartClick={handleChartClick}
+            scrollToBottom
+          />
+        )}
       </div>
 
       <div
         className={styles['chatDetailPage-inputWrapper']}
-        style={{
-          paddingLeft: `${leftOffset}px`
-        }}
+        style={{ paddingLeft: `${leftOffset}px` }}
       >
         <div className={styles['chatDetailPage-inputContainer']}>
           <div className={styles['chatDetailPage-inputArea']}>
@@ -77,7 +83,7 @@ const ChatDetailPage = () => {
           </div>
         </div>
       </div>
-      
+
       <Suspense fallback={<div style={{ display: 'none' }} />}>
         {showModal && (
           <TeamMemberSelectModal

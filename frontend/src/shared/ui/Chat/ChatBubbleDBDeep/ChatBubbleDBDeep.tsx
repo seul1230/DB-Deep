@@ -1,34 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './ChatBubbleDBDeep.module.css';
 import { TypewriterText } from '../TypewriterText/TypewriterText';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import { ChatPart } from '@/features/chat/chatTypes';
 import { FiMoreVertical } from 'react-icons/fi';
 import { ChatBubbleMenuOverlay } from '@/entities/chat/ChatBubbleMenuOverlay/ChatBubbleMenuOverlay';
 import { InlineChart } from '../InlineChart/InlineChart';
-import { Components } from 'react-markdown';
 import { showSuccessToast, showErrorToast } from '@/shared/toast';
 import { archiveChatMessage } from '@/features/archive/archiveApi';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { ChatMarkdownRenderers } from './markdownRenderers';
 
-interface ChatBubbleDBDeepProps {
-  text: string;
-  onChartClick: (chartId: string) => void;
-  onTyping?: () => void;
-  isLive?: boolean;
-  showMenu?: boolean;
+interface Props {
+  parts: ChatPart[];
+  isLive: boolean;
   uuid: string;
-  messageId: number;
+  messageId: string;
+  onChartClick: (chartId: string) => void;
 }
 
 export const ChatBubbleDBDeep = ({
-  text,
-  onChartClick,
-  onTyping,
-  isLive = false,
-  showMenu = true,
-  uuid,
+  parts,
+  isLive,
   messageId,
-}: ChatBubbleDBDeepProps) => {
+  onChartClick,
+}: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -42,63 +38,72 @@ export const ChatBubbleDBDeep = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const markdownComponents: Components = {
-    p: (props) => {
-      const content = String(props.children);
-      if (content.trim().startsWith('{') && content.trim().endsWith('}')) {
-        return <InlineChart chartJson={content} />;
-      }
-      return <p>{props.children}</p>;
-    },
-    code: () => <></>, // 숨김 처리
-  };
+  const text = parts.filter(p => p.type === 'text').map(p => p.content).join('\n');
+  const sql = parts.find(p => p.type === 'sql')?.content;
+  const status = parts.find(p => p.type === 'status')?.content;
+  const chart = parts.find(p => p.type === 'chart')?.content;
 
   return (
     <div className={styles['chatBubbleDBDeep-wrapper']}>
       <div className={styles['chatBubbleDBDeep-bubbleWithMenu']}>
         <div className={styles['chatBubbleDBDeep-bubble']}>
           {isLive ? (
-            <TypewriterText markdownText={text} onChartClick={onChartClick} onTyping={onTyping} />
+            <TypewriterText markdownText={text} onChartClick={onChartClick} />
           ) : (
-            <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={ChatMarkdownRenderers(onChartClick)}>
               {text}
             </ReactMarkdown>
           )}
+
+          {sql && (
+            <pre className={styles['chatBubbleDBDeep-sqlBlock']}>{sql}</pre>
+          )}
+
+          {chart && (
+            <InlineChart chartJson={JSON.stringify(chart)} />
+          )}
+
+          {status && (
+            <div className={styles['chatBubbleDBDeep-status']}>{status}</div>
+          )}
         </div>
 
-        {showMenu && ( 
-          <div className={styles['chatBubbleDBDeep-menuArea']} ref={menuRef}>
-            <div className={styles['chatBubbleDBDeep-menuButtonWrapper']}>
-              <button
-                className={styles['chatBubbleDBDeep-menuButton']}
-                onClick={() => setMenuOpen((prev) => !prev)}
-              >
-                <FiMoreVertical size={18} />
-              </button>
-              {menuOpen && (
-                <div className={styles['chatBubbleDBDeep-menuOverlayContainer']}>
-                  <ChatBubbleMenuOverlay
-                    onCopy={() => {
-                      navigator.clipboard.writeText(text);
-                      showSuccessToast('채팅이 복사되었습니다.');
-                    }}
-                    onArchive={async () => {
-                      try {
-                        const archiveId = parseInt(uuid, 10); // 백엔드에서 요구하는 타입이 number라고 가정
-                        await archiveChatMessage({ archiveId, messageId });
-                        showSuccessToast('채팅이 아카이브에 저장되었습니다.');
-                      } catch (error) {
-                        showErrorToast('아카이브 저장에 실패했습니다.');
-                        console.error(error);
-                      }
-                    }}
-                    onClose={() => setMenuOpen(false)}
-                  />
-                </div>
-              )}
-            </div>
+        <div className={styles['chatBubbleDBDeep-menuArea']} ref={menuRef}>
+          <div className={styles['chatBubbleDBDeep-menuButtonWrapper']}>
+            <button
+              className={styles['chatBubbleDBDeep-menuButton']}
+              onClick={() => setMenuOpen(prev => !prev)}
+            >
+              <FiMoreVertical size={18} />
+            </button>
+            {menuOpen && (
+              <div className={styles['chatBubbleDBDeep-menuOverlayContainer']}>
+                <ChatBubbleMenuOverlay
+                  onCopy={() => {
+                    navigator.clipboard.writeText(text);
+                    showSuccessToast('채팅이 복사되었습니다.');
+                  }}
+                  onArchive={async () => {
+                    if (!messageId) {
+                      console.log(messageId)
+                      showErrorToast("이 메시지는 아카이브할 수 없습니다.");
+                      return;
+                    }
+
+                    try {
+                      await archiveChatMessage(messageId); // ✅ 단일 인자 전달
+                      showSuccessToast("채팅이 아카이브에 저장되었습니다.");
+                    } catch (err) {
+                      console.error(err);
+                      showErrorToast("아카이브 저장에 실패했습니다.");
+                    }
+                  }}
+                  onClose={() => setMenuOpen(false)}
+                />
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

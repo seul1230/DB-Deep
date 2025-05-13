@@ -10,14 +10,6 @@ export const deleteArchive = async (archiveId: string): Promise<void> => {
   await axios.delete(`/archives/${archiveId}`);
 };
 
-export const archiveChatMessage = async ({
-  archiveId,
-  messageId,
-}: {
-  archiveId: number;
-  messageId: number;
-}): Promise<void> => {
-  await axios.post(`/archives/${archiveId}`, {
-    messageId,
-  });
+export const archiveChatMessage = async (messageId: string): Promise<void> => {
+  await axios.post(`/archives`, { messageId });
 };

@@ -1,18 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import { ChatBubbleUser } from '@/shared/ui/Chat/ChatBubbleUser/ChatBubbleUser';
 import { ChatBubbleDBDeep } from '@/shared/ui/Chat/ChatBubbleDBDeep/ChatBubbleDBDeep';
-import { ChatMessage } from '@/features/chat/chatTypes';
+import { ChatStreamMessage } from '@/features/chat/chatTypes';
 import styles from './ChatList.module.css';
 
 interface Props {
   chatId: string;
-  chatList: ChatMessage[];
+  chatList: ChatStreamMessage[]; // ✅ 타입 수정
   onChartClick?: (chartId: string) => void;
   scrollToBottom?: boolean;
-  showMenu?: boolean;
 }
 
-const ChatList: React.FC<Props> = ({ chatId, chatList, onChartClick, scrollToBottom, showMenu = true, }) => {
+const ChatList: React.FC<Props> = ({ chatId, chatList, onChartClick, scrollToBottom }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,21 +26,25 @@ const ChatList: React.FC<Props> = ({ chatId, chatList, onChartClick, scrollToBot
   return (
     <div className={styles['ChatList-scrollArea']} ref={scrollRef}>
       <div className={styles['ChatList-chatBox']}>
-      {chatList.map((msg, index) => {
-          const isLast = index === chatList.length - 1;
-          const isLive = isLast && msg.senderType === 'AI';
+        {chatList.map((msg) => {
+          if (msg.senderType === 'USER') {
+            const textPart = msg.parts.find(p => p.type === 'text');
+            return (
+              <ChatBubbleUser
+                key={msg.id}
+                text={textPart?.content ?? ''}
+              />
+            );
+          }
 
-          return msg.senderType === 'USER' ? (
-            <ChatBubbleUser key={msg.id} text={msg.content} />
-          ) : (
+          return (
             <ChatBubbleDBDeep
               key={msg.id}
-              text={msg.content}
-              onChartClick={onChartClick || (() => {})}
-              isLive={isLive}
-              showMenu={showMenu}
-              uuid={chatId || ''}
-              messageId={Number(msg.id)}
+              parts={msg.parts}
+              isLive={msg.isLive}
+              uuid={chatId}
+              messageId={msg.id}
+              onChartClick={onChartClick ?? (() => {})}
             />
           );
         })}
