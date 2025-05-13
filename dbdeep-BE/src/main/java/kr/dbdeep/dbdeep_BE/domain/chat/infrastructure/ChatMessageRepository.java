@@ -32,7 +32,6 @@ public class ChatMessageRepository {
                             .id(doc.getId())
                             .chatRoomId(doc.getString("chat_room_id"))
                             .content(doc.getString("content"))
-                            .memberId(Integer.valueOf(doc.getString("sender_id")))
                             .senderType(doc.getString("sender_type"))
                             .timestamp(doc.getTimestamp("timestamp"))
                             .build())
@@ -57,7 +56,6 @@ public class ChatMessageRepository {
                             .id(doc.getId())
                             .chatRoomId(doc.getString("chat_room_id"))
                             .content(doc.getString("content"))
-                            .memberId(Integer.valueOf(doc.getString("sender_id")))
                             .senderType(doc.getString("sender_type"))
                             .timestamp(doc.getTimestamp("timestamp"))
                             .build())
@@ -79,7 +77,6 @@ public class ChatMessageRepository {
                     .id(doc.getId())
                     .chatRoomId(doc.getString("chat_room_id"))
                     .content(doc.getString("content"))
-                    .memberId(Integer.valueOf(doc.getString("sender_id")))
                     .senderType(doc.getString("sender_type"))
                     .timestamp(doc.getTimestamp("timestamp"))
                     .build();
@@ -99,7 +96,6 @@ public class ChatMessageRepository {
                     Map.of(
                             "chat_room_id", message.getChatRoomId(),
                             "content", message.getContent(),
-                            "sender_id", message.getMemberId(),
                             "sender_type", message.getSenderType(),
                             "timestamp", message.getTimestamp()
                     )
