@@ -83,18 +83,15 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectChatRoomResponse> getChatRooms(Integer memberId, Integer projectId) {
+    public ProjectChatRoomResponse getChatRooms(Integer memberId, Integer projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(ErrorCode.PROJECT_NOT_FOUND));
         if (!project.getMember().getId().equals(memberId)) {
             throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
         }
 
-        return chatRoomRepository.findAllByProjectId(projectId)
-                .stream()
-                .map(chatRoom -> new ProjectChatRoomResponse(chatRoom.getId(), chatRoom.getChatroomName(),
-                        chatRoom.getLastMessageAt()))
-                .toList();
+        List<ChatRoom> chatRooms = chatRoomRepository.findAllByProjectId(projectId);
+        return ProjectChatRoomResponse.from(project, chatRooms);
     }
 
     @Transactional
