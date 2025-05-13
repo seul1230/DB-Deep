@@ -38,8 +38,8 @@ public class ArchiveService {
             return ArchivedMessageResponse.from(
                     archive.getId(),
                     message.getId(),
-                    message.getContent(),
                     chatRoom.getChatroomName(),
+                    message.getContent(),
                     message.getTimestamp().toDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),
                     archive.getCreatedAt()
             );
