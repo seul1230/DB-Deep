@@ -53,7 +53,7 @@ public class ProjectService {
         return projectRepository.findAllByMember(memberRepository.findById(memberId)
                         .orElseThrow(() -> new MemberNotFoundException(ErrorCode.MEMBER_NOT_FOUND)))
                 .stream()
-                .map(project -> new ProjectListResponse(project.getId(), project.getTitle(), project.getCreatedAt()))
+                .map(ProjectListResponse::from)
                 .toList();
     }
 
