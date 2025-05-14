@@ -89,8 +89,7 @@ const ProjectDetailPage: React.FC = () => {
   };
 
   const handleCardClick = (chatId: string) => {
-    // 추후 라우팅 예정
-    console.log("Clicked card id:", chatId);
+    navigate(`/chat/${chatId}`);
   };
 
   const handleDelete = (e: React.MouseEvent, chatId: string) => {
