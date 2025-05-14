@@ -19,8 +19,8 @@ def get_prompt_for_insight():
     ### 3. 대화 맥락
     {chat_history}
 
-    ### 4. 조회된 데이터 요약
-    {data_summary}
+    ### 4. 조회된 데이터 및 요약
+    {data_summary} {data}
 
     ### 5. 시각화 차트 (plotly.js JSON)
     ```json
@@ -30,7 +30,7 @@ def get_prompt_for_insight():
     ## 출력 형식 (마크다운으로 작성)
     사용자의 질문에 기반하여 다음을 포함해 분석 결과를 작성하세요:
 
-    1. 차트 설명: 차트가 시각적으로 어떤 정보를 보여주는지 간단히 요약합니다.  
+    1. 차트가 있는 경우에만 차트 설명: 차트가 시각적으로 어떤 정보를 보여주는지 간단히 요약합니다. 차트 시각화 할 필요 없이 간단히 조회된 데이터라면 차트 정보가 없을 수 있습니다.
        예: "월별 판매량 추이를 보여주는 선형 차트입니다."
 
     2. 핵심 인사이트 요약: 조회된 데이터 기반으로 유의미한 패턴, 변화, 차이 등을 서술합니다.  
@@ -44,7 +44,14 @@ def get_prompt_for_insight():
     """
 
     prompt_template = PromptTemplate(
-        input_variables=["question", "user_department", "chat_history", "data_summary", "chart_spec"],
+        input_variables=[
+            "question",
+            "user_department",
+            "chat_history",
+            "data",
+            "data_summary",
+            "chart_spec"
+        ],
         template=base_template
     )
 
