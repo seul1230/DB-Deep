@@ -7,8 +7,7 @@ import lombok.Builder;
 @Builder
 public record ChatMessageDto(
         String id,
-        String content,
-        Integer memberId,
+        Object content,
         String senderType,
         Timestamp timestamp
 ) {

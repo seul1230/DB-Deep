@@ -14,7 +14,7 @@ public record ArchivedMessageResponse(
         String messageId,
         String chatRoomId,
         String chatName,
-        String lastMessage,
+        Object lastMessage,
 
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime chatSentAt,
