@@ -7,7 +7,10 @@ from google.oauth2 import service_account
 class SQLExecutor:
     def __init__(self):
         credentials = service_account.Credentials.from_service_account_file(settings.GOOGLE_APPLICATION_CREDENTIALS)
-        self.bq_client = bigquery.Client(credentials=credentials, project=settings.GOOGLE_CLOUD_PROJECT)
+        if credentials == None:
+            self.bq_client = bigquery.Client(project=settings.GOOGLE_CLOUD_PROJECT)
+        else:
+            self.bq_client = bigquery.Client(credentials=credentials, project=settings.GOOGLE_CLOUD_PROJECT)
 
     def validate(self, query: str, location: str = "asia-northeast3"):
         job_config = bigquery.QueryJobConfig(dry_run=True, use_query_cache=False)

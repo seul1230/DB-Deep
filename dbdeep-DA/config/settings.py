@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     GOOGLE_CLOUD_PROJECT: str
 
     # MySQL
-    MYSQL_USERNAME: str
+    MYSQL_USERNAME: str 
     MYSQL_PASSWORD: str
     MYSQL_HOST: str
     MYSQL_PORT: int
