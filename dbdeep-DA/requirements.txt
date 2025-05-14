@@ -43,3 +43,6 @@ google-cloud-core==2.4.1
 # --- 문서 임베딩 처리용
 unstructured==0.12.6
 openpyxl==3.1.2
+
+google-cloud-firestore
+pymysql
