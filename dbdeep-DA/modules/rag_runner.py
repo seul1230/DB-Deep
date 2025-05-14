@@ -72,16 +72,6 @@ def run_chart_pipeline(chart_request: ChartRequest) -> ChartRequest:
         "data_summary": extract_text_block(response_text)
     })
 
-
-# async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSocket):
-#     logging.info("🧠 인사이트 추출 중...")
-#     chain, inputs = build_insight_chain(request.dict())
-#     result = ""
-#     async for chunk in chain.astream(inputs):
-#         await websocket.send_text(chunk)
-#         result += chunk
-#     return result
-
 async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSocket):
     logging.info("🧠 인사이트 추출 중...")
     chain, inputs = build_insight_chain(request.dict())
