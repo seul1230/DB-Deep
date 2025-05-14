@@ -73,14 +73,34 @@ def run_chart_pipeline(chart_request: ChartRequest) -> ChartRequest:
     })
 
 
+# async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSocket):
+#     logging.info("🧠 인사이트 추출 중...")
+#     chain, inputs = build_insight_chain(request.dict())
+#     result = ""
+#     async for chunk in chain.astream(inputs):
+#         await websocket.send_text(chunk)
+#         result += chunk
+#     return result
+
 async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSocket):
     logging.info("🧠 인사이트 추출 중...")
     chain, inputs = build_insight_chain(request.dict())
     result = ""
-    async for chunk in chain.astream(inputs):
-        await websocket.send_text(chunk)
-        result += chunk
+    generator = chain.astream(inputs)
+
+    try:
+        async for chunk in generator:
+            await websocket.send_text(chunk)
+            result += chunk
+    except Exception as e:
+        logging.exception("❌ 인사이트 추출 중 예외 발생:")
+        raise
+    finally:
+        # 누수 방지를 위한 명시적 종료
+        await generator.aclose()
+    print(result)
     return result
+
 
 # 테스트 코드
 if __name__ == "__main__":

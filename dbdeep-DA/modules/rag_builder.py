@@ -99,6 +99,7 @@ def build_insight_chain(input_dict: dict) -> Tuple[Any, dict]:
             "question": RunnableLambda(lambda x: x["question"]),
             "user_department": RunnableLambda(lambda x: x["user_department"]),
             "chat_history": RunnableLambda(lambda x: x.get("chat_history", "")),
+            "data": RunnableLambda(lambda x: x.get("data", "")),
             "data_summary": RunnableLambda(lambda x: x.get("data_summary", "")),
             "chart_spec": RunnableLambda(lambda x: json.dumps(x["chart_spec"], ensure_ascii=False))
         }

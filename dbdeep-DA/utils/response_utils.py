@@ -20,10 +20,11 @@ def clean_sql_from_response(response_text: str) -> str:
         if isinstance(json_obj, dict):
             # ✅ answer → sql_code 경로 우선 시도
             sql_code = (
+                json_obj.get("sql_code") or
                 json_obj.get("answer", {}).get("sql_code") or
-                json_obj.get("query", {}).get("sql_code") or
-                json_obj.get("sql_code")
+                json_obj.get("query", {}).get("sql_code")
             )
+
     except json.JSONDecodeError:
         logging.warning("⚠️ JSON 파싱 실패, 코드블럭 추출로 fallback")
 
