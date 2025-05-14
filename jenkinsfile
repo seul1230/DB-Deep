@@ -51,6 +51,7 @@ pipeline {
               --allow-unauthenticated \
               --cpu 2 \
               --memory 8Gi \
+              --max-instances 2 \
               --port ${PORT} \
               --add-cloudsql-instances ${CLOUDSQL_INSTANCE} \
               --set-env-vars ${ENV_VARS}
