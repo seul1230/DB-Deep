@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./ArchivePage.module.css";
 import SectionTitle from "@/entities/archive/SectionTitle/SectionTitle";
 import ArchiveCard from "@/entities/archive/ArchiveCard/ArchiveCard";
@@ -10,6 +11,8 @@ const ArchivePage = () => {
 
   const [archives, setArchives] = useState<ArchiveItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadArchives = async () => {
@@ -24,6 +27,10 @@ const ArchivePage = () => {
     };
     loadArchives();
   }, []);
+
+  const handleCardClick = (chatRoomId: string) => {
+    navigate(`/archiveDetail/${chatRoomId}`);
+  };
 
   const handleDeleteSuccess = (deletedId: string) => {
     setArchives((prev) =>
@@ -51,7 +58,7 @@ const ArchivePage = () => {
                 title={item.chatName}
                 description={item.lastMessage}
                 date={dayjs(item.archivedAt).format("YYYY년 M월 D일 A h시 m분")}
-                onClick={() => console.log(`ArchiveCard ${item.archiveId} clicked`)}
+                onClick={() => handleCardClick(item.chatRoomId)}
                 onDeleteSuccess={handleDeleteSuccess}
               />
             ))}
