@@ -1,3 +1,7 @@
+// ==============================
+// ✅ 1. API 응답 타입 (서버 원형 데이터)
+// ==============================
+
 export interface ChatTimestamp {
   seconds: number;
   nanos: number;
@@ -6,9 +10,9 @@ export interface ChatTimestamp {
 export interface ChatMessage {
   id: string;
   uuid: string;
-  content: string;
+  content: string | ParsedChatContent; // 서버에서 오는 content는 문자열 or 객체
   memberId: number;
-  senderType: 'AI' | 'USER';
+  senderType: 'ai' | 'user';
   timestamp: ChatTimestamp;
 }
 
@@ -25,14 +29,9 @@ export interface ChatApiResponse {
   result: ChatDetail;
 }
 
-export interface ChartData {
-  chart_type: string;
-  x: string[];
-  y: number[];
-  x_label: string;
-  y_label: string;
-  title: string;
-}
+// ==============================
+// ✅ 2. 클라이언트 내부 렌더링용 타입
+// ==============================
 
 export type ChatPart =
   | { type: 'text'; content: string }
@@ -44,9 +43,37 @@ export interface ChatStreamMessage {
   id: string;
   uuid: string;
   parts: ChatPart[];
-  senderType: 'AI' | 'USER';
+  senderType: 'ai' | 'user';
   isLive: boolean;
 }
+
+// ==============================
+// ✅ 3. 차트 데이터 타입
+// ==============================
+
+export interface ChartData {
+  chart_type: string;
+  x: string[];
+  y: number[];
+  x_label: string;
+  y_label: string;
+  title: string;
+}
+
+// ==============================
+// ✅ 4. JSON 기반 콘텐츠 content 파싱용 타입
+// ==============================
+
+export interface ParsedChatContent {
+  question: string;
+  insight?: string;
+  query?: string;
+  chart?: ChartData;
+}
+
+// ==============================
+// ✅ 5. 사용자 메시지 전송 페이로드 타입
+// ==============================
 
 export interface ChatPayload {
   uuid: string;
@@ -54,28 +81,42 @@ export interface ChatPayload {
   department: string;
 }
 
-// ✅ 변환 유틸
+// ==============================
+// ✅ 6. 변환 유틸 - ChatMessage → ChatStreamMessage
+// ==============================
+
 export const convertToStreamMessage = (msg: ChatMessage): ChatStreamMessage => {
   const parts: ChatPart[] = [];
-  const chartMatch = msg.content.match(/<Chart id="(.*?)" \/>/);
 
-  if (chartMatch) {
-    const chartId = chartMatch[1];
-    const cleaned = msg.content.replace(/<Chart.*?\/>/g, '').trim();
-    if (cleaned) parts.push({ type: 'text', content: cleaned });
-    parts.push({
-      type: 'chart',
-      content: {
-        chart_type: 'bar',
-        x: [],
-        y: [],
-        x_label: '',
-        y_label: '',
-        title: `Chart ID: ${chartId}`, // 임시로 chartId를 title로 노출
-      },
-    });
-  } else {
-    parts.push({ type: 'text', content: msg.content });
+  let parsed: ParsedChatContent | null = null;
+
+  if (typeof msg.content === 'string') {
+    try {
+      const maybeParsed = JSON.parse(msg.content);
+      if (maybeParsed && typeof maybeParsed === 'object' && 'question' in maybeParsed) {
+        parsed = maybeParsed;
+      } else {
+        parts.push({ type: 'text', content: msg.content });
+      }
+    } catch {
+      parts.push({ type: 'text', content: msg.content });
+    }
+  } else if (typeof msg.content === 'object' && msg.content !== null && 'question' in msg.content) {
+    parsed = msg.content as ParsedChatContent;
+  }
+
+  if (parsed) {
+    if (parsed.insight) {
+      parts.push({ type: 'text', content: parsed.insight });
+    }
+    if (parsed.query) {
+      parts.push({ type: 'sql', content: parsed.query });
+    }
+    if (parsed.chart) {
+      parts.push({ type: 'chart', content: parsed.chart });
+    }
+  } else if (parts.length === 0) {
+    parts.push({ type: 'text', content: String(msg.content) });
   }
 
   return {

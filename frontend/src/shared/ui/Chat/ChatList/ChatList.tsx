@@ -28,7 +28,7 @@ const ChatList: React.FC<Props> = ({ chatId, chatList, onChartClick, scrollToBot
     <div className={styles['ChatList-scrollArea']} ref={scrollRef}>
       <div className={styles['ChatList-chatBox']}>
         {chatList.map((msg) => {
-          if (msg.senderType === 'USER') {
+          if (msg.senderType === 'user') {
             const textPart = msg.parts.find(p => p.type === 'text');
             return (
               <ChatBubbleUser

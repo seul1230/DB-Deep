@@ -29,6 +29,8 @@ export const ChatBubbleDBDeep = ({
 }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  
+  
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
