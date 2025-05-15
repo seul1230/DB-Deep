@@ -21,9 +21,9 @@ const ProjectDetailPage: React.FC = () => {
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError } = useQuery<ProjectDetail>({
-    queryKey: ["projectDetail", projectId],
-    queryFn: () => fetchProjectDetail(projectId!),
-    enabled: !!projectId,
+    queryKey: ["projectDetail", String(projectId)],
+    queryFn: () => fetchProjectDetail(String(projectId)!),
+    enabled: !!String(projectId),
   });
 
   const updateTitleMutation = useMutation({
