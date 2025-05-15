@@ -28,8 +28,9 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(name = "project_id")
     private Integer projectId;
 
+    @Builder.Default
     @Column(name = "chatroom_name", length = 50)
-    private String chatroomName;
+    private String chatroomName = "새 채팅방";
 
     @Column(name = "last_message_at")
     private LocalDateTime lastMessageAt;
