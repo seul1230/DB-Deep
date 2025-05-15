@@ -12,6 +12,7 @@ import { useChatSocket } from '@/features/chat/useChatSocket';
 import { sendMessage } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
 import { useAuth } from '@/features/auth/useAuth';
+import { ChartOverlay } from '@/entities/chat/ChartOverlay/ChartOverlay';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -97,6 +98,8 @@ const ChatDetailPage = () => {
           />
         )}
       </Suspense>
+
+      <ChartOverlay />
     </div>
   );
 };

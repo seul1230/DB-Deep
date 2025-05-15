@@ -22,7 +22,7 @@ export const useChatMessageStore = create<State>((set) => ({
         id: `${Date.now()}`,
         uuid: chatId,
         parts: [],
-        senderType: 'AI',
+        senderType: 'ai',
         isLive: true,
       };
       return {
