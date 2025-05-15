@@ -1,8 +1,13 @@
 import re
 import json
 import logging
+
+import asyncio
 from typing import Dict
+
 from fastapi import WebSocket
+from starlette.websockets import WebSocketDisconnect
+
 
 from services.sql_executor import SQLExecutor
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
@@ -80,16 +85,20 @@ async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSock
 
     try:
         async for chunk in generator:
-            await websocket.send_text(chunk)
-            result += chunk
+            try:
+                await websocket.send_text(chunk)
+                result += chunk
+            except (RuntimeError, asyncio.CancelledError, WebSocketDisconnect):
+                logging.warning("⚠️ WebSocket 전송 실패 또는 연결 종료")
+                break
     except Exception as e:
         logging.exception("❌ 인사이트 추출 중 예외 발생:")
         raise
     finally:
-        # 누수 방지를 위한 명시적 종료
         await generator.aclose()
-    print(result)
+
     return result
+
 
 
 # 테스트 코드
