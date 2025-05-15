@@ -1,0 +1,15 @@
+.inlineQuery-wrapper {
+  margin-top: 12px;
+}
+
+.inlineQuery-block {
+  background-color: var(--primary-light-blue);
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  max-height: 240px;
+  overflow: auto;
+  white-space: pre;
+  border-left: 4px solid var(--primary-dark-blue);
+}

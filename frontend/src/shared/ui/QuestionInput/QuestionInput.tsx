@@ -5,7 +5,7 @@ import { FiSend } from "react-icons/fi";
 interface Props {
   value?: string;
   onChange?: (text: string) => void;
-  onSubmit?: () => void;
+  onSubmit?: (text: string) => void;
 }
 
 const QuestionInput: React.FC<Props> = ({ value = "", onChange, onSubmit }) => {
@@ -31,7 +31,7 @@ const QuestionInput: React.FC<Props> = ({ value = "", onChange, onSubmit }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      onSubmit?.();
+      onSubmit?.(value); // ✅ 현재 value 전달
     }
   };
 
@@ -46,7 +46,11 @@ const QuestionInput: React.FC<Props> = ({ value = "", onChange, onSubmit }) => {
         onChange={handleInputResize}
         onKeyDown={handleKeyDown}
       />
-      <button className={styles.sendButton} onClick={onSubmit} aria-label="보내기">
+      <button
+        className={styles.sendButton}
+        onClick={() => onSubmit?.(value)} // ✅ 클릭 시도 마찬가지
+        aria-label="보내기"
+      >
         <FiSend />
       </button>
     </div>
