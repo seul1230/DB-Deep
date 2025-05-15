@@ -1,12 +1,15 @@
 import { ChartData } from '@/features/chat/chatTypes';
 import Plot from 'react-plotly.js';
 import { PlotType } from 'plotly.js';
+import { useChartOverlayStore } from '@/features/chat/useChatOverlaystore';
 
 interface InlineChartProps {
   chartJson: string;
 }
 
 export const InlineChart: React.FC<InlineChartProps> = ({ chartJson }) => {
+  const { openChart } = useChartOverlayStore();
+  
   let parsedChart: ChartData | null = null;
 
   try {
@@ -36,11 +39,13 @@ export const InlineChart: React.FC<InlineChartProps> = ({ chartJson }) => {
   };
 
   return (
-    <Plot
-      data={data}
-      layout={layout}
-      style={{ width: '100%', height: '300px', marginTop: '10px' }}
-      config={{ responsive: true }}
-    />
+    <div onClick={() => parsedChart && openChart(parsedChart)} style={{ cursor: 'pointer' }}>
+      <Plot
+        data={data}
+        layout={layout}
+        style={{ width: '100%', height: '300px', marginTop: '10px' }}
+        config={{ responsive: true }}
+      />
+    </div>
   );
 };
