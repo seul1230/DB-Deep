@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     PINECONE_API_KEY: str
     PINECONE_ENV: str
 
+    # HuggingFace
+    HUGGINGFACE_HUB_TOKEN: str
+
     class Config:
         env_file = ".env"
 

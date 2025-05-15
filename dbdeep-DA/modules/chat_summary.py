@@ -1,6 +1,7 @@
 import logging
 import re
 import nltk
+from config.settings import settings
 from typing import List, Dict
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
@@ -12,8 +13,8 @@ nltk.download('punkt')
 
 # 모델 로딩
 logging.info("🔄 모델 및 토크나이저 로딩 중...")
-tokenizer = AutoTokenizer.from_pretrained('eenzeenee/t5-base-korean-summarization') # 'eenzeenee/t5-base-korean-summarization', 'eenzeenee/t5-small-korean-summarization'
-model = AutoModelForSeq2SeqLM.from_pretrained('eenzeenee/t5-base-korean-summarization') # 'eenzeenee/t5-base-korean-summarization', 'eenzeenee/t5-small-korean-summarization'
+tokenizer = AutoTokenizer.from_pretrained('eenzeenee/t5-base-korean-summarization', use_auth_token=settings.HUGGINGFACE_HUB_TOKEN) # 'eenzeenee/t5-base-korean-summarization', 'eenzeenee/t5-small-korean-summarization'
+model = AutoModelForSeq2SeqLM.from_pretrained('eenzeenee/t5-base-korean-summarization', use_auth_token=settings.HUGGINGFACE_HUB_TOKEN) # 'eenzeenee/t5-base-korean-summarization', 'eenzeenee/t5-small-korean-summarization'
 logging.info("✅ 모델 로딩 완료")
 
 def summarize_text(text: str) -> str:
