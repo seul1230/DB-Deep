@@ -20,7 +20,20 @@ pipeline {
     }
     stage('Build Docker Image') {
       steps {
-        script { docker.build("${IMAGE}", "dbdeep-DA/") }
+        withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
+          script {
+            def hfToken = sh(
+              script: "echo \"$ENV_VARS\" | tr ',' '\\n' | grep '^HUGGINGFACE_HUB_TOKEN=' | cut -d'=' -f2-",
+              returnStdout: true
+            ).trim()
+            sh """
+              docker build \
+                --build-arg HUGGINGFACE_HUB_TOKEN=${hfToken} \
+                -t ${IMAGE} \
+                dbdeep-DA/
+            """
+          }
+        }
       }
     }
     stage('Authenticate with GCP') {
