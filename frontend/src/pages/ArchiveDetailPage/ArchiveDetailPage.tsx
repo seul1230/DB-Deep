@@ -1,31 +1,24 @@
 import { useParams } from "react-router-dom";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import styles from "./ArchiveDetailPage.module.css";
 import ChatList from "@/shared/ui/Chat/ChatList/ChatList";
 import { fetchChatDetail } from "@/features/chat/chatApi";
 import { convertToStreamMessage } from "@/features/chat/chatTypes";
 import { useChatMessageStore } from "@/features/chat/useChatMessageStore";
-import { usePanelStore } from "@/shared/store/usePanelStore";
-
-const PANEL_WIDTH = 240;
 
 const ArchiveDetailPage = () => {
-  const { chatId } = useParams<{ chatId: string }>();
-  const { openPanel } = usePanelStore();
+  const { chatRoomId } = useParams<{ chatRoomId: string }>();
   const { messages, setMessages } = useChatMessageStore();
-  const chatMessages = chatId ? messages[chatId] || [] : [];
-
-  const isAnyPanelOpen = !!openPanel;
-  const leftOffset = isAnyPanelOpen ? PANEL_WIDTH + 68 : 0;
+  const chatMessages = chatRoomId ? messages[chatRoomId] || [] : [];
 
   useEffect(() => {
-    if (!chatId) return;
+    if (!chatRoomId) return;
 
-    fetchChatDetail(chatId).then((res) => {
+    fetchChatDetail(chatRoomId).then((res) => {
       const converted = res.messages.map(convertToStreamMessage);
-      setMessages(chatId, converted);
+      setMessages(chatRoomId, converted);
     });
-  }, [chatId, setMessages]);
+  }, [chatRoomId, setMessages]);
 
   const handleChartClick = (chartId: string) => {
     console.log(`Chart clicked: ${chartId}`);
@@ -34,9 +27,9 @@ const ArchiveDetailPage = () => {
   return (
     <div className={styles["chatDetailPage-outer"]}>
       <div className={styles["chatDetailPage-contentWrapper"]}>
-        {chatId && (
+        {chatRoomId && (
           <ChatList
-            chatId={chatId}
+            chatId={chatRoomId}
             chatList={chatMessages}
             onChartClick={handleChartClick}
             scrollToBottom

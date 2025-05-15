@@ -18,6 +18,10 @@ const ArchivePage = () => {
     const loadArchives = async () => {
       try {
         const data = await fetchArchiveList();
+        const nullIds = data.filter((d) => !d.chatRoomId);
+        if (nullIds.length > 0) {
+          console.warn("chatRoomId가 null인 archive:", nullIds);
+        }
         setArchives(data);
       } catch (error) {
         console.error("아카이브 불러오기 실패:", error);
@@ -27,6 +31,7 @@ const ArchivePage = () => {
     };
     loadArchives();
   }, []);
+  
 
   const handleCardClick = (chatRoomId: string) => {
     navigate(`/archiveDetail/${chatRoomId}`);
@@ -37,7 +42,6 @@ const ArchivePage = () => {
       prev.filter((archive) => archive.archiveId.toString() !== deletedId)
     );
   };
-  
 
   return (
     <div className={styles.container}>
@@ -56,11 +60,11 @@ const ArchivePage = () => {
                 key={item.archiveId}
                 id={item.archiveId.toString()}
                 title={item.chatName}
-                description={item.lastMessage}
+                description={item.lastMessage.insight || item.lastMessage.question}
                 date={dayjs(item.archivedAt).format("YYYY년 M월 D일 A h시 m분")}
                 onClick={() => handleCardClick(item.chatRoomId)}
                 onDeleteSuccess={handleDeleteSuccess}
-              />
+              />            
             ))}
           </div>
         )}
