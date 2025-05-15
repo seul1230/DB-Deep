@@ -37,3 +37,14 @@ export const updateProjectTitle = async (
 export const deleteProject = async (projectId: string): Promise<void> => {
   await api.delete(`/projects/${projectId}`);
 };
+
+export const addChatToProject = async (projectId: string, chatId: string): Promise<void> => {
+  console.log("chatId: ", chatId)
+  await api.post(`/projects/${projectId}`, { chatId });
+};
+
+export const removeChatFromProject = async (projectId: string, chatId: string): Promise<void> => {
+  await api.delete(`/projects/${projectId}/chatroom`, {
+    data: { chatId },
+  });
+};

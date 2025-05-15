@@ -11,6 +11,7 @@ const MainPage = lazy(() => import("../pages/MainPage/MainPage"));
 const ChangePasswordPage = lazy(() => import("../pages/ChangePasswordPage/ChangePasswordPage"))
 const ChatDetailPage = lazy(() => import("../pages/ChatDetailPage/ChatDetailPage"))
 const ProjectDetailPage = lazy(()=>import("../pages/ProjectDetailPage/ProjectDetailPage"))
+const ArchiveDetailPage = lazy(()=>import("../pages/ArchiveDetailPage/ArchiveDetailPage"))
 
 const Router = () => {
   const isLoggedOut = useAuth((state) => state.isLoggedOut);
@@ -37,6 +38,7 @@ const Router = () => {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/archive" element={<ArchivePage />} />
         <Route path="/project/:projectId" element={<ProjectDetailPage />} />
+        <Route path="/archiveDetail/:chatRoomId" element={<ArchiveDetailPage />} />
         {/* 여기에 더 추가 가능 */}
       </Route>
     </Routes>

@@ -167,9 +167,6 @@ const ChatLogPanel: React.FC = () => {
           ref={menuRef}
           position={menuPosition}
           onClose={closeMenu}
-          onSaveToProject={() => {
-            closeMenu();
-          }}
           selectedChatId={selectedChatId}
           onRequestTitleEdit={(chatId) => {
             const chat = data?.chatRooms.find((c) => c.id === chatId);
