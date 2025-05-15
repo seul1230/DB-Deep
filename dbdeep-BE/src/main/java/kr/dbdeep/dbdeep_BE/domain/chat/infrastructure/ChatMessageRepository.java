@@ -23,7 +23,7 @@ public class ChatMessageRepository {
         try {
             Query query = firestore.collection("chat_messages")
                     .whereEqualTo("chat_room_id", chatRoomId)
-                    .orderBy("timestamp", Direction.DESCENDING);
+                    .orderBy("timestamp", Direction.ASCENDING);
 
             List<QueryDocumentSnapshot> docs = query.get().get().getDocuments();
 
@@ -47,7 +47,7 @@ public class ChatMessageRepository {
             Query query = firestore.collection("chat_messages")
                     .whereEqualTo("chat_room_id", chatRoomId)
                     .whereLessThan("timestamp", before)
-                    .orderBy("timestamp", Direction.DESCENDING);
+                    .orderBy("timestamp", Direction.ASCENDING);
 
             List<QueryDocumentSnapshot> docs = query.get().get().getDocuments();
 
