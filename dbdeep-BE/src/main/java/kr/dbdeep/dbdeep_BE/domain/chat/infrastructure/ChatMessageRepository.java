@@ -55,7 +55,7 @@ public class ChatMessageRepository {
                     .map(doc -> ChatMessage.builder()
                             .id(doc.getId())
                             .chatRoomId(doc.getString("chat_room_id"))
-                            .content(doc.get("content", Map.class))
+                            .content(doc.get("content"))
                             .senderType(doc.getString("sender_type"))
                             .timestamp(doc.getTimestamp("timestamp"))
                             .build())
@@ -76,7 +76,7 @@ public class ChatMessageRepository {
             return ChatMessage.builder()
                     .id(doc.getId())
                     .chatRoomId(doc.getString("chat_room_id"))
-                    .content(doc.get("content", Map.class))
+                    .content(doc.get("content"))
                     .senderType(doc.getString("sender_type"))
                     .timestamp(doc.getTimestamp("timestamp"))
                     .build();
