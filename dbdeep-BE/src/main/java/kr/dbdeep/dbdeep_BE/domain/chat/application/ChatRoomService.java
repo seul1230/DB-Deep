@@ -32,6 +32,7 @@ public class ChatRoomService {
         ChatRoom chatRoom = ChatRoom.builder()
                 .id(UUID.randomUUID().toString())
                 .memberId(memberId)
+                .lastMessageAt(LocalDateTime.now())
                 .build();
         ChatRoom created = save(chatRoom);
         return CreateChatRoomResponse.from(created);
