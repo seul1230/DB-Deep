@@ -78,7 +78,7 @@ export interface ParsedChatContent {
 export interface ChatPayload {
   uuid: string;
   question: string;
-  department: string;
+  user_department: string;
 }
 
 // ==============================

@@ -6,6 +6,7 @@ import { createChatRoom } from "@/features/chat/chatApi";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { sendMessage } from "@/shared/api/socketManager";
+import { useAuth } from "@/features/auth/useAuth";
 
 const recommendedQuestions = [
   "마케팅 캠페인 전후의 전환율 차이를 알려줘",
@@ -20,6 +21,7 @@ const MainPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const { profile } = useAuth();
 
   const handleSubmit = async () => {
     const text = input.trim();
@@ -32,7 +34,7 @@ const MainPage: React.FC = () => {
       sendMessage({
         uuid: chatId,
         question: text,
-        department: "마케팅팀", // 사용자의 부서 (하드코딩 or user 상태에서 가져오기)
+        user_department: profile?.teamName ?? '알 수 없음',
       });
 
       // ✅ 캐시 갱신 및 이동
