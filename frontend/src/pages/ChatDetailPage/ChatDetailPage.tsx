@@ -62,12 +62,13 @@ const ChatDetailPage = () => {
 
   useEffect(() => {
     if (!chatId) return;
+    if (messages[chatId]?.length > 0) return;
     fetchChatDetail(chatId).then((res) => {
       const converted = res.messages.map(convertToStreamMessage);
       setMessages(chatId, converted);
       setShouldScrollToBottom(true);
     });
-  }, [chatId, setMessages]);
+  }, [chatId, messages, setMessages]);
 
   useEffect(() => {
     if (shouldScrollToBottom && scrollBottomRef.current) {

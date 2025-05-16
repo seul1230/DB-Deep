@@ -13,33 +13,38 @@ export const InlineChart: React.FC<InlineChartProps> = ({ chartJson }) => {
   let parsedChart: ChartData | null = null;
 
   try {
-    parsedChart = JSON.parse(chartJson);
+    const parsed = JSON.parse(chartJson);
+
+    const isValid =
+      parsed &&
+      typeof parsed.chart_type === 'string' &&
+      Array.isArray(parsed.x) &&
+      Array.isArray(parsed.y);
+
+    if (!isValid) return null;
+
+    parsedChart = parsed;
   } catch {
-    // fallback to dummy
+    return null;
   }
 
-  const data = parsedChart
-    ? [{
-        type: parsedChart.chart_type as PlotType,
-        x: parsedChart.x,
-        y: parsedChart.y,
-        name: parsedChart.title,
-      }]
-    : [{
-        type: 'bar' as PlotType,
-        x: ['A', 'B', 'C'],
-        y: [10, 20, 30],
-        name: '더미 데이터',
-      }];
+  if (!parsedChart) return null;
+
+  const data = [{
+    type: parsedChart.chart_type as PlotType,
+    x: parsedChart.x,
+    y: parsedChart.y,
+    name: parsedChart.title,
+  }];
 
   const layout = {
-    title: parsedChart?.title || '더미 차트',
-    xaxis: { title: parsedChart?.x_label || '' },
-    yaxis: { title: parsedChart?.y_label || '' },
+    title: parsedChart.title,
+    xaxis: { title: parsedChart.x_label },
+    yaxis: { title: parsedChart.y_label },
   };
 
   return (
-    <div onClick={() => parsedChart && openChart(parsedChart)} style={{ cursor: 'pointer' }}>
+    <div onClick={() => openChart(parsedChart)} style={{ cursor: 'pointer' }}>
       <Plot
         data={data}
         layout={layout}

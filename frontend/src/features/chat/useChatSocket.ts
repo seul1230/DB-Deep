@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { connectSocket, getSocket } from '@/shared/api/socketManager';
 import { useChatMessageStore } from './useChatMessageStore';
+import { tryReconnect } from '@/shared/api/socketManager';
 
 export const useChatSocket = (chatId?: string) => {
   const {
@@ -98,6 +99,7 @@ export const useChatSocket = (chatId?: string) => {
       socket.onclose = () => {
         console.warn('🔌 WebSocket 연결 종료');
         finalizeLast(chatId);
+        tryReconnect();
       };
     });
   }, [chatId, startNewMessage, appendToLast, finalizeLast, setInsightQueue, appendInsightLine, setRealChatId]);
