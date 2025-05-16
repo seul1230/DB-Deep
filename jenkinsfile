@@ -62,9 +62,9 @@ pipeline {
               --region ${REGION} \
               --service-account ${CLOUDRUN_SA} \
               --allow-unauthenticated \
-              --cpu 2 \
-              --memory 8Gi \
-              --max-instances 2 \
+              --cpu 4 \
+              --memory 16Gi \
+              --max-instances 4 \
               --timeout=3600s \
               --port ${PORT} \
               --add-cloudsql-instances ${CLOUDSQL_INSTANCE} \
