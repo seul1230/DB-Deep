@@ -64,7 +64,7 @@ pipeline {
               --allow-unauthenticated \
               --cpu 4 \
               --memory 16Gi \
-              --max-instances 4 \
+              --max-instances 1 \
               --timeout=3600s \
               --port ${PORT} \
               --add-cloudsql-instances ${CLOUDSQL_INSTANCE} \
