@@ -2,7 +2,7 @@
     background: var(--background-color);
     padding: 16px;
     border-radius: 14px;
-    border: 1px solid var(--light-gray);
+    border: 1px solid var(--primary-light-blue);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     transition: box-shadow 0.2s ease, background-color 0.2s ease;
     cursor: pointer;
@@ -12,7 +12,7 @@
     gap: 12px;
     margin-left: auto;
     margin-right: auto;
-    width: 100%; /* 전체 resultList 너비에 맞춤 */
+    width: 100%;
     max-width: 680px;
     box-sizing: border-box;
   }

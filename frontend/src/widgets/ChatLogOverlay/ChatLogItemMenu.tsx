@@ -4,21 +4,36 @@ import { FiEdit3, FiFolderPlus, FiChevronRight } from "react-icons/fi";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import ProjectSelectorOverlay from "../ProjectSelectorOverlay/ProjectSelectorOverlay";
 import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
+import { addChatToProject } from "@/features/project/projectApi";
 
 interface Props {
   position: { top: number; left: number } | null;
   onClose: () => void;
-  onSaveToProject: (projectId: string) => void;
   selectedChatId: string;
   onRequestTitleEdit: (chatId: string) => void;
   onRequestDelete: (chatId: string) => void;
+  onSuccess?: () => void;
 }
 
 const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
-  ({ position, onClose, onSaveToProject, selectedChatId, onRequestTitleEdit, onRequestDelete }, ref) => {
+  ({ position, onClose, selectedChatId, onRequestTitleEdit, onRequestDelete, onSuccess }, ref) => {
     const [isHoveringProject, setIsHoveringProject] = useState(false);
 
     const closeMenu = useOverlayStore((state) => state.closeMenu);
+
+    const handleSelectProject = async (projectId: string) => {
+      try {
+        await addChatToProject(projectId, selectedChatId);
+
+        alert("채팅이 프로젝트에 저장되었습니다.");
+      } catch (err) {
+        console.error("프로젝트에 채팅 저장 실패:", err);
+        alert("프로젝트에 저장 실패했습니다.");
+      } finally {
+        setIsHoveringProject(false);
+        closeMenu();
+      }
+    };
 
     return (
       <div
@@ -58,21 +73,19 @@ const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
           </div>
           <FiChevronRight className={styles.ChatLogItemArrow} />
 
-          {/* 서브메뉴 오버레이 */}
           {isHoveringProject && (
             <div className={styles.ChatLogItemSubOverlay}>
               <ProjectSelectorOverlay
-                onSelect={(projectId) => {
-                  onSaveToProject(projectId);
-                  setIsHoveringProject(false); // 선택 후 닫기
-                }}
+                chatId={selectedChatId}
+                onSelect={handleSelectProject}
                 onClose={() => setIsHoveringProject(false)}
+                onSuccess={onSuccess}
               />
             </div>
           )}
         </div>
 
-        {/* 채팅 삭제 (클릭 이벤트 추가 필요 시 props에 추가하세요) */}
+        {/* 채팅 삭제 (클릭 이벤트 추가 필요 시 props에 추가) */}
         <div
           className={styles.ChatLogItemMenuItemDanger}
           onClick={() => {
