@@ -29,7 +29,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <h2 className={styles.title}>프로젝트 이름 수정</h2>
+        <h2 className={styles.title}>프로젝트 정보 수정</h2>
         <input
           className={styles.input}
           type="text"
