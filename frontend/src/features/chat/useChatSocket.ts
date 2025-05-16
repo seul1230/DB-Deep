@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { connectSocket, getSocket } from '@/shared/api/socketManager';
 import { useChatMessageStore } from './useChatMessageStore';
 import { tryReconnect } from '@/shared/api/socketManager';
+import { fetchChatDetail, updateChatTitle } from './chatApi';
 
 export const useChatSocket = (chatId?: string) => {
+  const updatedTitlesRef = useRef<Set<string>>(new Set());
   const {
     startNewMessage,
     appendToLast,
@@ -25,7 +27,7 @@ export const useChatSocket = (chatId?: string) => {
         startNewMessage(chatId);
       };
 
-      socket.onmessage = (event) => {
+      socket.onmessage = async (event) => {
         const raw = event.data;
         if (!raw) return;
 
@@ -40,8 +42,25 @@ export const useChatSocket = (chatId?: string) => {
         const { type, payload } = msg;
 
         switch (type) {
-          case 'title':
+          case 'title': {
+            if (
+              typeof payload === 'string' &&
+              payload.trim() &&
+              !updatedTitlesRef.current.has(chatId)
+            ) {
+              try {
+                const detail = await fetchChatDetail(chatId);
+                if (!detail.chatTitle || detail.chatTitle === '새 채팅방') {
+                  await updateChatTitle(chatId, payload);
+                  updatedTitlesRef.current.add(chatId);
+                  console.log(`📌 채팅방 제목 '${payload}'로 업데이트됨`);
+                }
+              } catch (e) {
+                console.warn('❌ 채팅방 제목 업데이트 실패', e);
+              }
+            }
             return;
+          }
 
           case 'info': {
             if (payload === 'SQL 생성 중...') {
@@ -50,13 +69,12 @@ export const useChatSocket = (chatId?: string) => {
               appendToLast(chatId, { type: 'status', content: '차트 생성 중...' });
             } else if (payload === '인사이트 생성 중') {
               setInsightQueue(chatId, []);
-              // 상태 메시지 제거
               appendToLast(chatId, { type: 'status', content: '' });
             } else if (payload === '인사이트 생성 완료') {
               finalizeLast(chatId);
             } else {
               if (typeof payload === 'string' && /^[a-zA-Z0-9_-]+$/.test(payload)) {
-                setRealChatId(chatId, payload); // chatId 저장
+                setRealChatId(chatId, payload);
               }
             }
             return;
@@ -82,7 +100,6 @@ export const useChatSocket = (chatId?: string) => {
             for (const ch of chars) {
               appendInsightLine(chatId, ch);
             }
-            // ✅ insight_stream을 text 파트로도 저장
             appendToLast(chatId, { type: 'text', content: payload });
             return;
           }

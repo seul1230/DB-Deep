@@ -5,6 +5,6 @@ export const useChatRooms = () => {
   return useQuery({
     queryKey: ['chatRooms'],
     queryFn: () => fetchChatRooms(),
-    staleTime: 1000 * 60 * 3,
+    enabled: false,
   });
 };
