@@ -49,6 +49,7 @@ public enum ErrorCode {
     PROJECT_NOT_FOUND(4040, HttpStatus.NOT_FOUND, "찾을 수 없는 프로젝트입니다"),
     PROJECT_ALREADY_EXISTS(4000, BAD_REQUEST, "이미 존재하는 프로젝트입니다"),
     PROJECT_UNAUTHORIZED(4010, UNAUTHORIZED, "프로젝트 권한이 없습니다"),
+    CHAT_ROOM_ALREADY_EXISTS_IN_PROJECT(4020, BAD_REQUEST, "해당 채팅방은 이미 프로젝트에 연결되어 있습니다"),
     ;
     private final int code;
     private final HttpStatus httpStatus;

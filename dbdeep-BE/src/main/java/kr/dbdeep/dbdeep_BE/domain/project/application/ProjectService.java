@@ -11,6 +11,7 @@ import kr.dbdeep.dbdeep_BE.domain.project.api.dto.CreateProjectResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectChatRoomResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.api.dto.ProjectListResponse;
 import kr.dbdeep.dbdeep_BE.domain.project.entity.Project;
+import kr.dbdeep.dbdeep_BE.domain.project.exception.ChatRoomAlreadyExistsInProjectException;
 import kr.dbdeep.dbdeep_BE.domain.project.exception.ProjectNotFoundException;
 import kr.dbdeep.dbdeep_BE.domain.project.infrastructure.ProjectRepository;
 import kr.dbdeep.dbdeep_BE.global.code.ErrorCode;
@@ -79,8 +80,14 @@ public class ProjectService {
         if (!project.getMember().getId().equals(memberId) || !chatRoom.getMemberId().equals(memberId)) {
             throw new ProjectNotFoundException(ErrorCode.PROJECT_UNAUTHORIZED);
         }
+
+        if (chatRoom.getProjectId() != null && chatRoom.getProjectId().equals(projectId)) {
+            throw new ChatRoomAlreadyExistsInProjectException(ErrorCode.CHAT_ROOM_ALREADY_EXISTS_IN_PROJECT);
+        }
+
         chatRoom.connectToProject(projectId);
     }
+
 
     @Transactional(readOnly = true)
     public ProjectChatRoomResponse getChatRooms(Integer memberId, Integer projectId) {
