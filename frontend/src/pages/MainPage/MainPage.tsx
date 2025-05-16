@@ -6,6 +6,8 @@ import { createChatRoom } from "@/features/chat/chatApi";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { sendMessage } from "@/shared/api/socketManager";
+import { useAuth } from "@/features/auth/useAuth";
+import { useChatMessageStore } from "@/features/chat/useChatMessageStore";
 
 const recommendedQuestions = [
   "마케팅 캠페인 전후의 전환율 차이를 알려줘",
@@ -20,6 +22,8 @@ const MainPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const { profile } = useAuth();
+  const { setMessages } = useChatMessageStore();
 
   const handleSubmit = async () => {
     const text = input.trim();
@@ -28,14 +32,32 @@ const MainPage: React.FC = () => {
     try {
       const chatId = await createChatRoom();
 
-      // 👉 WebSocket으로 메시지 전송
+      // ✅ 상태를 직접 넣어줘서 navigate 이후에도 메시지가 유지되도록 함
+      setMessages(chatId, [
+        {
+          id: `${Date.now()}-user`,
+          uuid: chatId,
+          parts: [{ type: 'text', content: text }],
+          senderType: 'user',
+          isLive: false,
+        },
+        {
+          id: `${Date.now()}-ai`,
+          uuid: chatId,
+          parts: [{ type: 'status', content: '응답 생성 중...' }],
+          senderType: 'ai',
+          isLive: true,
+        },
+      ]);
+
+      // ✅ WebSocket 메시지 전송
       sendMessage({
         uuid: chatId,
         question: text,
-        department: "마케팅팀", // 사용자의 부서 (하드코딩 or user 상태에서 가져오기)
+        user_department: profile?.teamName ?? '알 수 없음',
       });
 
-      // ✅ 캐시 갱신 및 이동
+      // ✅ 캐시 초기화 및 페이지 이동
       queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
       navigate(`/chat/${chatId}`);
       setInput("");
