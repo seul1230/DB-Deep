@@ -6,7 +6,6 @@ import pandas as pd
 from datetime import datetime
 from api.dto import WebSocketMessage
 from fastapi import WebSocket
-from starlette.websockets import WebSocketDisconnect
 from typing import Any, Optional
 
 from services.message_service import save_chat_message, build_chat_history
