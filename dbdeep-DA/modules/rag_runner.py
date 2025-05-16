@@ -6,6 +6,7 @@ import asyncio
 from typing import Dict
 
 from fastapi import WebSocket
+from services.streaming_service import send_ws_message
 from starlette.websockets import WebSocketDisconnect
 
 
@@ -86,20 +87,24 @@ async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSock
     try:
         async for chunk in generator:
             try:
-                await websocket.send_text(chunk)
+                await send_ws_message(websocket, type_="insight_stream", payload=chunk)
                 result += chunk
             except (RuntimeError, asyncio.CancelledError, WebSocketDisconnect):
                 logging.warning("⚠️ WebSocket 전송 실패 또는 연결 종료")
                 break
     except Exception as e:
         logging.exception("❌ 인사이트 추출 중 예외 발생:")
+        await send_ws_message(
+            websocket,
+            type_="error",
+            payload="인사이트 추출 중 오류가 발생했습니다.",
+            error=str(e)
+        )
         raise
     finally:
         await generator.aclose()
 
     return result
-
-
 
 # 테스트 코드
 if __name__ == "__main__":
