@@ -3,10 +3,7 @@ import asyncio
 import logging
 import pandas as pd
 
-from datetime import datetime
-from api.dto import WebSocketMessage
 from fastapi import WebSocket, WebSocketDisconnect
-from typing import Any, Optional
 from utils.ws_utils import send_ws_message
 from services.message_service import save_chat_message, build_chat_history
 from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title
@@ -28,10 +25,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             # 제목 자동 생성
             try:
                 title = generate_chatroom_title(question)
-                print(title)
-                print("#####################")
                 await send_ws_message(websocket, type_="title", payload=title)
-                print("#####################")
             except Exception as e:
                 logging.warning(f"❗ 채팅방 제목 생성 실패: {e}")
                 await send_ws_message(websocket, type_="title", payload="새 채팅방", error=str(e))
@@ -51,7 +45,7 @@ async def handle_chat_websocket(websocket: WebSocket):
                 content={"question": question}
             )
 
-            await send_ws_message(websocket, type_="info", payload="SQL 생성 중...")
+            await send_ws_message(websocket, type_="info", payload="SQL & 데이터 생성 중")
 
             result_dict = run_sql_pipeline(request)
             need_chart = result_dict.get("need_chart")
@@ -65,12 +59,14 @@ async def handle_chat_websocket(websocket: WebSocket):
             await send_ws_message(websocket, type_="query", payload=sql)
             await send_ws_message(websocket, type_="data", payload=df.to_dict(orient="records"))
 
+            await send_ws_message(websocket, type_="info", payload="SQL 생성 완료")
+
             # 차트 생성
             data_summary = ""
             chart_obj={}
 
             if need_chart:
-                await send_ws_message(websocket, type_="info", payload="차트&데이터 생성 중...")
+                await send_ws_message(websocket, type_="info", payload="차트 생성 중")
                 
                 updated_chart_request = run_chart_pipeline(result)
                 chart_obj = updated_chart_request.chart_spec
@@ -84,9 +80,10 @@ async def handle_chat_websocket(websocket: WebSocket):
             else:
                 data_for_insight = df.to_dict(orient="records")
                 data_summary_for_insight = None
+            await send_ws_message(websocket, type_="info", payload="차트 생성 완료")
 
             # 인사이트 생성
-            await send_ws_message(websocket, type_="info", payload="인사이트 생성 중...")
+            await send_ws_message(websocket, type_="info", payload="인사이트 생성 중")
             chat_history = build_chat_history(uuid)
 
             request_dict = {
@@ -125,7 +122,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             await send_ws_message(websocket, type_="info", payload="인사이트 생성 완료")
 
             # 최종 메시지 저장 (AI 응답)
-            save_chat_message(
+            chat_id = save_chat_message(
                 chat_room_id=uuid,
                 sender_type="ai",
                 message_type="sql",
@@ -137,12 +134,16 @@ async def handle_chat_websocket(websocket: WebSocket):
                 }
             )
 
+            await send_ws_message(websocket, type_= "info", payload=chat_id)
+
             update_chatroom_summary(
                 chat_room_id=uuid,
                 last_question=question,
                 last_insight=insight_text or "",
                 last_chart_type=chart_obj.get("chart_type") if chart_obj else None
             )
+
+            
 
         except WebSocketDisconnect:
             logging.warning("⚠️ 클라이언트가 WebSocket 연결을 중단했습니다.")

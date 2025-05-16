@@ -9,13 +9,15 @@ def save_chat_message(
     content: str | dict
 ):
     db = get_firestore_client()
-    db.collection("chat_messages").add({
+    doc_ref = db.collection("chat_messages").add({
         "chat_room_id": chat_room_id,
         "sender_type": sender_type,
         "type": message_type,
         "content": content,
         "timestamp": datetime.utcnow()
     })
+
+    return doc_ref[1].id
 
 def get_chat_messages(chat_room_id: str, limit: int = 100):
     db = get_firestore_client()
