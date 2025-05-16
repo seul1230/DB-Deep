@@ -1,0 +1,23 @@
+.inlineTable-wrapper {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.inlineTable-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.inlineTable-table th,
+.inlineTable-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.inlineTable-table th {
+  background-color: var(--primary-light-blue);
+  font-weight: bold;
+}

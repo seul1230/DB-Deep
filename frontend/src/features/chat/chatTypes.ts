@@ -10,7 +10,7 @@ export interface ChatTimestamp {
 export interface ChatMessage {
   id: string;
   uuid: string;
-  content: string | ParsedChatContent; // 서버에서 오는 content는 문자열 or 객체
+  content: string | ParsedChatContent;
   memberId: number;
   senderType: 'ai' | 'user';
   timestamp: ChatTimestamp;
@@ -37,7 +37,8 @@ export type ChatPart =
   | { type: 'text'; content: string }
   | { type: 'sql'; content: string }
   | { type: 'status'; content: string }
-  | { type: 'chart'; content: ChartData };
+  | { type: 'chart'; content: ChartData }
+  | { type: 'data'; content: Record<string, string | number>[] };
 
 export interface ChatStreamMessage {
   id: string;
@@ -69,6 +70,7 @@ export interface ParsedChatContent {
   insight?: string;
   query?: string;
   chart?: ChartData;
+  data?: Record<string, string | number>[];
 }
 
 // ==============================
@@ -87,7 +89,6 @@ export interface ChatPayload {
 
 export const convertToStreamMessage = (msg: ChatMessage): ChatStreamMessage => {
   const parts: ChatPart[] = [];
-
   let parsed: ParsedChatContent | null = null;
 
   if (typeof msg.content === 'string') {
@@ -114,6 +115,9 @@ export const convertToStreamMessage = (msg: ChatMessage): ChatStreamMessage => {
     }
     if (parsed.chart) {
       parts.push({ type: 'chart', content: parsed.chart });
+    }
+    if (parsed.data) {
+      parts.push({ type: 'data', content: parsed.data });
     }
   } else if (parts.length === 0) {
     parts.push({ type: 'text', content: String(msg.content) });

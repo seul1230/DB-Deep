@@ -8,7 +8,7 @@ import styles from './ChatDetailPage.module.css';
 import { fetchChatDetail } from '@/features/chat/chatApi';
 import { usePanelStore } from '@/shared/store/usePanelStore';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
-import { useQuestionInput } from '@/features/chat/useChatInput';
+import { useQuestionInput } from '@/features/chat/useQuestionInput';
 import { useChatSocket } from '@/features/chat/useChatSocket';
 import { sendMessage } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
@@ -26,6 +26,7 @@ const ChatDetailPage = () => {
   const { messages, setMessages } = useChatMessageStore();
   const { openPanel } = usePanelStore();
   const { profile } = useAuth();
+  const { startUserMessage, startLiveMessage } = useChatMessageStore();
 
   const [showModal, setShowModal] = useState(false);
   const chatMessages = useMemo(() => {
@@ -42,11 +43,18 @@ const ChatDetailPage = () => {
 
   const { value, onChange, onSubmit } = useQuestionInput((text) => {
     if (!chatId) return;
+
+    // ✅ 사용자 메시지를 바로 리스트에 추가
+    startUserMessage(chatId, text);
+    startLiveMessage(chatId);
+
+    // ✅ WebSocket으로 전송
     sendMessage({
       uuid: chatId,
       question: text,
       user_department: profile?.teamName ?? '알 수 없음',
     });
+
     setShouldScrollToBottom(true);
   });
 

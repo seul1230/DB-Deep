@@ -1,15 +1,33 @@
 .inlineQuery-wrapper {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .inlineQuery-block {
-  background-color: var(--primary-light-blue);
-  padding: 12px 16px;
-  border-radius: 12px;
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  max-height: 240px;
-  overflow: auto;
-  white-space: pre;
-  border-left: 4px solid var(--primary-dark-blue);
+  background-color: var(--gray-900); /* 노션 스타일 어두운 톤 */
+  color: var(--gray-100); /* 밝은 글씨 */
+  padding: 16px 20px;
+  border-radius: 10px;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  max-height: 280px;
+  overflow-x: auto;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-700) transparent;
+}
+
+/* 스크롤바 디자인 개선 (Chrome) */
+.inlineQuery-block::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.inlineQuery-block::-webkit-scrollbar-track {
+  background: transparent;
+}
+.inlineQuery-block::-webkit-scrollbar-thumb {
+  background-color: var(--gray-600);
+  border-radius: 4px;
 }

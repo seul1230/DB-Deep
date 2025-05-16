@@ -1,4 +1,4 @@
-import { useChartOverlayStore } from '@/features/chat/useChatOverlaystore';
+import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
 import { usePanelStore } from '@/shared/store/usePanelStore';
 import styles from './ChartOverlay.module.css';
 import Plot from 'react-plotly.js';

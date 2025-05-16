@@ -19,7 +19,7 @@ export const useLogin = () => {
       if (profile.passwordNotChanged) {
         navigate("/change-password", { replace: true });
       } else {
-        navigate("/dashboard", { replace: true });
+        navigate("/main", { replace: true });
       }
     },
     onError: (error) => {

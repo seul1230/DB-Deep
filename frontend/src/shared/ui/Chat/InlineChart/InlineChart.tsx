@@ -1,7 +1,7 @@
 import { ChartData } from '@/features/chat/chatTypes';
 import Plot from 'react-plotly.js';
 import { PlotType } from 'plotly.js';
-import { useChartOverlayStore } from '@/features/chat/useChatOverlaystore';
+import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
 
 interface InlineChartProps {
   chartJson: string;
