@@ -4,9 +4,8 @@ import logging
 
 import asyncio
 from typing import Dict
-
+from utils.ws_utils import send_ws_message
 from fastapi import WebSocket
-from services.streaming_service import send_ws_message
 from starlette.websockets import WebSocketDisconnect
 
 

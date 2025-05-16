@@ -5,9 +5,9 @@ import pandas as pd
 
 from datetime import datetime
 from api.dto import WebSocketMessage
-from fastapi import WebSocket
+from fastapi import WebSocket, WebSocketDisconnect
 from typing import Any, Optional
-
+from utils.ws_utils import send_ws_message
 from services.message_service import save_chat_message, build_chat_history
 from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async
@@ -28,7 +28,10 @@ async def handle_chat_websocket(websocket: WebSocket):
             # 제목 자동 생성
             try:
                 title = generate_chatroom_title(question)
+                print(title)
+                print("#####################")
                 await send_ws_message(websocket, type_="title", payload=title)
+                print("#####################")
             except Exception as e:
                 logging.warning(f"❗ 채팅방 제목 생성 실패: {e}")
                 await send_ws_message(websocket, type_="title", payload="새 채팅방", error=str(e))
@@ -147,7 +150,3 @@ async def handle_chat_websocket(websocket: WebSocket):
         except Exception as e:
             logging.error(f"예상치 못한 에러 발생 : {e}")
             await websocket.send_text("서버 처리 중 오류가 발생했습니다. 다시 시도해주세요.")
-
-async def send_ws_message(websocket: WebSocket, type_: str, payload: Any = None, error: str = None):
-    message = WebSocketMessage(type=type_, payload=payload, error=error)
-    await websocket.send_json(message.dict())
