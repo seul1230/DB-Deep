@@ -10,7 +10,7 @@ export interface ChatTimestamp {
 export interface ChatMessage {
   id: string;
   uuid: string;
-  content: string | ParsedChatContent; // 서버에서 오는 content는 문자열 or 객체
+  content: string | ParsedChatContent;
   memberId: number;
   senderType: 'ai' | 'user';
   timestamp: ChatTimestamp;
@@ -37,7 +37,8 @@ export type ChatPart =
   | { type: 'text'; content: string }
   | { type: 'sql'; content: string }
   | { type: 'status'; content: string }
-  | { type: 'chart'; content: ChartData };
+  | { type: 'chart'; content: ChartData }
+  | { type: 'data'; content: Record<string, string | number>[] };
 
 export interface ChatStreamMessage {
   id: string;
@@ -69,6 +70,7 @@ export interface ParsedChatContent {
   insight?: string;
   query?: string;
   chart?: ChartData;
+  data?: Record<string, string | number>[];
 }
 
 // ==============================
@@ -78,7 +80,7 @@ export interface ParsedChatContent {
 export interface ChatPayload {
   uuid: string;
   question: string;
-  department: string;
+  user_department: string;
 }
 
 // ==============================
@@ -88,35 +90,46 @@ export interface ChatPayload {
 export const convertToStreamMessage = (msg: ChatMessage): ChatStreamMessage => {
   const parts: ChatPart[] = [];
 
-  let parsed: ParsedChatContent | null = null;
+  // ✅ user 메시지는 항상 question을 text로 추가
+  if (msg.senderType === 'user') {
+    if (typeof msg.content === 'object' && msg.content && 'question' in msg.content) {
+      parts.push({ type: 'text', content: msg.content.question });
+    } else {
+      parts.push({ type: 'text', content: String(msg.content) });
+    }
+  } else {
+    // ✅ AI 메시지 처리
+    let parsed: ParsedChatContent | null = null;
 
-  if (typeof msg.content === 'string') {
-    try {
-      const maybeParsed = JSON.parse(msg.content);
-      if (maybeParsed && typeof maybeParsed === 'object' && 'question' in maybeParsed) {
-        parsed = maybeParsed;
-      } else {
+    if (typeof msg.content === 'string') {
+      try {
+        const maybeParsed = JSON.parse(msg.content);
+        if (maybeParsed && typeof maybeParsed === 'object' && 'question' in maybeParsed) {
+          parsed = maybeParsed;
+        } else {
+          parts.push({ type: 'text', content: msg.content });
+        }
+      } catch {
         parts.push({ type: 'text', content: msg.content });
       }
-    } catch {
-      parts.push({ type: 'text', content: msg.content });
+    } else if (typeof msg.content === 'object' && msg.content !== null && 'question' in msg.content) {
+      parsed = msg.content as ParsedChatContent;
     }
-  } else if (typeof msg.content === 'object' && msg.content !== null && 'question' in msg.content) {
-    parsed = msg.content as ParsedChatContent;
-  }
 
-  if (parsed) {
-    if (parsed.insight) {
-      parts.push({ type: 'text', content: parsed.insight });
+    if (parsed) {
+      if (parsed.insight) {
+        parts.push({ type: 'text', content: parsed.insight });
+      }
+      if (parsed.query) {
+        parts.push({ type: 'sql', content: parsed.query });
+      }
+      if (parsed.chart) {
+        parts.push({ type: 'chart', content: parsed.chart });
+      }
+      if (parsed.data) {
+        parts.push({ type: 'data', content: parsed.data });
+      }
     }
-    if (parsed.query) {
-      parts.push({ type: 'sql', content: parsed.query });
-    }
-    if (parsed.chart) {
-      parts.push({ type: 'chart', content: parsed.chart });
-    }
-  } else if (parts.length === 0) {
-    parts.push({ type: 'text', content: String(msg.content) });
   }
 
   return {

@@ -1,62 +1,45 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
+import styles from './TypewriterText.module.css';
 import ReactMarkdown from 'react-markdown';
-import styles from '../../../../pages/ChatDetailPage/ChatDetailPage.module.css';
-import { Components } from 'react-markdown';
 
-interface TypewriterTextProps {
-  markdownText: string;
-  onChartClick: (chartId: string) => void;
-  onTyping?: () => void;
+interface Props {
+  chatId: string;
 }
 
-export const TypewriterText = ({ markdownText, onChartClick, onTyping }: TypewriterTextProps) => {
+export const TypewriterText = ({ chatId }: Props) => {
+  const { insightQueue } = useChatMessageStore();
   const [displayedText, setDisplayedText] = useState('');
+  const [charIndex, setCharIndex] = useState(0);
+  const scrollAnchorRef = useRef<HTMLDivElement>(null);
 
+  // ✅ 전체 인사이트 문자열 생성 (빈 배열 방어 포함)
+  const fullText = useMemo(() => {
+    const lines = insightQueue[chatId];
+    return Array.isArray(lines) ? lines.join('') : '';
+  }, [insightQueue, chatId]);
+
+  // ✅ 한 글자씩 타자 효과
   useEffect(() => {
-    let i = 0;
-    const speed = 20; // 타자 속도
-    const interval = setInterval(() => {
-      if (i < markdownText.length) {
-        setDisplayedText((prev) => {
-          const next = prev + markdownText.charAt(i);
-          onTyping?.();
-          return next;
-        });        
-        i++;
-      } else {
-        clearInterval(interval);
-      }
-    }, speed);
-    return () => clearInterval(interval);
-  }, [markdownText, onTyping]);
+    if (!fullText || charIndex >= fullText.length) return;
 
-  const renderers: Components = {
-    p: (props) => <p className={styles['chatDetailPage-paragraph']}>{props.children}</p>,
-    h2: (props) => <h2 className={styles['chatDetailPage-heading']}>{props.children}</h2>,
-    hr: () => <hr className={styles['chatDetailPage-hr']} />,
-    html: ({ node }) => {
-      if (node && 'value' in node) {
-        const htmlNode = node as { value?: string };
-        const value = htmlNode.value;
-        const chartMatch = value?.match(/<Chart id="(.*?)" \/>/);
-        if (chartMatch) {
-          return (
-            <div
-              className={styles['chatDetailPage-chartPlaceholder']}
-              onClick={() => onChartClick(chartMatch[1])}
-            >
-              📊 차트 보러가기 (ID: {chartMatch[1]})
-            </div>
-          );
-        }
-      }
-      return null;
-    },
-  };
+    const timeout = setTimeout(() => {
+      setDisplayedText((prev) => prev + fullText[charIndex]);
+      setCharIndex((prev) => prev + 1);
+    }, 25);
+
+    return () => clearTimeout(timeout);
+  }, [charIndex, fullText]);
+
+  // ✅ 자동 스크롤
+  useEffect(() => {
+    scrollAnchorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [displayedText]);
 
   return (
-    <div className={styles['chatDetailPage-typewriter']}>
-      <ReactMarkdown components={renderers}>{displayedText}</ReactMarkdown>
+    <div className={styles['typewriterText-wrapper']}>
+      <ReactMarkdown>{displayedText}</ReactMarkdown>
+      <div ref={scrollAnchorRef} />
     </div>
   );
 };

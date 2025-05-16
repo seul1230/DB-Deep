@@ -1,5 +1,6 @@
+// ChatDetailPage.tsx
 import { useParams } from 'react-router-dom';
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useRef, useMemo } from 'react';
 import ChatList from '@/shared/ui/Chat/ChatList/ChatList';
 import QuestionInput from '@/shared/ui/QuestionInput/QuestionInput';
 import Button from '@/shared/ui/Button/Button';
@@ -7,7 +8,7 @@ import styles from './ChatDetailPage.module.css';
 import { fetchChatDetail } from '@/features/chat/chatApi';
 import { usePanelStore } from '@/shared/store/usePanelStore';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
-import { useQuestionInput } from '@/features/chat/useChatInput';
+import { useQuestionInput } from '@/features/chat/useQuestionInput';
 import { useChatSocket } from '@/features/chat/useChatSocket';
 import { sendMessage } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
@@ -25,33 +26,56 @@ const ChatDetailPage = () => {
   const { messages, setMessages } = useChatMessageStore();
   const { openPanel } = usePanelStore();
   const { profile } = useAuth();
+  const { startUserMessage, startLiveMessage } = useChatMessageStore();
 
   const [showModal, setShowModal] = useState(false);
-  const chatMessages = chatId ? messages[chatId] || [] : [];
+  const chatMessages = useMemo(() => {
+    return chatId ? messages[chatId] || [] : [];
+  }, [chatId, messages]);
+
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollBottomRef = useRef<HTMLDivElement>(null);
 
   const isAnyPanelOpen = !!openPanel;
   const leftOffset = isAnyPanelOpen ? PANEL_WIDTH + 68 : 0;
 
-  // ✅ useQuestionInput은 무조건 실행되어야 함
   const { value, onChange, onSubmit } = useQuestionInput((text) => {
     if (!chatId) return;
+
+    // ✅ 사용자 메시지를 바로 리스트에 추가
+    startUserMessage(chatId, text);
+    startLiveMessage(chatId);
+
+    // ✅ WebSocket으로 전송
     sendMessage({
       uuid: chatId,
       question: text,
-      department: profile?.teamName ?? '알 수 없음',
+      user_department: profile?.teamName ?? '알 수 없음',
     });
+
+    setShouldScrollToBottom(true);
   });
 
-  useChatSocket(chatId); // 내부에서 chatId 없으면 처리하도록
+  useChatSocket(chatId);
 
-  // ✅ useEffect도 무조건 호출되도록!
   useEffect(() => {
     if (!chatId) return;
+    if (messages[chatId]?.length > 0) return;
     fetchChatDetail(chatId).then((res) => {
       const converted = res.messages.map(convertToStreamMessage);
       setMessages(chatId, converted);
+      setShouldScrollToBottom(true);
     });
-  }, [chatId, setMessages]);
+  }, [chatId, messages, setMessages]);
+
+  useEffect(() => {
+    if (shouldScrollToBottom && scrollBottomRef.current) {
+      scrollBottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      setShouldScrollToBottom(false);
+    }
+  }, [chatMessages, shouldScrollToBottom]);
 
   const handleChartClick = (chartId: string) => {
     console.log(`Chart clicked: ${chartId}`);
@@ -59,15 +83,19 @@ const ChatDetailPage = () => {
 
   return (
     <div className={styles['chatDetailPage-outer']}>
-      <div className={styles['chatDetailPage-contentWrapper']}>
-        {chatId && (
-          <ChatList
-            chatId={chatId}
-            chatList={chatMessages}
-            onChartClick={handleChartClick}
-            scrollToBottom
-          />
-        )}
+      <div className={styles['chatDetailPage-scrollContainer']} ref={scrollContainerRef}>
+        <div className={styles['chatDetailPage-contentWrapper']}>
+          {chatId && (
+            <>
+              <ChatList
+                chatId={chatId}
+                chatList={chatMessages}
+                onChartClick={handleChartClick}
+              />
+              <div ref={scrollBottomRef} style={{ height: '0px' }} />
+            </>
+          )}
+        </div>
       </div>
 
       <div
@@ -82,7 +110,8 @@ const ChatDetailPage = () => {
               onClick={() => setShowModal(true)}
               borderColor="var(--icon-blue)"
               backgroundColor="var(--icon-blue)"
-              textColor="var(--background-color)" />
+              textColor="var(--background-color)"
+            />
           </div>
         </div>
       </div>
