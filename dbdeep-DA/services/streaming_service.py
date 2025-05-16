@@ -45,6 +45,7 @@ async def handle_chat_websocket(websocket: WebSocket):
                 content={"question": question}
             )
 
+            # SQL & 테이블 생성
             await send_ws_message(websocket, type_="info", payload="SQL & 데이터 생성 중")
 
             result_dict = run_sql_pipeline(request)
@@ -129,6 +130,7 @@ async def handle_chat_websocket(websocket: WebSocket):
                 content={
                     "question": question,
                     "query": sql,
+                    "data": df.to_markdown(index=False),
                     "chart": chart_obj if chart_obj else {},
                     "insight": insight_text
                 }
@@ -142,9 +144,7 @@ async def handle_chat_websocket(websocket: WebSocket):
                 last_insight=insight_text or "",
                 last_chart_type=chart_obj.get("chart_type") if chart_obj else None
             )
-
             
-
         except WebSocketDisconnect:
             logging.warning("⚠️ 클라이언트가 WebSocket 연결을 중단했습니다.")
         

@@ -22,6 +22,9 @@ def run_bigquery(question, response_text):
         query = clean_sql_from_response(response_text)
         executor = SQLExecutor()
         df = executor.execute(query)
+        
+        if df is None:
+            raise RuntimeError("SQL 실행 결과가 없습니다.")
 
         return {
             "question": question,
@@ -30,7 +33,7 @@ def run_bigquery(question, response_text):
         }
     except Exception as e:
         logging.exception("❌ NL2SQL 처리 실패:")
-        return None
+        raise
 
 
 def run_sql_pipeline(request: QueryRequest, max_retry : int = 5) -> Dict:
@@ -54,7 +57,9 @@ def run_sql_pipeline(request: QueryRequest, max_retry : int = 5) -> Dict:
                     "user_department":request.user_department,
                     "data":result_dict["data"]
                 }
-            
+            else:
+                raise RuntimeError("BigQuery 실행 결과 없음 또는 빈 데이터터")
+
         except Exception as e:
             logging.warning(f"❌ SQL 검증 및 실행 실패 (시도 {attempt+1}): {e}")
             if attempt == max_retry - 1:
