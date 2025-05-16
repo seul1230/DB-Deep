@@ -5,6 +5,8 @@ import { useOverlayStore } from "@/shared/store/useChatLogPanelOverlayStore";
 import { fetchProjects, addChatToProject  } from "@/features/project/projectApi";
 import { Project } from "@/features/project/projectTypes";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+
 
 interface Props {
   chatId: string;
@@ -40,7 +42,7 @@ const ProjectSelectorOverlay: React.FC<Props> = ({ chatId, onClose, onSuccess })
 
     try {
       await addChatToProject(projectId, chatId);
-      alert("채팅이 프로젝트에 추가되었습니다.");
+      toast.success("채팅이 프로젝트에 성공적으로 추가되었습니다.");
       onSuccess?.();
 
       const currentProjectId = window.location.pathname.match(/^\/project\/([^/]+)/)?.[1];
@@ -52,8 +54,13 @@ const ProjectSelectorOverlay: React.FC<Props> = ({ chatId, onClose, onSuccess })
           exact: true,
         });
       }
-    } catch (err) {
-      alert("채팅 추가 실패");
+    } catch (err: any) {
+      const errorCode = err?.response?.data?.code;
+      const errorMessage =
+        errorCode === 4020
+          ? "이미 해당 채팅이 프로젝트에 추가되어 있습니다."
+          : "채팅 추가에 실패했습니다.";
+      toast.error(errorMessage);
       console.error(err);
     } finally {
       setSelecting(false);
