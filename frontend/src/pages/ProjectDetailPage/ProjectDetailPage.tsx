@@ -15,6 +15,10 @@ const ProjectDetailPage: React.FC = () => {
   const [showProjectMenu, setShowProjectMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showChatDeleteModal, setShowChatDeleteModal] = useState(false);
+  const [pendingDeleteChatId, setPendingDeleteChatId] = useState<string | null>(null);
+  const [pendingDeleteChatTitle, setPendingDeleteChatTitle] = useState<string | null>(null);
+
 
   const navigate = useNavigate();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -60,14 +64,29 @@ const ProjectDetailPage: React.FC = () => {
     },
   });
 
-  const handleDelete = (e: React.MouseEvent, chatId: string) => {
+  const handleDelete = (e: React.MouseEvent, chatId: string, chatTitle: string) => {
     e.stopPropagation();
-    if (
-      confirm("정말 이 채팅방을 프로젝트에서 삭제하시겠습니까?")
-    ) {
-      removeChatMutation.mutate(chatId);
-    }
+    setPendingDeleteChatId(chatId);
+    setPendingDeleteChatTitle(chatTitle);
+    setShowChatDeleteModal(true);
   };
+
+  const confirmDeleteChat = () => {
+    if (pendingDeleteChatId) {
+      removeChatMutation.mutate(pendingDeleteChatId);
+    }
+    setShowChatDeleteModal(false);
+    setPendingDeleteChatId(null);
+    setPendingDeleteChatTitle(null);
+  };
+  
+  const cancelDeleteChat = () => {
+    setShowChatDeleteModal(false);
+    setPendingDeleteChatId(null);
+    setPendingDeleteChatTitle(null);
+  };
+  
+  
 
   const handleDeleteProject = () => {
     setShowDeleteModal(true);
@@ -149,7 +168,7 @@ const ProjectDetailPage: React.FC = () => {
                     setShowEditModal(true);
                   }}
                 >
-                  이름 수정
+                  정보 수정
                 </div>
                 <div
                   className={styles.projectOverlayItemDanger}
@@ -191,7 +210,7 @@ const ProjectDetailPage: React.FC = () => {
                 <span className={styles.cardTitle}>{chat.title}</span>
                 <FiTrash
                   className={styles.deleteIcon}
-                  onClick={(e) => handleDelete(e, chat.id)}
+                  onClick={(e) => handleDelete(e, chat.id, chat.title)}
                 />
               </div>
               <div className={styles.cardDate}>
@@ -227,6 +246,21 @@ const ProjectDetailPage: React.FC = () => {
           }
           onCancel={cancelDeleteProject}
           onConfirm={confirmDeleteProject}
+        />
+      )}
+
+      {showChatDeleteModal && (
+        <DeleteConfirmModal
+          title="채팅 삭제"
+          message={
+            <>
+              <strong>"{pendingDeleteChatTitle}"</strong> 채팅방을 프로젝트에서 삭제하시겠습니까?
+              <br />
+              삭제된 채팅방은 복구할 수 없습니다.
+            </>
+          }
+          onCancel={cancelDeleteChat}
+          onConfirm={confirmDeleteChat}
         />
       )}
     </div>
