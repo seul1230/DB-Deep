@@ -31,7 +31,7 @@ const QuestionInput: React.FC<Props> = ({ value = "", onChange, onSubmit }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      onSubmit?.(value); // ✅ 현재 value 전달
+      onSubmit?.(value); //현재 value 전달
     }
   };
 
@@ -48,7 +48,7 @@ const QuestionInput: React.FC<Props> = ({ value = "", onChange, onSubmit }) => {
       />
       <button
         className={styles.sendButton}
-        onClick={() => onSubmit?.(value)} // ✅ 클릭 시도 마찬가지
+        onClick={() => onSubmit?.(value)}
         aria-label="보내기"
       >
         <FiSend />
