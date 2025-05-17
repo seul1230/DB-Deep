@@ -45,14 +45,22 @@ export const useChatSocket = (chatId?: string) => {
 
         switch (type) {
           case 'title': {
-            updateChatTitle(chatId, payload)
-              .then(() => {
-                queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
-              })
-              .catch((err) => {
-                console.error('❌ 채팅방 제목 업데이트 실패:', err);
-              });
-          
+            // 현재 캐시에 저장된 채팅방 제목 확인
+            const cache = queryClient.getQueryData<any>(['chatRooms']);
+
+            const chatRoom = cache?.chatRooms?.find((room: any) => room.id === chatId);
+            const currentTitle = chatRoom?.title ?? '';
+
+            if (currentTitle === '새 채팅방') {
+              updateChatTitle(chatId, payload)
+                .then(() => {
+                  queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
+                })
+                .catch((err) => {
+                  console.error('❌ 채팅방 제목 업데이트 실패:', err);
+                });
+            }
+
             return;
           }
 
@@ -95,7 +103,7 @@ export const useChatSocket = (chatId?: string) => {
             for (const ch of chars) {
               appendInsightLine(chatId, ch);
             }
-            // ✅ insight_stream을 text 파트로도 저장
+            // insight_stream을 text 파트로도 저장
             appendToLast(chatId, { type: 'text', content: payload });
             return;
           }
@@ -115,5 +123,5 @@ export const useChatSocket = (chatId?: string) => {
         tryReconnect();
       };
     });
-  }, [chatId, startNewMessage, appendToLast, finalizeLast, setInsightQueue, appendInsightLine, setRealChatId]);
+  }, [chatId, startNewMessage, appendToLast, finalizeLast, setInsightQueue, appendInsightLine, setRealChatId, queryClient]);
 };

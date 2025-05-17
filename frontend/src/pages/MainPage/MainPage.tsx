@@ -50,28 +50,6 @@ const MainPage: React.FC = () => {
         },
       ]);
 
-      // react-query 캐시에 임시 제목 추가
-      queryClient.setQueryData(["chatRooms"], (old: any) => {
-        const newChat = {
-          id: chatId,
-          title: "새로운 채팅",
-          lastMessageAt: new Date().toISOString(),
-        };
-
-        if (!old) {
-          return {
-            chatRooms: [newChat],
-            nextCursor: null,
-            hasNext: false,
-          };
-        }
-
-        return {
-          ...old,
-          chatRooms: [newChat, ...old.chatRooms],
-        };
-      });
-
       // WebSocket 메시지 전송
       sendMessage({
         uuid: chatId,
