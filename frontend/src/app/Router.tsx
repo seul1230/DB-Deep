@@ -38,7 +38,7 @@ const Router = () => {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/archive" element={<ArchivePage />} />
         <Route path="/project/:projectId" element={<ProjectDetailPage />} />
-        <Route path="/archiveDetail/:chatRoomId" element={<ArchiveDetailPage />} />
+        <Route path="/archiveDetail" element={<ArchiveDetailPage />} />
         {/* 여기에 더 추가 가능 */}
       </Route>
     </Routes>
