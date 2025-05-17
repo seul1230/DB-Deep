@@ -1,40 +1,32 @@
-import { useParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import styles from "./ArchiveDetailPage.module.css";
-import ChatList from "@/shared/ui/Chat/ChatList/ChatList";
-import { fetchChatDetail } from "@/features/chat/chatApi";
-import { convertToStreamMessage } from "@/features/chat/chatTypes";
-import { useChatMessageStore } from "@/features/chat/useChatMessageStore";
+import { ArchiveItem } from "@/features/archive/archiveTypes";
+import { convertToStreamMessage, ChatMessage } from "@/features/chat/chatTypes";
+import ArchivedChatBubble from "@/entities/archive/ArchiveChatBubble/ArchivedChatBubble"
 
 const ArchiveDetailPage = () => {
-  const { chatRoomId } = useParams<{ chatRoomId: string }>();
-  const { messages, setMessages } = useChatMessageStore();
-  const chatMessages = chatRoomId ? messages[chatRoomId] || [] : [];
+  const location = useLocation();
+  const archive = location.state as ArchiveItem;
 
-  useEffect(() => {
-    if (!chatRoomId) return;
+  if (!archive) {
+    return <div className={styles.error}>❌ 잘못된 접근입니다.</div>;
+  }
 
-    fetchChatDetail(chatRoomId).then((res) => {
-      const converted = res.messages.map(convertToStreamMessage);
-      setMessages(chatRoomId, converted);
-    });
-  }, [chatRoomId, setMessages]);
-
-  const handleChartClick = (chartId: string) => {
-    console.log(`Chart clicked: ${chartId}`);
+  const archivedChatMessage: ChatMessage = {
+    id: archive.messageId,
+    uuid: archive.chatRoomId,
+    content: archive.lastMessage,
+    memberId: 0,
+    senderType: "ai" as const,
+    timestamp: { seconds: 0, nanos: 0 },
   };
+
+  const streamMessage = convertToStreamMessage(archivedChatMessage);
 
   return (
     <div className={styles["chatDetailPage-outer"]}>
       <div className={styles["chatDetailPage-contentWrapper"]}>
-        {chatRoomId && (
-          <ChatList
-            chatId={chatRoomId}
-            chatList={chatMessages}
-            onChartClick={handleChartClick}
-            scrollToBottom
-          />
-        )}
+        <ArchivedChatBubble message={streamMessage} />
       </div>
     </div>
   );

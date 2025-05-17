@@ -27,8 +27,8 @@ const ArchivePage = () => {
     loadArchives();
   }, []);
 
-  const handleCardClick = (chatRoomId: string) => {
-    navigate(`/archiveDetail/${chatRoomId}`);
+  const handleCardClick = (archive: ArchiveItem) => {
+    navigate("/archiveDetail", { state: archive });
   };
 
   const handleDeleteSuccess = (deletedId: string) => {
@@ -62,7 +62,7 @@ const ArchivePage = () => {
                 }
                 
                 date={dayjs(item.archivedAt).format("YYYY년 M월 D일 A h시 m분")}
-                onClick={() => handleCardClick(item.chatRoomId)}
+                onClick={() => handleCardClick(item)}
                 onDeleteSuccess={handleDeleteSuccess}
               />
             ))}
