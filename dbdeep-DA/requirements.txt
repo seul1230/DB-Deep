@@ -48,3 +48,7 @@ google-cloud-firestore
 pymysql
 
 db-dtypes
+
+# --- es
+elasticsearch==7.17.0
+pytz
