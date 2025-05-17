@@ -11,7 +11,7 @@
 .chatDetailPage-scrollContainer {
   width: 100%;
   overflow-y: auto;
-  height: calc(100vh - 60px); /* input창 없는 구조라면 이 정도면 충분 */
+  height: calc(100vh - 60px);
 }
 
 .chatDetailPage-contentWrapper {

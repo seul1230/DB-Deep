@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { connectSocket, getSocket } from '@/shared/api/socketManager';
 import { useChatMessageStore } from './useChatMessageStore';
 import { tryReconnect } from '@/shared/api/socketManager';
+import { useQueryClient } from '@tanstack/react-query';
+import { updateChatTitle } from '@/features/chat/chatApi';
 
 export const useChatSocket = (chatId?: string) => {
   const {
@@ -12,6 +14,8 @@ export const useChatSocket = (chatId?: string) => {
     appendInsightLine,
     setRealChatId,
   } = useChatMessageStore();
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!chatId) return;
@@ -40,8 +44,17 @@ export const useChatSocket = (chatId?: string) => {
         const { type, payload } = msg;
 
         switch (type) {
-          case 'title':
+          case 'title': {
+            updateChatTitle(chatId, payload)
+              .then(() => {
+                queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
+              })
+              .catch((err) => {
+                console.error('❌ 채팅방 제목 업데이트 실패:', err);
+              });
+          
             return;
+          }
 
           case 'info': {
             if (payload === 'SQL 생성 중...') {
