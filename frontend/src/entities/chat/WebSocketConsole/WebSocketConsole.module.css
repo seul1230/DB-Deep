@@ -1,0 +1,63 @@
+.webSocketConsole-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 300px;
+    background-color: #111827;
+    color: #f3f4f6;
+    font-size: 12px;
+    font-family: monospace;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .webSocketConsole-open {
+    transform: translateX(0%);
+  }
+  
+  .webSocketConsole-toggleButton {
+    position: absolute;
+    top: 20px;
+    left: -20px;
+    background-color: var(--primary-dark-blue);
+    color: white;
+    border: none;
+    width: 24px;
+    height: 40px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 4px 0 0 4px;
+    cursor: pointer;
+    z-index: 1001;
+  }  
+  
+  .webSocketConsole-logWrapper {
+    padding: 16px;
+  }
+  
+  .webSocketConsole-logLine {
+    margin-bottom: 4px;
+    word-break: break-word;
+    line-height: 1.4;
+  }
+  
+  .webSocketConsole-info {
+    color: #60a5fa;
+  }
+  
+  .webSocketConsole-error {
+    color: #f87171;
+  }
+  
+  .webSocketConsole-data {
+    color: #34d399;
+  }
+  
+  .webSocketConsole-status {
+    color: #eab308;
+  }
+  

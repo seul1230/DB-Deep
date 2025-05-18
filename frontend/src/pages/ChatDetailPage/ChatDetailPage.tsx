@@ -14,6 +14,8 @@ import { sendMessage } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
 import { useAuth } from '@/features/auth/useAuth';
 import { ChartOverlay } from '@/entities/chat/ChartOverlay/ChartOverlay';
+import WebSocketConsole from '@/entities/chat/WebSocketConsole/WebSocketConsole';
+import { useWebSocketConsoleStore } from '@/features/chat/useWebSocketConsoleStore';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -40,6 +42,9 @@ const ChatDetailPage = () => {
 
   const isAnyPanelOpen = !!openPanel;
   const leftOffset = isAnyPanelOpen ? PANEL_WIDTH + 68 : 0;
+
+  const { isOpen: isConsoleOpen } = useWebSocketConsoleStore();
+  const rightOffset = isConsoleOpen ? 300 : 0;
 
   const { value, onChange, onSubmit } = useQuestionInput((text) => {
     if (!chatId) return;
@@ -83,7 +88,7 @@ const ChatDetailPage = () => {
 
   return (
     <div className={styles['chatDetailPage-outer']}>
-      <div className={styles['chatDetailPage-scrollContainer']} ref={scrollContainerRef}>
+      <div className={styles['chatDetailPage-scrollContainer']} ref={scrollContainerRef} style={{ marginRight: `${rightOffset}px` }}>
         <div className={styles['chatDetailPage-contentWrapper']}>
           {chatId && (
             <>
@@ -100,7 +105,7 @@ const ChatDetailPage = () => {
 
       <div
         className={styles['chatDetailPage-inputWrapper']}
-        style={{ paddingLeft: `${leftOffset}px` }}
+        style={{ paddingLeft: `${leftOffset}px`, paddingRight: `${rightOffset}px` }}
       >
         <div className={styles['chatDetailPage-inputContainer']}>
           <div className={styles['chatDetailPage-inputArea']}>
@@ -129,6 +134,7 @@ const ChatDetailPage = () => {
       </Suspense>
 
       <ChartOverlay />
+      <WebSocketConsole />
     </div>
   );
 };
