@@ -65,7 +65,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             # 차트 생성
             data_summary = ""
             chart_obj={}
-
+            print("need_chart: ", need_chart)
             if need_chart:
                 await send_ws_message(websocket, type_="info", payload="차트 생성 중")
                 
@@ -104,6 +104,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             for attempt in range(1, max_retries + 1):
                 try:
                     insight_text = await run_insight_pipeline_async(insight_request, websocket)
+                    print(insight_text)
                     break
                 except WebSocketDisconnect:
                     logging.warning("🚫 클라이언트가 WebSocket 연결을 종료했습니다.")
