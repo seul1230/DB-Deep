@@ -15,11 +15,10 @@ import org.springframework.stereotype.Service;
 public class ChatMessageSearchService {
 
     private final ChatRoomRepository chatRoomRepository;
-    private final ChatMessageSearchRepository chatMessageSearchRepository;
+    private final CustomChatMessageRepository customChatMessageRepository;
 
     public List<ChatRoomSearchResultResponse> findLatestUserMessagesByKeyword(Integer memberId, String keyword) {
-        List<ChatMessage> messages = chatMessageSearchRepository
-                .findByMemberIdAndContentContainingIgnoreCaseOrderByTimestampDesc(memberId, keyword);
+        List<ChatMessage> messages = customChatMessageRepository.searchByMemberIdAndKeyword(memberId, keyword);
 
         List<String> chatRoomIds = messages.stream()
                 .map(ChatMessage::getChatRoomId)

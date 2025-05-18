@@ -6,7 +6,7 @@ import lombok.Builder;
 public record ChatRoomSearchResultResponse(
         String chatId,
         String title,
-        String message,
+        Object message,
         String updatedAt
 ) {
 
