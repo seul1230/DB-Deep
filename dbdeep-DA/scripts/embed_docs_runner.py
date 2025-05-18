@@ -20,11 +20,12 @@ def embed_and_upload_documents(
     logging.info("📦 문서 임베딩 시작")
 
     if text_files is None:
-        text_files = ["hr_dataset_description.txt", "business_term.txt", "bigquery_sql.txt"]
+        text_files = ["hr_dataset_description.txt", "card_dataset_description.txt", "business_term.txt", "bigquery_sql.txt"]
 
     document_types = {
-        "hr_dataset_description.txt": "schema_description",
+        "hr_dataset_description.txt": "hr_schema_description",
         "business_term.txt": "business_term",
+        "card_dataset_description.txt": "card_schema_description",
         "bigquery_sql.txt": "sql_guide"
     }
 
@@ -57,13 +58,13 @@ def embed_and_upload_documents(
     embedding = HuggingFaceEmbeddings(
         model_name=embedding_model_name,
         model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True}
+        # encode_kwargs={"normalize_embeddings": True}
     )
 
     # ----------------------------
     #  Pinecone 초기화
     # ----------------------------
-    vectorstore = get_vectorstore()
+    vectorstore = get_vectorstore(index_name=index_name, model_name=embedding_model_name)
 
     # ----------------------------
     #  Pinecone에 업로드
@@ -79,3 +80,4 @@ def embed_and_upload_documents(
 
 if __name__ == "__main__":
     embed_and_upload_documents()
+    # embed_and_upload_documents(index_name="kanana-index", embedding_model_name="kakaocorp/kanana-nano-2.1b-embedding")
