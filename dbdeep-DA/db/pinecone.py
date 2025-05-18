@@ -21,7 +21,7 @@ def get_pinecone_client():
     return _pinecone_client
 
 
-def get_vectorstore(index_name: str = "schema-index", dimension : int = 1024):
+def get_vectorstore(index_name: str = "schema-index", model_name: str="nlpai-lab/KURE-v1", dimension : int = 1024):
     pc = get_pinecone_client()
     
     if index_name not in pc.list_indexes().names():
@@ -35,9 +35,9 @@ def get_vectorstore(index_name: str = "schema-index", dimension : int = 1024):
     index = pc.Index(index_name)
 
     embedding = HuggingFaceEmbeddings(
-        model_name="nlpai-lab/KURE-v1",
+        model_name=model_name,
         model_kwargs={"device": "cpu"},
-        encode_kwargs={"normalize_embeddings": True}
+        # encode_kwargs={"normalize_embeddings": True}
     )
 
     return PineconeVectorStore(

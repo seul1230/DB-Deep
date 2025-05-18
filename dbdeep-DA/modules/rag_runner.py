@@ -12,7 +12,7 @@ from starlette.websockets import WebSocketDisconnect
 from services.sql_executor import SQLExecutor
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from db.pinecone import get_vectorstore
-from utils.response_utils import clean_sql_from_response, clean_json_from_response, extract_text_block
+from utils.response_utils import clean_sql_from_response, clean_json_from_response, extract_text_block, extract_need_chart_flag
 from modules.rag_builder import build_sql_chain, build_chart_chain, build_insight_chain
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -24,6 +24,7 @@ def run_bigquery(question, response_text):
         df = executor.execute(query)
         
         if df is None:
+            logging.warning("⚠️ SQL 실행 결과가 없거나 쿼리 실패로 인해 None 반환됨.")
             raise RuntimeError("SQL 실행 결과가 없습니다.")
 
         return {
@@ -33,7 +34,6 @@ def run_bigquery(question, response_text):
         }
     except Exception as e:
         logging.exception("❌ NL2SQL 처리 실패:")
-        raise
 
 
 def run_sql_pipeline(request: QueryRequest, max_retry : int = 5) -> Dict:
@@ -55,10 +55,11 @@ def run_sql_pipeline(request: QueryRequest, max_retry : int = 5) -> Dict:
                     "question":request.question,
                     "sql_query":result_dict["sql_query"],
                     "user_department":request.user_department,
-                    "data":result_dict["data"]
+                    "data":result_dict["data"],
+                    "need_chart": extract_need_chart_flag(answer)
                 }
             else:
-                raise RuntimeError("BigQuery 실행 결과 없음 또는 빈 데이터터")
+                raise RuntimeError("BigQuery 실행 결과 없음 또는 빈 데이터")
 
         except Exception as e:
             logging.warning(f"❌ SQL 검증 및 실행 실패 (시도 {attempt+1}): {e}")
