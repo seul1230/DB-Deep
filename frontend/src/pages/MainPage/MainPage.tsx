@@ -32,7 +32,7 @@ const MainPage: React.FC = () => {
     try {
       const chatId = await createChatRoom();
 
-      // ✅ 상태를 직접 넣어줘서 navigate 이후에도 메시지가 유지되도록 함
+      // 상태를 직접 넣어줘서 navigate 이후에도 메시지가 유지되도록 함
       setMessages(chatId, [
         {
           id: `${Date.now()}-user`,
@@ -50,14 +50,14 @@ const MainPage: React.FC = () => {
         },
       ]);
 
-      // ✅ WebSocket 메시지 전송
+      // WebSocket 메시지 전송
       sendMessage({
         uuid: chatId,
         question: text,
         user_department: profile?.teamName ?? '알 수 없음',
       });
 
-      // ✅ 캐시 초기화 및 페이지 이동
+      // 캐시 초기화 및 페이지 이동
       queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
       navigate(`/chat/${chatId}`);
       setInput("");
@@ -66,7 +66,7 @@ const MainPage: React.FC = () => {
     }
   };
 
-  //추천 받은 질문이 구현되면 사용용
+  //추천 받은 질문이 구현되면 사용
   // const handleQuestionSelect = (question: string) => {
   //   createAndNavigateChatRoom (question);
   // };

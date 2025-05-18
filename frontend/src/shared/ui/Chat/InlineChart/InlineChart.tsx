@@ -1,7 +1,9 @@
+import { useEffect, useState } from 'react';
 import { ChartData } from '@/features/chat/chatTypes';
 import Plot from 'react-plotly.js';
 import { PlotType } from 'plotly.js';
 import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
+import { useThemeStore } from "@/shared/store/themeStore";
 
 interface InlineChartProps {
   chartJson: string;
@@ -9,7 +11,24 @@ interface InlineChartProps {
 
 export const InlineChart: React.FC<InlineChartProps> = ({ chartJson }) => {
   const { openChart } = useChartOverlayStore();
+  const theme = useThemeStore((state) => state.theme);
+  const [colors, setColors] = useState({
+    textColor: '',
+    bgColor: '',
+    gridColor: '',
+  });
+
+  useEffect(() => {
+    const getCSSVariable = (name: string) =>
+      getComputedStyle(document.body).getPropertyValue(name).trim();
   
+    setColors({
+      textColor: getCSSVariable("--text-color"),
+      bgColor: getCSSVariable("--background-color"),
+      gridColor: getCSSVariable("--light-gray"),
+    });
+  }, [theme]);
+
   let parsedChart: ChartData | null = null;
 
   try {
@@ -39,8 +58,21 @@ export const InlineChart: React.FC<InlineChartProps> = ({ chartJson }) => {
 
   const layout = {
     title: parsedChart.title,
-    xaxis: { title: parsedChart.x_label },
-    yaxis: { title: parsedChart.y_label },
+    xaxis: {
+      title: parsedChart.x_label,
+      color: colors.textColor,
+      gridcolor: colors.gridColor,
+    },
+    yaxis: {
+      title: parsedChart.y_label,
+      color: colors.textColor,
+      gridcolor: colors.gridColor,
+    },
+    paper_bgcolor: colors.bgColor,
+    plot_bgcolor: colors.bgColor,
+    font: {
+      color: colors.textColor,
+    },
   };
 
   return (

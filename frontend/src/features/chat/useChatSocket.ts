@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { connectSocket, getSocket } from '@/shared/api/socketManager';
 import { useChatMessageStore } from './useChatMessageStore';
 import { tryReconnect } from '@/shared/api/socketManager';
-import { fetchChatDetail, updateChatTitle } from './chatApi';
+import { useQueryClient } from '@tanstack/react-query';
+import { updateChatTitle } from '@/features/chat/chatApi';
 
 export const useChatSocket = (chatId?: string) => {
   const updatedTitlesRef = useRef<Set<string>>(new Set());
@@ -14,6 +15,8 @@ export const useChatSocket = (chatId?: string) => {
     appendInsightLine,
     setRealChatId,
   } = useChatMessageStore();
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!chatId) return;
@@ -43,22 +46,22 @@ export const useChatSocket = (chatId?: string) => {
 
         switch (type) {
           case 'title': {
-            if (
-              typeof payload === 'string' &&
-              payload.trim() &&
-              !updatedTitlesRef.current.has(chatId)
-            ) {
-              try {
-                const detail = await fetchChatDetail(chatId);
-                if (!detail.chatTitle || detail.chatTitle === '새 채팅방') {
-                  await updateChatTitle(chatId, payload);
-                  updatedTitlesRef.current.add(chatId);
-                  console.log(`📌 채팅방 제목 '${payload}'로 업데이트됨`);
-                }
-              } catch (e) {
-                console.warn('❌ 채팅방 제목 업데이트 실패', e);
-              }
+            // 현재 캐시에 저장된 채팅방 제목 확인
+            const cache = queryClient.getQueryData<any>(['chatRooms']);
+
+            const chatRoom = cache?.chatRooms?.find((room: any) => room.id === chatId);
+            const currentTitle = chatRoom?.title ?? '';
+
+            if (currentTitle === '새 채팅방') {
+              updateChatTitle(chatId, payload)
+                .then(() => {
+                  queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
+                })
+                .catch((err) => {
+                  console.error('❌ 채팅방 제목 업데이트 실패:', err);
+                });
             }
+
             return;
           }
 
@@ -100,6 +103,7 @@ export const useChatSocket = (chatId?: string) => {
             for (const ch of chars) {
               appendInsightLine(chatId, ch);
             }
+            // insight_stream을 text 파트로도 저장
             appendToLast(chatId, { type: 'text', content: payload });
             return;
           }
@@ -119,5 +123,5 @@ export const useChatSocket = (chatId?: string) => {
         tryReconnect();
       };
     });
-  }, [chatId, startNewMessage, appendToLast, finalizeLast, setInsightQueue, appendInsightLine, setRealChatId]);
+  }, [chatId, startNewMessage, appendToLast, finalizeLast, setInsightQueue, appendInsightLine, setRealChatId, queryClient]);
 };

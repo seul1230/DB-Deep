@@ -8,33 +8,27 @@ import { ArchiveItem } from "@/features/archive/archiveTypes";
 import dayjs from "dayjs";
 
 const ArchivePage = () => {
-
   const [archives, setArchives] = useState<ArchiveItem[]>([]);
   const [loading, setLoading] = useState(true);
-
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadArchives = async () => {
       try {
-        const data = await fetchArchiveList();
-        const nullIds = data.filter((d) => !d.chatRoomId);
-        if (nullIds.length > 0) {
-          console.warn("chatRoomId가 null인 archive:", nullIds);
-        }
-        setArchives(data);
+        const archiveList = await fetchArchiveList();
+        setArchives(archiveList);
       } catch (error) {
-        console.error("아카이브 불러오기 실패:", error);
+        console.error("아카이브 목록 불러오기 실패:", error);
       } finally {
         setLoading(false);
       }
     };
+
     loadArchives();
   }, []);
-  
 
-  const handleCardClick = (chatRoomId: string) => {
-    navigate(`/archiveDetail/${chatRoomId}`);
+  const handleCardClick = (archive: ArchiveItem) => {
+    navigate("/archiveDetail", { state: archive });
   };
 
   const handleDeleteSuccess = (deletedId: string) => {
@@ -60,11 +54,17 @@ const ArchivePage = () => {
                 key={item.archiveId}
                 id={item.archiveId.toString()}
                 title={item.chatName}
-                description={item.lastMessage.insight || item.lastMessage.question}
+                description={
+                  item.lastMessage?.insight ||
+                  item.lastMessage?.question ||
+                  item.lastMessage?.query ||
+                  (item.lastMessage?.chart ? `[차트] ${item.lastMessage.chart.title}` : "(내용 없음)")
+                }
+                
                 date={dayjs(item.archivedAt).format("YYYY년 M월 D일 A h시 m분")}
-                onClick={() => handleCardClick(item.chatRoomId)}
+                onClick={() => handleCardClick(item)}
                 onDeleteSuccess={handleDeleteSuccess}
-              />            
+              />
             ))}
           </div>
         )}
