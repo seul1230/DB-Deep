@@ -1,5 +1,6 @@
 import { ChatPayload } from '@/features/chat/chatTypes';
 import { showErrorToast } from '@/shared/toast';
+import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger'; // ✅ 추가
 
 let socket: WebSocket | null = null;
 let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -16,7 +17,9 @@ const startHeartbeat = () => {
   stopHeartbeat();
   heartbeatInterval = setInterval(() => {
     if (socket?.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: 'ping' }));
+      const ping = { type: 'ping' };
+      socket.send(JSON.stringify(ping));
+      // ❌ ping은 로그에 남기지 않음
     }
   }, 10000);
 };
@@ -77,7 +80,7 @@ export const connectSocket = (): Promise<WebSocket> => {
     socket.onerror = (err) => {
       console.error('[Socket] ❌ 에러 발생', err);
       stopHeartbeat();
-      reject(err); // ❗ 여기서 tryReconnect() 호출 X
+      reject(err);
     };
 
     socket.onclose = () => {
@@ -91,13 +94,21 @@ const flushPendingMessages = () => {
   console.log(`[Socket] 📤 대기 중 메시지 ${pendingMessages.length}개 전송`);
   while (pendingMessages.length > 0) {
     const msg = pendingMessages.shift();
-    socket?.send(JSON.stringify(msg));
+    if (msg) sendMessage(msg); // ✅ sendMessage로 보내면서 로깅도 적용됨
   }
 };
 
 export const sendMessage = (data: ChatPayload) => {
+  const json = JSON.stringify(data);
+
+  // ✅ 로그 추가: 내가 보낸 메시지
+  useWebSocketLogger.getState().addLog({
+    type: 'sent',
+    message: `전송: ${json}`,
+  });
+
   if (socket?.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify(data));
+    socket.send(json);
   } else {
     console.warn('[Socket] 연결 안 됨. 메시지를 큐에 저장합니다.');
     pendingMessages.push(data);

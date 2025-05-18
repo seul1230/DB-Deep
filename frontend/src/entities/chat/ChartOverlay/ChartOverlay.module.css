@@ -1,25 +1,31 @@
-.overlay {
+/* ChartOverlay.module.css */
+
+.chartOverlay-overlay {
   position: fixed;
   top: 0;
   bottom: 0;
+  left: 68px;
+  right: 0;
   background: white;
-  z-index: 9999;
-  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.3s ease-out;
+  z-index: 1000;
   overflow: auto;
   padding-top: 48px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  will-change: transform, opacity;
 }
 
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0%);
-  }
+.chartOverlay-visible {
+  transform: translateX(0%);
+  opacity: 1;
 }
 
-.close {
+.chartOverlay-hidden {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chartOverlay-close {
   position: absolute;
   top: 16px;
   left: 16px;
@@ -32,11 +38,73 @@
   cursor: pointer;
 }
 
-.controls {
+.chartOverlay-tabs {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.chartOverlay-tab {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.chartOverlay-tabActive {
+  font-weight: 700;
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.chartOverlay-controls {
   display: flex;
   gap: 16px;
   padding: 16px;
   align-items: center;
   background-color: #f9f9f9;
   border-bottom: 1px solid #ddd;
+  flex-wrap: wrap;
+}
+
+.chartOverlay-controlGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.chartOverlay-gridWrapper {
+  padding: 16px;
+  overflow-x: auto;
+}
+
+.chartOverlay-grid {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #ddd;
+}
+
+.chartOverlay-grid th,
+.chartOverlay-grid td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.chartOverlay-rangeControls {
+  display: flex;
+  gap: 24px;
+  padding: 16px;
+  background: #f0f0f0;
+  border-top: 1px solid #ccc;
+}
+
+.chartOverlay-toggleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  padding-left: 16px;
 }

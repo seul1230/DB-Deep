@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type LogType = 'info' | 'error' | 'data' | 'status';
+type LogType = 'info' | 'error' | 'data' | 'status' | 'sent';
 
 interface LogEntry {
   type: LogType;

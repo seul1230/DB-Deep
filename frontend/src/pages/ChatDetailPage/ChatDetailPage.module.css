@@ -1,17 +1,36 @@
 .chatDetailPage-outer {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   background-color: var(--background-color);
-  align-items: center;
-  position: relative;
+  z-index: 20;
+  transition: margin 0.3s ease;
+  box-sizing: border-box;
 }
 
 .chatDetailPage-scrollContainer {
-  width: 100%;
+  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   height: calc(100vh - 60px - 120px);
+  width: 100%;
+  box-sizing: border-box;
+  transition: margin 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-text) transparent;
+}
+
+.chatDetailPage-scrollContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chatDetailPage-scrollContainer::-webkit-scrollbar-thumb {
+  background-color: var(--gray-text);
+  border-radius: 4px;
 }
 
 .chatDetailPage-contentWrapper {
@@ -21,31 +40,33 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: all 0.3s ease;
 }
 
 .chatDetailPage-inputWrapper {
   position: fixed;
   bottom: 0;
-  right: 0;
   left: 0;
+  right: 0;
   background-color: var(--background-color);
-  padding: 12px 0px;
+  padding: 2px 0px 16px 0px;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
-
   width: 100%;
-  transition: padding-left 0.3s ease;
-  z-index: 1;
+  z-index: 10;
+  transition: all 0.3s ease;
 }
 
 .chatDetailPage-inputContainer {
+  display: flex;
+  justify-content: center;
   width: 100%;
-  padding: auto 0;
-  max-width: 650px;
-  align-items: stretch;
+  max-width: 1000px;
+  padding: 0 24px;
   transition: width 0.3s ease;
-  margin-left: 68px;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .chatDetailPage-inputArea {
@@ -53,6 +74,8 @@
   flex-direction: column;
   align-items: flex-end;
   width: 100%;
-  gap: 10px;
+  max-width: 650px;
+  gap: 12px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
 }
-

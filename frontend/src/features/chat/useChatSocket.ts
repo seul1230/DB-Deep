@@ -34,7 +34,7 @@ export const useChatSocket = (chatId?: string) => {
 
       socket.onmessage = async (event) => {
         const raw = event.data;
-        if (!raw) return;
+        if (!raw || raw === '서버 처리 중 오류가 발생했습니다. 다시 시도해주세요.') return; // 🔒 필터링
 
         addLog({ type: 'data', message: `수신: ${raw}` });
 
@@ -42,10 +42,11 @@ export const useChatSocket = (chatId?: string) => {
         try {
           msg = JSON.parse(raw);
         } catch {
+          // 🔒 이 에러 메시지도 예외
+          if (raw === '서버 처리 중 오류가 발생했습니다. 다시 시도해주세요.') return;
           addLog({ type: 'error', message: `JSON 파싱 실패: ${raw}` });
           return;
         }
-
         const { type, payload } = msg;
 
         switch (type) {

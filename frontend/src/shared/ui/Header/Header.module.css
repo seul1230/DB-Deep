@@ -1,19 +1,19 @@
 .header {
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
-    /* margin-top: 10px; */
-    background-color: var(--background-color);
-    display: flex;
-    align-items: center;
-    padding: 15px 0 0 25px;
-    z-index: 4;
-  }
-  
-  .logo {
-    width: 100px;
-    height: auto;
-    cursor: pointer;
-  }
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 25px 0 25px;
+  z-index: 0;
+  background-color: var(--background-color);
+}
+
+.logo {
+  width: 100px;
+  height: auto;
+  cursor: pointer;
+}

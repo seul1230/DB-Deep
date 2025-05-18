@@ -1,42 +1,58 @@
+/* WebSocketConsole.module.css */
+
 .webSocketConsole-container {
     position: fixed;
     top: 0;
     right: 0;
     height: 100vh;
     width: 300px;
-    background-color: #111827;
-    color: #f3f4f6;
+    background-color: var(--background-color);
+    color: var(--text-color);
     font-size: 12px;
     font-family: monospace;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
     transform: translateX(100%);
     transition: transform 0.3s ease;
-    z-index: 1000;
-    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.3);
-  }
+    z-index: 999;
+    padding-bottom: 100px;
+    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
+  }  
   
   .webSocketConsole-open {
     transform: translateX(0%);
   }
   
   .webSocketConsole-toggleButton {
-    position: absolute;
-    top: 20px;
-    left: -20px;
-    background-color: var(--primary-dark-blue);
-    color: white;
+    position: fixed;
+    top: 16px;
+    right: 0;
+    background-color: var(--sidebar-bg);
+    color: var(--icon-blue);
     border: none;
-    width: 24px;
+    width: 32px;
     height: 40px;
     font-size: 16px;
     font-weight: bold;
     border-radius: 4px 0 0 4px;
     cursor: pointer;
     z-index: 1001;
-  }  
+    transition: right 0.3s ease;
+  }
   
   .webSocketConsole-logWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
     padding: 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
   }
   
   .webSocketConsole-logLine {
@@ -61,3 +77,6 @@
     color: #eab308;
   }
   
+  .webSocketConsole-sent {
+    color: #c084fc;
+  }
