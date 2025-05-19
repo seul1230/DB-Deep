@@ -1,163 +1,213 @@
-import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
-import styles from './ChartOverlay.module.css';
+import { useRef, useState, useEffect } from 'react';
 import Plot from 'react-plotly.js';
-import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+import { Layout, PlotData } from 'plotly.js-dist-min';
+import styles from './ChartOverlay.module.css';
+import { CustomChartData, SupportedChartType } from '@/types/chart';
+import type { PlotlyHTMLElement } from 'plotly.js-dist-min';
 
-export const ChartOverlay = () => {
-  const { chart, closeChart } = useChartOverlayStore();
-  const [visible, setVisible] = useState(false);
-  const [chartType, setChartType] = useState('bar');
-  const [xLabel, setXLabel] = useState('');
-  const [yLabel, setYLabel] = useState('');
-  const [xRange, setXRange] = useState<[number, number] | undefined>();
-  const [yRange, setYRange] = useState<[number, number] | undefined>();
+interface ChartOverlayProps {
+  onClose: () => void;
+  chartData: CustomChartData;
+}
+
+const supportedChartTypes: SupportedChartType[] = ['bar', 'line', 'scatter', 'pie', 'heatmap'];
+
+const ChartOverlay = ({ onClose, chartData }: ChartOverlayProps) => {
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  const [chartType, setChartType] = useState<SupportedChartType>(chartData.type);
+  const [xLabel, setXLabel] = useState('X 축');
+  const [yLabel, setYLabel] = useState('Y 축');
+  const [showXLabel, setShowXLabel] = useState(true);
+  const [showYLabel, setShowYLabel] = useState(true);
+  const [xRange, setXRange] = useState<[number, number]>([0, chartData.x.length - 1]);
+  const [yRange, setYRange] = useState<[number, number]>([
+    Math.min(...chartData.y),
+    Math.max(...chartData.y),
+  ]);
+  const [showLegend, setShowLegend] = useState(true);
   const [showGrid, setShowGrid] = useState(true);
+  const [color, setColor] = useState(chartData.color);
 
-  const chartTypes = ['bar', 'line', 'scatter', 'area', 'pie', 'heatmap'] as const;
-
-  useEffect(() => {
-    if (chart) {
-      setVisible(true);
-      setChartType(chart.chart_type);
-      setXLabel(chart.x_label);
-      setYLabel(chart.y_label);
-      setXRange(undefined);
-      setYRange(undefined);
-      setShowGrid(true);
+  const downloadChart = () => {
+    const plot = chartRef.current?.querySelector('.js-plotly-plot');
+    if (plot) {
+      const node = plot as PlotlyHTMLElement;
+      window.Plotly.downloadImage(node, {
+        format: 'png',
+        filename: 'custom_chart',
+        width: 960,
+        height: 640,
+      });
     }
-  }, [chart]);
-
-  const handleClose = () => {
-    setVisible(false);
-    setTimeout(() => closeChart(), 300);
   };
 
-  if (!chart && !visible) return null;
+  const layout: Partial<Layout> = {
+    showlegend: showLegend,
+    xaxis: {
+      title: showXLabel ? xLabel : '',
+      range: xRange,
+      showgrid: showGrid,
+      tickangle: -45,
+    },
+    yaxis: {
+      title: showYLabel ? yLabel : '',
+      range: yRange,
+      showgrid: showGrid,
+    },
+    paper_bgcolor: 'var(--background-color)',
+    plot_bgcolor: 'var(--background-color)',
+    font: { color: 'var(--text-color)' },
+  };
 
-  const availableTypes = chartTypes.filter((type) => {
-    if (!chart) return false;
-    if (type === 'pie') return 'x' in chart && 'y' in chart && chart.x.length === chart.y.length;
-    if (type === 'heatmap') return Array.isArray((chart as any).z);
-    return true;
-  });
+  const data: Partial<PlotData>[] = [
+    {
+      type: chartType === 'line' ? 'scatter' : chartType,
+      mode: chartType === 'line' ? 'lines' : chartType === 'scatter' ? 'markers' : undefined,
+      x: chartData.x,
+      y: chartData.y,
+      name: chartData.name,
+      marker: { color },
+      line: { color },
+    },
+  ];
 
-  let data;
-  if (!chart) return null;
-
-  switch (chartType) {
-    case 'pie':
-      data = [{
-        type: 'pie',
-        labels: chart.x,
-        values: chart.y,
-        name: chart.title,
-      }];
-      break;
-    case 'heatmap':
-      data = [{
-        type: 'heatmap',
-        z: (chart as any).z,
-        x: chart.x,
-        y: chart.y,
-        name: chart.title,
-      }];
-      break;
-    case 'area':
-      data = [{
-        type: 'scatter',
-        mode: 'lines',
-        fill: 'tozeroy',
-        x: chart.x,
-        y: chart.y,
-        name: chart.title,
-      }];
-      break;
-    case 'line':
-      data = [{
-        type: 'scatter',
-        mode: 'lines',
-        x: chart.x,
-        y: chart.y,
-        name: chart.title,
-      }];
-      break;
-    case 'scatter':
-      data = [{
-        type: 'scatter',
-        mode: 'markers',
-        x: chart.x,
-        y: chart.y,
-        name: chart.title,
-      }];
-      break;
-    default:
-      data = [{
-        type: 'bar',
-        x: chart.x,
-        y: chart.y,
-        name: chart.title,
-      }];
-  }
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
 
   return (
-    <div
-      className={clsx(styles['chartOverlay-overlay'], {
-        [styles['chartOverlay-visible']]: visible,
-        [styles['chartOverlay-hidden']]: !visible,
-      })}
-    >
-      <button className={styles['chartOverlay-close']} onClick={handleClose}>✕</button>
+    <div className={styles.chartOverlayContainer}>
+      {/* 헤더 */}
+      <div className={styles.chartOverlayHeader}>
+        <button onClick={onClose} className={styles.chartOverlayCloseButton}>✕</button>
+        <div className={styles.chartOverlayTitle}>그래프 편집기</div>
+        <button onClick={downloadChart} className={styles.chartOverlaySaveButton}>저장</button>
+      </div>
 
-      <div className={styles['chartOverlay-tabBar']}>
-        {availableTypes.map((type) => (
+      {/* 탭 바 */}
+      <div className={styles.chartOverlayTabBar}>
+        {supportedChartTypes.map((type) => (
           <button
             key={type}
-            className={clsx(styles['chartOverlay-tab'], {
-              [styles['chartOverlay-tab-active']]: type === chartType,
-            })}
             onClick={() => setChartType(type)}
+            className={
+              chartType === type
+                ? styles.chartOverlayTabActive
+                : styles.chartOverlayTab
+            }
           >
-            {type}
+            {type.charAt(0).toUpperCase() + type.slice(1)}
           </button>
         ))}
       </div>
 
-      <Plot
-        data={data as any}
-        layout={{
-          title: chart.title,
-          xaxis: { title: xLabel, range: xRange, showgrid: showGrid },
-          yaxis: { title: yLabel, range: yRange, showgrid: showGrid },
-          autosize: true,
-        }}
-        style={{ width: '100%', height: '400px' }}
-        config={{ responsive: true }}
-      />
+      {/* 본문 */}
+      <div className={styles.chartOverlayBody}>
+        <div className={styles.chartOverlayPlotArea} ref={chartRef}>
+          <Plot data={data} layout={layout} style={{ width: '100%', height: '100%' }} config={{ responsive: true }} />
+        </div>
 
-      <div className={styles['chartOverlay-controls']}>
-        <label>
-          X축 라벨:
-          <input value={xLabel} onChange={(e) => setXLabel(e.target.value)} />
-        </label>
-        <label>
-          Y축 라벨:
-          <input value={yLabel} onChange={(e) => setYLabel(e.target.value)} />
-        </label>
-        <label>
-          X축 범위:
-          <input type="number" placeholder="최소" onChange={(e) => setXRange([+e.target.value, xRange?.[1] ?? +e.target.value + 10])} />
-          <input type="number" placeholder="최대" onChange={(e) => setXRange([xRange?.[0] ?? +e.target.value - 10, +e.target.value])} />
-        </label>
-        <label>
-          Y축 범위:
-          <input type="number" placeholder="최소" onChange={(e) => setYRange([+e.target.value, yRange?.[1] ?? +e.target.value + 10])} />
-          <input type="number" placeholder="최대" onChange={(e) => setYRange([yRange?.[0] ?? +e.target.value - 10, +e.target.value])} />
-        </label>
-        <label>
-          <input type="checkbox" checked={showGrid} onChange={() => setShowGrid(!showGrid)} /> 그리드 표시
-        </label>
+        {/* 설정 영역 */}
+        <div className={styles.chartOverlaySidebar}>
+          {/* 라벨 */}
+          <section className={styles.chartOverlaySection}>
+            <div className={styles.chartOverlayLabelRow}>
+              <label>📌 X축 라벨</label>
+              <input
+                type="checkbox"
+                checked={showXLabel}
+                onChange={() => setShowXLabel(!showXLabel)}
+              />
+            </div>
+            <input
+              className={styles.chartOverlayInput}
+              value={xLabel}
+              onChange={(e) => setXLabel(e.target.value)}
+              disabled={!showXLabel}
+            />
+
+            <div className={styles.chartOverlayLabelRow}>
+              <label>📌 Y축 라벨</label>
+              <input
+                type="checkbox"
+                checked={showYLabel}
+                onChange={() => setShowYLabel(!showYLabel)}
+              />
+            </div>
+            <input
+              className={styles.chartOverlayInput}
+              value={yLabel}
+              onChange={(e) => setYLabel(e.target.value)}
+              disabled={!showYLabel}
+            />
+          </section>
+
+          {/* 범위 */}
+          <section className={styles.chartOverlaySection}>
+            <label>X축 범위: {xRange.join(' ~ ')}</label>
+            <input
+              type="range"
+              min={0}
+              max={chartData.x.length - 1}
+              value={xRange[0]}
+              onChange={(e) => setXRange([+e.target.value, xRange[1]])}
+            />
+            <input
+              type="range"
+              min={0}
+              max={chartData.x.length - 1}
+              value={xRange[1]}
+              onChange={(e) => setXRange([xRange[0], +e.target.value])}
+            />
+
+            <label>Y축 범위: {yRange.join(' ~ ')}</label>
+            <input
+              type="range"
+              min={Math.min(...chartData.y)}
+              max={Math.max(...chartData.y)}
+              value={yRange[0]}
+              onChange={(e) => setYRange([+e.target.value, yRange[1]])}
+            />
+            <input
+              type="range"
+              min={Math.min(...chartData.y)}
+              max={Math.max(...chartData.y)}
+              value={yRange[1]}
+              onChange={(e) => setYRange([yRange[0], +e.target.value])}
+            />
+          </section>
+
+          {/* 토글 */}
+          <section className={styles.chartOverlaySection}>
+            <div className={styles.chartOverlayToggleRow}>
+              <label>🧩 그리드 표시</label>
+              <input type="checkbox" checked={showGrid} onChange={() => setShowGrid(!showGrid)} />
+            </div>
+            <div className={styles.chartOverlayToggleRow}>
+              <label>📘 범례 표시</label>
+              <input type="checkbox" checked={showLegend} onChange={() => setShowLegend(!showLegend)} />
+            </div>
+          </section>
+
+          {/* 색상 선택 */}
+          <section className={styles.chartOverlaySection}>
+            <label>🎨 색상</label>
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              className={styles.chartOverlayColorButton}
+            />
+          </section>
+        </div>
       </div>
     </div>
   );
 };
+
+export default ChartOverlay;

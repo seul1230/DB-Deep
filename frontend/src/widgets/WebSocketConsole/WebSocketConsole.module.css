@@ -44,7 +44,8 @@
   }
   
   .webSocketConsole-logWrapper {
-    flex: 1;
+    height: 100%;
+    max-height: calc(100vh - 100px);
     margin: 60px 12px 16px 12px; /* 여닫는 버튼 아래 간격 */
     padding: 12px;
     background-color: var(--sidebar-bg);
@@ -53,7 +54,7 @@
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-start;
     scroll-behavior: smooth;
 
     -ms-overflow-style: none; /* IE */

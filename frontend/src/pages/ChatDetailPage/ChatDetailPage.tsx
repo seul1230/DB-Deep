@@ -1,5 +1,3 @@
-
-// ChatDetailPage.tsx
 import { useParams } from 'react-router-dom';
 import React, { useEffect, useState, Suspense, useRef, useMemo } from 'react';
 import ChatList from '@/shared/ui/Chat/ChatList/ChatList';
@@ -13,7 +11,9 @@ import { useChatSocket } from '@/features/chat/useChatSocket';
 import { sendMessage } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
 import { useAuth } from '@/features/auth/useAuth';
-import { ChartOverlay } from '@/entities/chat/ChartOverlay/ChartOverlay';
+import ChartOverlay from '@/entities/chat/ChartOverlay/ChartOverlay';
+import { CustomChartData } from '@/types/chart';
+import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -27,6 +27,8 @@ const ChatDetailPage = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
+  const [showChartOverlay, setShowChartOverlay] = useState(false);
+  const [overlayChartData, setOverlayChartData] = useState<CustomChartData | null>(null);
 
   const chatMessages = useMemo(() => {
     return chatId ? messages[chatId] || [] : [];
@@ -68,6 +70,12 @@ const ChatDetailPage = () => {
     }
   }, [chatMessages, shouldScrollToBottom]);
 
+  useEffect(() => {
+    if (showChartOverlay) {
+      useWebSocketLogger.getState().setConnected(false); // WebSocketConsole 닫기용
+    }
+  }, [showChartOverlay]);
+
   const layoutStyle = {
     transition: 'all 0.3s ease',
     position: 'relative' as const,
@@ -91,7 +99,10 @@ const ChatDetailPage = () => {
               <ChatList
                 chatId={chatId}
                 chatList={chatMessages}
-                onChartClick={(chartId) => console.log(`Chart clicked: ${chartId}`)}
+                onChartClick={(chartData) => {
+                  setOverlayChartData(chartData);
+                  setShowChartOverlay(true);
+                }}
               />
               <div ref={scrollBottomRef} style={{ height: '0px' }} />
             </>
@@ -99,23 +110,22 @@ const ChatDetailPage = () => {
         </div>
       </div>
 
-      <div
-        className={styles['chatDetailPage-inputWrapper']}
-        style={layoutStyle}
-      >
-        <div className={styles['chatDetailPage-inputContainer']}>
-          <div className={styles['chatDetailPage-inputArea']}>
-            <QuestionInput value={value} onChange={onChange} onSubmit={onSubmit} />
-            <Button
-              label="지금까지의 채팅 공유"
-              onClick={() => setShowModal(true)}
-              borderColor="var(--icon-blue)"
-              backgroundColor="var(--icon-blue)"
-              textColor="var(--background-color)"
-            />
+      {!showChartOverlay && (
+        <div className={styles['chatDetailPage-inputWrapper']} style={layoutStyle}>
+          <div className={styles['chatDetailPage-inputContainer']}>
+            <div className={styles['chatDetailPage-inputArea']}>
+              <QuestionInput value={value} onChange={onChange} onSubmit={onSubmit} />
+              <Button
+                label="지금까지의 채팅 공유"
+                onClick={() => setShowModal(true)}
+                borderColor="var(--icon-blue)"
+                backgroundColor="var(--icon-blue)"
+                textColor="var(--background-color)"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <Suspense fallback={<div style={{ display: 'none' }} />}>
         {showModal && (
@@ -129,7 +139,12 @@ const ChatDetailPage = () => {
         )}
       </Suspense>
 
-      <ChartOverlay />
+      {showChartOverlay && overlayChartData && (
+        <ChartOverlay
+          onClose={() => setShowChartOverlay(false)}
+          chartData={overlayChartData}
+        />
+      )}
     </div>
   );
 };

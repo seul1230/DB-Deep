@@ -3,13 +3,14 @@ import { ChatBubbleUser } from '@/shared/ui/Chat/ChatBubbleUser/ChatBubbleUser';
 import { ChatBubbleDBDeep } from '@/shared/ui/Chat/ChatBubbleDBDeep/ChatBubbleDBDeep';
 import { ChatStreamMessage } from '@/features/chat/chatTypes';
 import styles from './ChatList.module.css';
+import { CustomChartData } from '@/types/chart';
 
 interface Props {
   chatId: string;
   chatList: ChatStreamMessage[];
-  onChartClick?: (chartId: string) => void;
+  onChartClick?: (chartData: CustomChartData) => void;
   showMenu?: boolean;
-  onRetry?: (message: ChatStreamMessage) => void; // ✅ 추가
+  onRetry?: (message: ChatStreamMessage) => void;
 }
 
 const ChatList: React.FC<Props> = ({

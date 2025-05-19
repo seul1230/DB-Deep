@@ -1,110 +1,130 @@
 /* ChartOverlay.module.css */
 
-.chartOverlay-overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 68px;
-  right: 0;
-  background: white;
-  z-index: 1000;
-  overflow: auto;
-  padding-top: 48px;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  will-change: transform, opacity;
-}
-
-.chartOverlay-visible {
-  transform: translateX(0%);
-  opacity: 1;
-}
-
-.chartOverlay-hidden {
-  transform: translateX(100%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.chartOverlay-close {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  background: #eee;
-  border: none;
-  padding: 6px 12px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.chartOverlay-tabs {
+.chartOverlayContainer {
   display: flex;
-  gap: 16px;
-  padding: 16px;
-  border-bottom: 1px solid #ddd;
+  flex-direction: column;
+  height: 100vh;
+  background-color: var(--background-color);
 }
 
-.chartOverlay-tab {
-  background: none;
+.chartOverlayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--light-gray);
+  background-color: var(--background-color);
+}
+
+.chartOverlayCloseButton,
+.chartOverlaySaveButton {
+  background-color: transparent;
   border: none;
-  font-size: 14px;
-  font-weight: 400;
+  color: var(--icon-blue);
+  font-size: 16px;
   cursor: pointer;
+  font-weight: bold;
+}
+
+.chartOverlaySaveButton:hover {
+  color: var(--icon-blue-hover);
+}
+
+.chartOverlayTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+  text-align: center;
+  flex-grow: 1;
+}
+
+.chartOverlayTabBar {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0;
+  background-color: var(--sidebar-bg);
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.chartOverlayTab,
+.chartOverlayTabActive {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.chartOverlayTab {
+  background-color: var(--primary-light-blue);
   color: var(--text-color);
 }
 
-.chartOverlay-tabActive {
-  font-weight: 700;
-  color: var(--primary-color);
-  border-bottom: 2px solid var(--primary-color);
+.chartOverlayTabActive {
+  background-color: var(--primary-dark-blue);
+  color: white;
+  font-weight: bold;
 }
 
-.chartOverlay-controls {
+.chartOverlayBody {
   display: flex;
-  gap: 16px;
-  padding: 16px;
-  align-items: center;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #ddd;
-  flex-wrap: wrap;
+  flex: 1;
+  overflow: hidden;
 }
 
-.chartOverlay-controlGroup {
+.chartOverlayPlotArea {
+  flex: 1;
+  padding: 24px;
+  background-color: var(--background-color);
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 
-.chartOverlay-gridWrapper {
-  padding: 16px;
-  overflow-x: auto;
-}
-
-.chartOverlay-grid {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #ddd;
-}
-
-.chartOverlay-grid th,
-.chartOverlay-grid td {
-  padding: 8px;
-  border: 1px solid #ddd;
-  text-align: left;
-}
-
-.chartOverlay-rangeControls {
+.chartOverlaySidebar {
+  width: 320px;
+  padding: 24px;
+  background-color: var(--sidebar-bg);
+  border-left: 1px solid var(--light-gray);
+  overflow-y: auto;
   display: flex;
+  flex-direction: column;
   gap: 24px;
-  padding: 16px;
-  background: #f0f0f0;
-  border-top: 1px solid #ccc;
 }
 
-.chartOverlay-toggleWrapper {
+.chartOverlaySection {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chartOverlayLabelRow {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  padding-left: 16px;
+}
+
+.chartOverlayInput {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--light-gray);
+  border-radius: 6px;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.chartOverlayToggleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chartOverlayColorButton {
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
 }

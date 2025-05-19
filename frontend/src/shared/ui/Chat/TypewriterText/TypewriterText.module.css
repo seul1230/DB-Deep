@@ -1,6 +1,7 @@
 .typewriterText-wrapper {
   white-space: pre-wrap;
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1.6;
   word-break: break-word;
+  max-width: 100%;
 }

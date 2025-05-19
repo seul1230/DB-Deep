@@ -109,3 +109,9 @@
 .chatBubbleDBDeep-section {
   margin-bottom: 12px;
 }
+
+.chatArea-wrapper {
+  overflow-y: auto;
+  max-height: 100vh;
+  scroll-behavior: smooth;
+}

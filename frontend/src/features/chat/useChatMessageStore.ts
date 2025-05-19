@@ -10,7 +10,7 @@ interface State {
   appendToLast: (chatId: string, part: ChatPart) => void;
   finalizeLast: (chatId: string) => void;
   insightQueue: Record<string, string[]>;
-  setInsightQueue: (chatId: string, queue: string[]) => void;
+  setInsightQueue: (chatId: string, updater: (prev?: string[]) => string[]) => void;
   appendInsightLine: (chatId: string, line: string) => void;
   chatIdMap: Record<string, string>;
   setRealChatId: (uuid: string, realId: string) => void;
@@ -87,12 +87,20 @@ export const useChatMessageStore = create<State>((set, get) => ({
     const msgs = get().messages[chatId] || [];
     if (!msgs.length) return;
     const last = { ...msgs[msgs.length - 1], isLive: false };
-    set({ messages: { ...get().messages, [chatId]: [...msgs.slice(0, -1), last] } });
+    set({
+      messages: { ...get().messages, [chatId]: [...msgs.slice(0, -1), last] },
+      insightQueue: { ...get().insightQueue, [chatId]: [] }, // ✅ 여기서 비워줌
+    });
   },
 
   insightQueue: {},
-  setInsightQueue: (chatId, queue) =>
-    set((s) => ({ insightQueue: { ...s.insightQueue, [chatId]: queue } })),
+  setInsightQueue: (chatId, updater) =>
+    set((state) => ({
+      insightQueue: {
+        ...state.insightQueue,
+        [chatId]: updater(state.insightQueue[chatId]),
+      },
+    })),
 
   appendInsightLine: (chatId, line) => {
     const prev = get().insightQueue[chatId] || [];

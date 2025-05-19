@@ -5,7 +5,7 @@ interface InlineTableProps {
 }
 
 export const InlineTable = ({ data }: InlineTableProps) => {
-  if (!Array.isArray(data) || data.length === 0) return <div>데이터 없음</div>;
+  if (!Array.isArray(data) || data.length === 0) return null;
 
   const headers = Object.keys(data[0]);
 

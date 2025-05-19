@@ -1,14 +1,17 @@
-import { useEffect, useRef } from 'react';
-import { connectSocket, getSocket } from '@/shared/api/socketManager';
+import { useEffect } from 'react';
+import {
+  connectSocket,
+  getSocket,
+  tryReconnect,
+  flushPendingMessages, // ✅ 반드시 import
+} from '@/shared/api/socketManager';
 import { useChatMessageStore } from './useChatMessageStore';
-import { tryReconnect } from '@/shared/api/socketManager';
 import { useQueryClient } from '@tanstack/react-query';
 import { updateChatTitle } from '@/features/chat/chatApi';
+import { ChatRoom } from '@/features/chat/chatApi';
 import { useWebSocketLogger } from './useWebSocketLogger';
 
 export const useChatSocket = (chatId?: string) => {
-  const { addLog } = useWebSocketLogger();
-  const updatedTitlesRef = useRef<Set<string>>(new Set());
   const {
     startNewMessage,
     appendToLast,
@@ -19,6 +22,7 @@ export const useChatSocket = (chatId?: string) => {
   } = useChatMessageStore();
 
   const queryClient = useQueryClient();
+  const { addLog } = useWebSocketLogger();
 
   useEffect(() => {
     if (!chatId) return;
@@ -28,41 +32,53 @@ export const useChatSocket = (chatId?: string) => {
       if (!socket) return;
 
       socket.onopen = () => {
-        addLog({ type: 'info', message: 'WebSocket 연결됨' });
+        console.log('✅ WebSocket 연결 성공');
         startNewMessage(chatId);
+        flushPendingMessages(); // ✅ 누락된 메시지 자동 전송
       };
 
-      socket.onmessage = async (event) => {
+      socket.onmessage = (event) => {
         const raw = event.data;
-        if (!raw || raw === '서버 처리 중 오류가 발생했습니다. 다시 시도해주세요.') return; // 🔒 필터링
+        if (!raw) return;
 
         addLog({ type: 'data', message: `수신: ${raw}` });
+
+        // ✅ 에러 문자열 직접 처리
+        if (typeof raw === 'string' && raw.includes('서버 처리 중 오류')) {
+          appendToLast(chatId, { type: 'status', content: '' }); // 기존 status 제거
+          appendToLast(chatId, {
+            type: 'status',
+            content: `❌ ${raw}`,
+          });
+          finalizeLast(chatId); // 응답 종료
+          return;
+        }
 
         let msg;
         try {
           msg = JSON.parse(raw);
         } catch {
-          // 🔒 이 에러 메시지도 예외
-          if (raw === '서버 처리 중 오류가 발생했습니다. 다시 시도해주세요.') return;
-          addLog({ type: 'error', message: `JSON 파싱 실패: ${raw}` });
+          console.error('❌ JSON 파싱 실패:', raw);
           return;
         }
+
         const { type, payload } = msg;
 
         switch (type) {
           case 'title': {
-            const cache = queryClient.getQueryData<any>(['chatRooms']);
-            const chatRoom = cache?.chatRooms?.find((room: any) => room.id === chatId);
+            const cache = queryClient.getQueryData<{ chatRooms: ChatRoom[] }>(['chatRooms']);
+            const chatRoom = cache?.chatRooms?.find((room: ChatRoom) => room.id === chatId);
             const currentTitle = chatRoom?.title ?? '';
 
             if (currentTitle === '새 채팅방') {
               updateChatTitle(chatId, payload)
-                .then(() => queryClient.invalidateQueries({ queryKey: ['chatRooms'] }))
+                .then(() => {
+                  queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
+                })
                 .catch((err) => {
-                  addLog({ type: 'error', message: `채팅방 제목 업데이트 실패: ${err}` });
+                  console.error('❌ 채팅방 제목 업데이트 실패:', err);
                 });
             }
-
             return;
           }
 
@@ -72,14 +88,12 @@ export const useChatSocket = (chatId?: string) => {
             } else if (payload === '차트 생성 중...') {
               appendToLast(chatId, { type: 'status', content: '차트 생성 중...' });
             } else if (payload === '인사이트 생성 중') {
-              setInsightQueue(chatId, []);
+              setInsightQueue(chatId, () => []);
               appendToLast(chatId, { type: 'status', content: '' });
             } else if (payload === '인사이트 생성 완료') {
               finalizeLast(chatId);
-            } else {
-              if (typeof payload === 'string' && /^[a-zA-Z0-9_-]+$/.test(payload)) {
-                setRealChatId(chatId, payload);
-              }
+            } else if (typeof payload === 'string' && /^[a-zA-Z0-9_-]+$/.test(payload)) {
+              setRealChatId(chatId, payload);
             }
             return;
           }
@@ -100,28 +114,35 @@ export const useChatSocket = (chatId?: string) => {
           }
 
           case 'insight_stream': {
-            const chars = payload.split('');
-            for (const ch of chars) {
-              appendInsightLine(chatId, ch);
-            }
+            setInsightQueue(chatId, (prev = []) => [...prev, payload]);
             appendToLast(chatId, { type: 'text', content: payload });
             return;
           }
 
           default:
-            addLog({ type: 'status', message: `알 수 없는 type: ${type}` });
+            console.warn('❓ 알 수 없는 type:', type);
         }
       };
 
       socket.onerror = (e) => {
-        addLog({ type: 'error', message: `WebSocket 오류: ${JSON.stringify(e)}` });
+        console.error('❌ WebSocket 오류:', e);
       };
 
       socket.onclose = () => {
-        addLog({ type: 'status', message: 'WebSocket 연결 종료됨' });
+        console.warn('🔌 WebSocket 연결 종료');
         finalizeLast(chatId);
         tryReconnect();
       };
     });
-  }, [chatId, startNewMessage, appendToLast, finalizeLast, setInsightQueue, appendInsightLine, setRealChatId, queryClient]);
+  }, [
+    chatId,
+    startNewMessage,
+    appendToLast,
+    finalizeLast,
+    setInsightQueue,
+    appendInsightLine,
+    setRealChatId,
+    queryClient,
+    addLog,
+  ]);
 };
