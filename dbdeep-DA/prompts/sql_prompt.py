@@ -173,8 +173,10 @@ def get_prompt_for_sql(user_department):
     [데이터셋 요약 - card_dataset]
     - 총 8개 테이블(card_members, card_credit, card_sales, card_invoice, card_balance, card_channels, card_marketing, card_performance)로 구성
     - 각 테이블은 '기준년월(job_mon)', '회원번호(member_no)'로 공통 연결 가능
+      - job_mon의 자료형은 INTEGER입니다.
+      - ratio_로 시작하는 필드의 자료형은 FLOAT입니다.
     - 컬럼명은 영어 식별자를 사용 (예: code_gender, amt_use 등)
-    - 자료형: 대부분 STRING / FLOAT / INT로 구성됨
+    - 자료형: 대부분 STRING / FLOAT / INTEGER 로 구성됨
     - 코드형 필드는 유효값 존재 (예: code_gender = 1:남, 2:여)
     ※ 정확한 테이블명 및 필드명을 사용할 것. 존재하지 않는 필드(예: name, id 등) 사용 금지.
 
@@ -182,7 +184,6 @@ def get_prompt_for_sql(user_department):
     ❗❗❗주의: 실제 존재하지 않는 필드/컬럼명은 절대 사용하지 마세요. 아래 card_schema 문서를 참고하여, 정확한 테이블명과 컬럼명, 그리고 자료형을 사용하세요. 존재하지 않는 컬럼(e.g. first_name, title, name 등)을 생성하지 마세요. 테이블명에 별칭을 쓸 때, 꼭 있는지 확인하고 쓰세요.
     {card_schema}
 
-    
     
     [비즈니스 용어 및 판단 기준 정의]
     {context_term}
