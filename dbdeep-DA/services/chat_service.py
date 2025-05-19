@@ -8,6 +8,13 @@ def chat_room_exists(chat_room_id: str) -> bool:
     with SessionLocal() as session:
         return session.get(ChatRoom, chat_room_id) is not None
     
+def is_first_chat(chat_room_id: str) -> bool:
+    db = get_firestore_client()
+    messages_ref = db.collection("chat_messages")
+    query = messages_ref.where("chat_room_id", "==", chat_room_id).limit(1)
+    docs = query.stream()
+    return not any(True for _ in docs)
+    
 
 def update_chatroom_summary(chat_room_id: str, last_question: str, last_insight: str, last_chart_type: str = None):
     summary_text = f"{last_question or '최근 질문 없음'} → {last_insight or '답변 없음'}"
