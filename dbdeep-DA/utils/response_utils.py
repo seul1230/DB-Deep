@@ -45,6 +45,8 @@ def clean_sql_from_response(response_text: str) -> str:
     lines = sql_code.splitlines()
     cleaned_lines = [line for line in lines if not line.strip().startswith("--")]
     cleaned_sql = "\n".join(cleaned_lines).strip()
+    
+    cleaned_sql = re.sub(r"[^\x20-\x7E\n\t]", "", cleaned_sql)
 
     # 5. 시작 검증
     if not re.match(r"^\s*(SELECT|WITH|DECLARE)", cleaned_sql, re.IGNORECASE):

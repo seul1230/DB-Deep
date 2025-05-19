@@ -34,7 +34,7 @@ def build_sql_chain(question: str, user_department: str) -> Tuple[Any, dict]:
     
     card_schema_retriever = vectorstore.as_retriever(
         search_type='mmr',
-        search_kwargs={"k": 3, "filter": {"type": {"$in": ["card_schema_description"]}}}
+        search_kwargs={"k": 5, "filter": {"type": {"$in": ["card_schema_description"]}}}
     )
 
     term_retriever = vectorstore.as_retriever(
@@ -44,7 +44,7 @@ def build_sql_chain(question: str, user_department: str) -> Tuple[Any, dict]:
 
     # Reranker + Retriever 압축기 구성
     model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
-    compressor = CrossEncoderReranker(model=model, top_n=3)
+    compressor = CrossEncoderReranker(model=model, top_n=5)
 
     hr_schema_retriever_compression = ContextualCompressionRetriever(
         base_compressor=compressor,
