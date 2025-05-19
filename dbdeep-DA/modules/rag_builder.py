@@ -18,6 +18,9 @@ from prompts.insight_prompt import get_prompt_for_insight
 
 with open("assets/RAG_docs/bigquery_sql.txt", "r", encoding="utf-8") as f:
     STATIC_SQL_GUIDE = f.read()
+    
+with open("assets/RAG_docs/card_schema_json.txt", "r", encoding="utf-8") as f:
+    STATIC_CARD_SCHEMA = f.read()
 
 def build_sql_chain(question: str, user_department: str) -> Tuple[Any, dict]:
     
@@ -198,7 +201,9 @@ def build_sql_chain(question: str, user_department: str) -> Tuple[Any, dict]:
             "card_schema": RunnableLambda(lambda x: card_schema_retriever_compression.invoke(x["question"])),
             "context_term": RunnableLambda(lambda x: term_retriever_compression.invoke(x["question"])),
             "context_sql": RunnableLambda(lambda x: STATIC_SQL_GUIDE),
-            "hr_schema_json_str": RunnableLambda(lambda x: json.dumps(hr_schema_json, indent=4, ensure_ascii=False))
+            "card_schema_json_str" : RunnableLambda(lambda x: json.dumps(STATIC_CARD_SCHEMA, indent=4, ensure_ascii=False)),
+            "hr_schema_json_str": RunnableLambda(lambda x: json.dumps(hr_schema_json, indent=4, ensure_ascii=False)),
+            "customer_dict" : RunnableLambda(lambda x: "")
         }
         | get_prompt_for_sql(user_department)
         | llm

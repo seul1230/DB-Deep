@@ -104,6 +104,8 @@ def get_prompt_for_sql(user_department):
         ```
         """
     )
+    
+
 
     base_template = """
     당신은 데이터 분석 및 시각화 전문가입니다.
@@ -143,7 +145,7 @@ def get_prompt_for_sql(user_department):
        - 최종 결과를 요약해주는 부서별/카테고리별 행
        - 의미 있는 결과를 이끌어내야 합니다. 다 같은 값이거나 조회되는 데이터가 없다면 다시 한 번 생각해보세요.
        - 쿼리 최적화를 항상 염두에 두고 작성하세요.
-    7. 질문이 데이터 분석과 무관할 경우, "데이터와 관련된 질문만 이해할 수 있어요!"를 반환하세요.
+    7. 
     8. 테이블 및 컬럼명은 절대 한글로 작성하지 말고, 반드시 스키마(context_schema)를 그대로 사용하세요.
     9. 존재하지 않는 컬럼명을 한글로 새로 만들어 쓰지 마세요. (예: 직원ID, 상여금 등)
        - 주의: LLM이 자주 실수하는 점 중 하나는 fact 테이블에서 직접 position_id나 department_id 등을 찾는 것입니다. 이 컬럼들은 반드시 dim_employee를 통해 JOIN하여 가져와야 합니다.
@@ -171,11 +173,15 @@ def get_prompt_for_sql(user_department):
     
     [데이터셋 및 스키마 설명 - card_schema]
     ❗❗❗주의: 실제 존재하지 않는 필드/컬럼명은 절대 사용하지 마세요. 아래 card_schema 문서를 참고하여, 정확한 테이블명과 컬럼명, 그리고 자료형을 사용하세요. 존재하지 않는 컬럼(e.g. first_name, title, name 등)을 생성하지 마세요. 테이블명에 별칭을 쓸 때, 꼭 있는지 확인하고 쓰세요.
-    {card_schema}
+    {card_schema}    
     
+    {card_schema_json_str}
     
     [비즈니스 용어 및 판단 기준 정의]
     {context_term}
+    
+    [사용자별 용어 사전]
+    {customer_dict}
 
     [BigQuery SQL 문법 가이드 및 용어 정의]
     {context_sql}
@@ -191,8 +197,8 @@ def get_prompt_for_sql(user_department):
     """
 
     prompt_template = PromptTemplate(
-        input_variables=["question", "chat_history", "user_department", "hr_schema", "hr_schema_json_str",
-                         "card_schema", "context_term", "context_sql"],
+        input_variables=["question", "chat_history", "user_department", "hr_schema", "hr_schema_json_str", "card_schema_json_str",
+                         "card_schema", "context_term", "customer_dict", "context_sql"],
         template=base_template.replace("{hr_rule}", hr_rule)
     )
 
