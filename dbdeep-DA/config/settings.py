@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     # HuggingFace
     HUGGINGFACE_HUB_TOKEN: str
 
+    ELASTICSEARCH_URL: str
+
     class Config:
         env_file = ".env"
 

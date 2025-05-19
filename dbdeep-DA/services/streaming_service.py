@@ -49,7 +49,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             # SQL & 테이블 생성
             await send_ws_message(websocket, type_="info", payload="SQL & 데이터 생성 중")
 
-            result_dict = run_sql_pipeline(request)
+            result_dict = await run_sql_pipeline(request, websocket)
             need_chart = result_dict.get("need_chart")
             if isinstance(need_chart, str):
                 need_chart = need_chart.lower() != "false"
