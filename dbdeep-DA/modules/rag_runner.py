@@ -11,7 +11,6 @@ from starlette.websockets import WebSocketDisconnect
 
 from services.sql_executor import SQLExecutor
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
-from db.pinecone import get_vectorstore
 from utils.response_utils import clean_sql_from_response, clean_json_from_response, extract_text_block, extract_need_chart_flag
 from modules.rag_builder import build_sql_chain, build_chart_chain, build_insight_chain
 
