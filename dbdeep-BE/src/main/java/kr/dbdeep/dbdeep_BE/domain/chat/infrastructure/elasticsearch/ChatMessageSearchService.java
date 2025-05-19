@@ -1,5 +1,6 @@
 package kr.dbdeep.dbdeep_BE.domain.chat.infrastructure.elasticsearch;
 
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -36,10 +37,14 @@ public class ChatMessageSearchService {
                 .collect(Collectors.toMap(
                         ChatMessage::getChatRoomId,
                         Function.identity(),
-                        (existing, replacement) -> existing
+                        (m1, m2) -> {
+                            ZonedDateTime t1 = ZonedDateTime.parse(m1.getTimestamp());
+                            ZonedDateTime t2 = ZonedDateTime.parse(m2.getTimestamp());
+                            return t1.isAfter(t2) ? m1 : m2;
+                        }
                 ))
                 .values().stream()
-                .sorted(Comparator.comparing(ChatMessage::getTimestamp))
+                .sorted(Comparator.comparing(ChatMessage::getTimestamp).reversed())
                 .map(m -> ChatRoomSearchResultResponse.builder()
                         .chatId(m.getChatRoomId())
                         .title(chatRoomNames.getOrDefault(m.getChatRoomId(), "알 수 없음"))
