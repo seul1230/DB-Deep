@@ -91,11 +91,11 @@ def get_prompt_for_sql(user_department):
     
     hr_rule = (
         f"""
-        9. 단, hr_dataset 내 테이블(position, salary 등)에 접근할 수 없습니다. 질문자가 인사팀이 아니므로 hr_dataset에 있는 테이블은 절대 사용하지 마세요.
+        11. 단, hr_dataset 내 테이블(position, salary 등)에 접근할 수 없습니다. 질문자가 인사팀이 아니므로 hr_dataset에 있는 테이블은 절대 사용하지 마세요.
         """
         if not is_hr_team(user_department)
         else f"""
-        9. 질문자가 인사팀이므로 hr_dataset 사용 가능합니다. 사용자 질문에 맞는 데이터셋을 사용하여 원하는 대답을 들을 수 있도록 도와주세요.
+        11. 질문자가 인사팀이므로 hr_dataset 사용 가능합니다. 사용자 질문에 맞는 데이터셋을 사용하여 원하는 대답을 들을 수 있도록 도와주세요.
         {hr_schema_info}
         
         아래는 hr_schema 테이블 JSON 구조입니다. 자료형과 필드명을 참고하세요:
@@ -149,6 +149,12 @@ def get_prompt_for_sql(user_department):
     8. 테이블 및 컬럼명은 절대 한글로 작성하지 말고, 반드시 스키마(context_schema)를 그대로 사용하세요.
     9. 존재하지 않는 컬럼명을 한글로 새로 만들어 쓰지 마세요. (예: 직원ID, 상여금 등)
        - 주의: LLM이 자주 실수하는 점 중 하나는 fact 테이블에서 직접 position_id나 department_id 등을 찾는 것입니다. 이 컬럼들은 반드시 dim_employee를 통해 JOIN하여 가져와야 합니다.
+    10. 성능을 고려한 SQL을 작성하세요. 다음 사항을 꼭 지켜야 합니다:
+       - 대용량 테이블(card_credit 등)은 반드시 WHERE 절에 job_mon 등 파티셔닝 필드를 기준으로 필터링할 것
+       - job_mon은 문자열로 변환하지 말고, 정수 상태로 활용할 것 (CAST 사용 금지)
+       - COUNT(*)는 꼭 필요한 경우에만 사용하며, GROUP BY 없이 사용하는 것을 지양할 것
+       - LIMIT을 포함하여 50건 이하로 결과를 제한할 것
+
     {hr_rule}
 
     ## 입력 정보

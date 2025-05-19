@@ -11,7 +11,13 @@ class SQLExecutor:
 
         if credentials_path:
             if os.path.exists(credentials_path):
-                credentials = service_account.Credentials.from_service_account_file(credentials_path)
+                credentials = service_account.Credentials.from_service_account_file(
+                    credentials_path,
+                    scopes=[
+                        "https://www.googleapis.com/auth/cloud-platform",
+                        "https://www.googleapis.com/auth/drive",
+                        "https://www.googleapis.com/auth/bigquery"
+                    ])
                 self.bq_client = bigquery.Client(credentials=credentials, project=settings.GOOGLE_CLOUD_PROJECT)
         else:
             self.bq_client = bigquery.Client(project=settings.GOOGLE_CLOUD_PROJECT)
