@@ -4,8 +4,9 @@ import logging
 import pandas as pd
 
 from fastapi import WebSocket, WebSocketDisconnect
-from utils.ws_session_manager import set_stop_flag, clear_stop_flag
+from utils.ws_session_manager import clear_stop_flag
 from utils.ws_utils import send_ws_message
+from services.ws_stop_listener import listen_for_stop
 from services.message_service import save_chat_message, build_chat_history
 from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title, is_first_chat
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
@@ -27,6 +28,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             uuid = request.uuid
             question = request.question
             department = request.user_department
+            stop_listener = asyncio.create_task(listen_for_stop(websocket, uuid))
 
             # 채팅방 생성 확인
             if not chat_room_exists(uuid):
@@ -222,3 +224,13 @@ async def handle_chat_websocket(websocket: WebSocket):
         except Exception as e:
             logging.error(f"예상치 못한 에러 발생 : {e}")
             await websocket.send_text("서버 처리 중 오류가 발생했습니다. 다시 시도해주세요.")
+
+        finally:
+            if stop_listener:
+                stop_listener.cancel()
+                try:
+                    await stop_listener
+                except asyncio.CancelledError:
+                    pass
+            if uuid:
+                await clear_stop_flag(uuid)
