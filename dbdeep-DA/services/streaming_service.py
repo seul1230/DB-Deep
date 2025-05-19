@@ -4,9 +4,10 @@ import logging
 import pandas as pd
 
 from fastapi import WebSocket, WebSocketDisconnect
+from utils.ws_session_manager import set_stop_flag, clear_stop_flag
 from utils.ws_utils import send_ws_message
 from services.message_service import save_chat_message, build_chat_history
-from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title
+from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title, is_first_chat
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from infrastructure.es_message_service import save_chat_message_to_es
@@ -14,6 +15,10 @@ from infrastructure.es_message_service import save_chat_message_to_es
 async def handle_chat_websocket(websocket: WebSocket):
     
     while True:
+
+        stop_listener = None
+        uuid = None
+
         try:
             data = await websocket.receive_text()
             data_dict = json.loads(data)
@@ -23,20 +28,21 @@ async def handle_chat_websocket(websocket: WebSocket):
             question = request.question
             department = request.user_department
 
-            # 제목 자동 생성
-            try:
-                title = generate_chatroom_title(question)
-                await send_ws_message(websocket, type_="title", payload=title)
-            except Exception as e:
-                logging.warning(f"❗ 채팅방 제목 생성 실패: {e}")
-                await send_ws_message(websocket, type_="title", payload="새 채팅방", error=str(e))
-                title = "새 채팅방"
-
             # 채팅방 생성 확인
             if not chat_room_exists(uuid):
                 await send_ws_message(websocket, type_="error", payload="채팅방이 존재하지 않습니다.")
                 await websocket.close()
                 return
+            
+            # 최초 메시지인 경우에만 제목 생성
+            if is_first_chat(uuid):
+                try:
+                    title = generate_chatroom_title(question)
+                    await send_ws_message(websocket, type_="title", payload=title)
+                except Exception as e:
+                    logging.warning(f"❗ 채팅방 제목 생성 실패: {e}")
+                    await send_ws_message(websocket, type_="title", payload="새 채팅방", error=str(e))
+                    title = "새 채팅방"
             
             chat_history = build_chat_history(uuid)
             
@@ -151,7 +157,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             insight_text = ""
             for attempt in range(1, max_retries + 1):
                 try:
-                    insight_text = await run_insight_pipeline_async(insight_request, websocket)
+                    insight_text = await run_insight_pipeline_async(insight_request, websocket, uuid)
                     print(insight_text)
                     break
                 except WebSocketDisconnect:
@@ -168,6 +174,9 @@ async def handle_chat_websocket(websocket: WebSocket):
                         except:
                             pass
                         break
+                finally:
+                    await clear_stop_flag(uuid)
+
 
             await send_ws_message(websocket, type_="info", payload="인사이트 생성 완료")
 
