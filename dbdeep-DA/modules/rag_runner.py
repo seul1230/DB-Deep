@@ -33,7 +33,7 @@ def run_bigquery(question, response_text):
         return None
 
 
-def run_sql_pipeline(request: QueryRequest, max_retry : int = 5) -> Dict:
+async def run_sql_pipeline(request: QueryRequest, websocket: WebSocket, max_retry: int = 5) -> Dict:
     sql_chain, inputs = build_sql_chain(request.question, request.user_department)
 
     result_dict = None
@@ -42,9 +42,7 @@ def run_sql_pipeline(request: QueryRequest, max_retry : int = 5) -> Dict:
             logging.info(f"🚀 SQL 생성 시도 (시도 {attempt+1})...")
             
             answer = sql_chain.invoke(inputs)
-            print("\n[최종 응답]")
-            print(answer, end="\n")
-            
+            await send_ws_message(websocket, type_="console", payload=answer)
             result_dict = run_bigquery(request.question, answer)
             
             if result_dict.get("data", []) != []:
@@ -112,7 +110,7 @@ if __name__ == "__main__":
         question="성과가 부진한 부서의 성과급을 조금 조정해야할 것 같아. 얼마 정도가 적당할까?",
         department="인사팀"
     )
-    chart_request = run_sql_pipeline(query, max_retry=5)
+    chart_request = run_sql_pipeline(query, max_retry=5, websocket=WebSocket)
     if chart_request:
         updated_chart_request = run_chart_pipeline(chart_request)
         insight_input = InsightRequest(
