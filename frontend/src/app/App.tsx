@@ -27,7 +27,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>페이지 로딩 중...</div>}>
+      <Suspense fallback={null}>
         <AppRoutes />
         <CustomToastContainer />
       </Suspense>

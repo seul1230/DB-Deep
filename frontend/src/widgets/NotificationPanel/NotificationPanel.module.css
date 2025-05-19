@@ -50,11 +50,13 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* 스크롤바 */
 .NotificationPanel-list::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
 
 .NotificationPanel-list::-webkit-scrollbar-thumb {

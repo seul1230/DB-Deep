@@ -8,8 +8,8 @@ interface Props {
   chatId: string;
   chatList: ChatStreamMessage[];
   onChartClick?: (chartId: string) => void;
-  scrollToBottom?: boolean;
   showMenu?: boolean;
+  onRetry?: (message: ChatStreamMessage) => void; // ✅ 추가
 }
 
 const ChatList: React.FC<Props> = ({
@@ -17,14 +17,34 @@ const ChatList: React.FC<Props> = ({
   chatList,
   onChartClick,
   showMenu = true,
+  onRetry,
 }) => {
   return (
     <div className={styles['ChatList-scrollArea']}>
       <div className={styles['ChatList-chatBox']}>
-        {chatList.map((msg) =>
-          msg.senderType === 'user' ? (
-            <ChatBubbleUser key={msg.id} text={msg.parts.find(p => p.type === 'text')?.content ?? ''} />
-          ) : (
+        {chatList.map((msg) => {
+          if (msg.senderType === 'user') {
+            const userText = msg.parts.find(p => p.type === 'text')?.content ?? '';
+            const aiError = chatList.find(
+              m => m.senderType === 'ai' &&
+              m.uuid === msg.uuid &&
+              m.parts.some(p =>
+                p.type === 'text' &&
+                p.content.includes('서버 처리 중 오류')
+              )
+            );
+
+            return (
+              <ChatBubbleUser
+                key={msg.id}
+                text={userText}
+                showRetryButton={!!aiError}
+                onRetry={() => onRetry?.(msg)}
+              />
+            );
+          }
+
+          return (
             <ChatBubbleDBDeep
               key={msg.id}
               parts={msg.parts}
@@ -34,8 +54,8 @@ const ChatList: React.FC<Props> = ({
               onChartClick={onChartClick ?? (() => {})}
               showMenu={showMenu}
             />
-          )
-        )}
+          );
+        })}
       </div>
     </div>
   );

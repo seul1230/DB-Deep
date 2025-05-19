@@ -44,15 +44,23 @@
   }
   
   .webSocketConsole-logWrapper {
+    flex: 1;
+    margin: 60px 12px 16px 12px; /* 여닫는 버튼 아래 간격 */
+    padding: 12px;
+    background-color: var(--sidebar-bg);
+    border-radius: 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    height: 100%;
-    padding: 16px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
     scroll-behavior: smooth;
+
+    -ms-overflow-style: none; /* IE */
+    scrollbar-width: none;     /* Firefox */
+  }
+  .webSocketConsole-logWrapper::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
   }
   
   .webSocketConsole-logLine {

@@ -1,21 +1,33 @@
 import styles from './WebSocketConsole.module.css';
 import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
 import { useWebSocketConsoleStore } from '@/features/chat/useWebSocketConsoleStore';
-import { useEffect, useRef } from 'react';
-import clsx from 'clsx';
 import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
+import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
+import clsx from 'clsx';
 
 const WebSocketConsole = () => {
   const { logs } = useWebSocketLogger();
-  const { isOpen, toggleConsole } = useWebSocketConsoleStore();
+  const { isOpen, toggleConsole, setConsoleOpen } = useWebSocketConsoleStore();
   const { chart } = useChartOverlayStore();
   const logEndRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
 
+  const isMainPage = location.pathname === '/main';
+
+  // ✅ 로그 자동 스크롤
   useEffect(() => {
     if (logEndRef.current) {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [logs]);
+
+  // ✅ /main에서는 콘솔 무조건 닫힘
+  useEffect(() => {
+    if (isMainPage && isOpen) {
+      setConsoleOpen(false);
+    }
+  }, [isMainPage, isOpen, setConsoleOpen]);
 
   return (
     <>
@@ -39,8 +51,9 @@ const WebSocketConsole = () => {
           <div ref={logEndRef} />
         </div>
       </div>
-      {/* ✅ 차트가 열려있으면 토글 버튼 숨김 */}
-      {!chart && (
+
+      {/* ✅ 메인 페이지거나 차트 오버레이 열려 있으면 버튼 숨김 */}
+      {!isMainPage && !chart && (
         <button
           className={clsx(styles['webSocketConsole-toggleButton'], {
             [styles['webSocketConsole-toggleOpen']]: isOpen,
