@@ -32,10 +32,7 @@ const ChatLogPanel: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [chatIdToDelete, setChatIdToDelete] = useState<string | null>(null);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-
   const handleClickChatRoom = (chatId: string) => {
-    setSelectedId(chatId);
     navigate(`/chat/${chatId}`);
   };
   

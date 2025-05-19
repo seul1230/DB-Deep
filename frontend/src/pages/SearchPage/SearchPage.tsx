@@ -14,7 +14,7 @@ import { showErrorToast, showSuccessToast } from "@/shared/toast";
 const SearchPage: React.FC = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchChatResult[]>([]);
-  const [selectedTab, setSelectedTab] = useState("전체");
+  // const [selectedTab, setSelectedTab] = useState("전체");
   const { isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
   const navigate = useNavigate(); 
 
