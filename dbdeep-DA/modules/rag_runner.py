@@ -8,11 +8,11 @@ from utils.ws_utils import send_ws_message
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-
+from utils.response_utils import clean_json_from_response
 from services.sql_executor import SQLExecutor
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from utils.response_utils import clean_sql_from_response, clean_json_from_response, extract_text_block, extract_need_chart_flag
-from modules.rag_builder import build_sql_chain, build_chart_chain, build_insight_chain
+from modules.rag_builder import build_question_clf_chain, build_follow_up_chain, build_sql_chain, build_chart_chain, build_insight_chain
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
@@ -33,6 +33,60 @@ def run_bigquery(question, response_text):
         }
     except Exception as e:
         logging.exception("❌ NL2SQL 처리 실패:")
+
+
+def run_question_clf_chain(question: str, chat_history: str = "") -> dict:
+    question_clf_chain = build_question_clf_chain(question)
+
+    try:
+        result = question_clf_chain.invoke({
+            "question": question,
+            "chat_history": chat_history
+        })
+        print("질문 분류: ", result)
+        raw_result = clean_json_from_response(result)
+        if isinstance(raw_result, str):
+            result_dict = json.loads(raw_result)
+        else:
+            result_dict = raw_result
+
+        return result_dict
+    except Exception as e:
+        return {"classification": "confused", "error": str(e)}
+
+async def run_follow_up_chain_async(question: str, chat_history: str, websocket: WebSocket) -> str:
+    logging.info("💬 Follow-up 응답 스트리밍 시작")
+    chain = build_follow_up_chain()
+    
+    inputs = {
+        "question": question,
+        "chat_history": chat_history
+    }
+
+    result = ""
+    generator = chain.astream(inputs)
+
+    try:
+        async for chunk in generator:
+            try:
+                await send_ws_message(websocket, type_="follow_up_stream", payload=chunk)
+                result += chunk
+            except (RuntimeError, asyncio.CancelledError, WebSocketDisconnect):
+                logging.warning("⚠️ WebSocket 전송 실패 또는 연결 종료")
+                break
+    except Exception as e:
+        logging.exception("❌ Follow-up 생성 중 예외 발생:")
+        await send_ws_message(
+            websocket,
+            type_="error",
+            payload="질문에 대한 답변 생성 중 오류가 발생했습니다.",
+            error=str(e)
+        )
+        raise
+    finally:
+        await generator.aclose()
+
+    return result
 
 
 def run_sql_pipeline(request: QueryRequest, max_retry : int = 5) -> Dict:
@@ -128,3 +182,4 @@ if __name__ == "__main__":
         )
         # asyncio.run(...) 으로 호출해야 실제 실행됨
         print("\n📌 최종 인사이트 요청 준비 완료:", insight_input)
+

@@ -12,9 +12,47 @@ from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from llm.gemini import GeminiSyncViaGMS, GeminiStreamingViaGMS
 from db.pinecone import get_vectorstore
 from modules.chat_summary import summarize_history_if_needed
+from prompts.question_clf_prompt import get_question_classification_prompt, get_follow_up_prompt
 from prompts.sql_prompt import get_prompt_for_sql
 from prompts.chart_prompt import get_prompt_for_chart, get_prompt_for_chart_summary
 from prompts.insight_prompt import get_prompt_for_insight
+
+def build_question_clf_chain(question: str) -> tuple:
+    logging.info("🤖 질문 분류 체인 구성 시작")
+
+    llm = GeminiSyncViaGMS()
+    prompt = get_question_classification_prompt()
+
+    chain = (
+        {
+            "user_question": RunnableLambda(lambda x: x["question"]),
+            "chat_history": RunnableLambda(lambda x: summarize_history_if_needed(x.get("chat_history", "")))
+        }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    return chain
+
+def build_follow_up_chain(question: str, chat_history: str) -> str:
+    prompt = f"""
+당신은 사용자의 질문 흐름을 이해하는 AI 비서입니다.
+
+아래 대화 맥락과 최근 질문을 바탕으로 사용자의 질문에 자연스럽게 이어지는 답변을 제공하세요. 
+단, 질문이 데이터 분석이나 SQL 실행이 필요하지 않은 follow-up이라면 친절하고 간결하게 텍스트로만 답변하세요.
+
+[대화 내역]
+{chat_history}
+
+[사용자의 현재 질문]
+{question}
+
+[답변]
+"""
+    llm = GeminiStreamingViaGMS()
+    response = llm.invoke(prompt)
+    return response
 
 with open("assets/RAG_docs/bigquery_sql.txt", "r", encoding="utf-8") as f:
     STATIC_SQL_GUIDE = f.read()
@@ -25,7 +63,7 @@ with open("assets/RAG_docs/card_schema_json.txt", "r", encoding="utf-8") as f:
 def build_sql_chain(question: str, user_department: str) -> Tuple[Any, dict]:
     
     logging.info("📥 RAG 체인 구성 시작")
-    vectorstore = get_vectorstore()
+    vectorstore = get_vectorstore(index_name="schema-index-v2")
     
     hr_schema_retriever = vectorstore.as_retriever(
         search_type='mmr',
@@ -255,3 +293,19 @@ def build_insight_chain(input_dict: dict) -> Tuple[Any, dict]:
     )
 
     return chain, input_dict
+
+
+def build_follow_up_chain():
+    llm = GeminiStreamingViaGMS()
+    prompt = get_follow_up_prompt()
+    
+    chain = (
+        {
+            "question": RunnableLambda(lambda x: x["question"]),
+            "chat_history": RunnableLambda(lambda x: x.get("chat_history", ""))
+        }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+    return chain

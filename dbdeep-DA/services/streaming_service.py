@@ -7,7 +7,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from utils.ws_utils import send_ws_message
 from services.message_service import save_chat_message, build_chat_history
 from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title
-from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async
+from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 
 async def handle_chat_websocket(websocket: WebSocket):
@@ -36,7 +36,9 @@ async def handle_chat_websocket(websocket: WebSocket):
                 await send_ws_message(websocket, type_="error", payload="채팅방이 존재하지 않습니다.")
                 await websocket.close()
                 return
-
+            
+            chat_history = build_chat_history(uuid)
+            
             # 사용자 질문 저장
             save_chat_message(
                 chat_room_id=uuid, 
@@ -44,6 +46,52 @@ async def handle_chat_websocket(websocket: WebSocket):
                 message_type="text", 
                 content={"question": question}
             )
+
+            # 🔍 질문 유형 분류
+            clf_result = run_question_clf_chain(question=question, chat_history=chat_history)
+            clf_type = clf_result.get("classification", "")
+            print(clf_type)
+
+            await send_ws_message(websocket, type_="info", payload=f"질문 분류 결과: {clf_type}")
+
+            if clf_type == "follow_up":
+                try:
+                    response_text = await run_follow_up_chain_async(question, chat_history, websocket)
+
+                    # ✅ Follow-up 응답 최종 저장
+                    chat_id = save_chat_message(
+                        chat_room_id=uuid,
+                        sender_type="ai",
+                        message_type="follow_up",
+                        content={
+                            "question": question,
+                            "follow_up_response": response_text
+                        }
+                    )
+
+                    await send_ws_message(websocket, type_="info", payload=chat_id)
+                    update_chatroom_summary(
+                        chat_room_id=uuid,
+                        last_question=question,
+                        last_insight=response_text,
+                        last_chart_type=None
+                    )
+                    continue
+
+                except WebSocketDisconnect:
+                    logging.warning("🚫 클라이언트가 WebSocket 연결을 종료했습니다.")
+                    break
+                except Exception as e:
+                    continue
+            
+            elif clf_type != "analysis":
+                msg = {
+                    "confused": "조금 더 구체적으로 질문해주시면 분석을 도와드릴 수 있어요!"
+                }.get(clf_type, "죄송합니다. 이해할 수 없는 질문입니다. 다시 시도해주세요.")
+        
+                await send_ws_message(websocket, type_="info", payload=msg)
+                continue
+            
 
             # SQL & 테이블 생성
             await send_ws_message(websocket, type_="info", payload="SQL & 데이터 생성 중")
@@ -59,7 +107,6 @@ async def handle_chat_websocket(websocket: WebSocket):
 
             await send_ws_message(websocket, type_="query", payload=sql)
             await send_ws_message(websocket, type_="data", payload=df.to_dict(orient="records"))
-
             await send_ws_message(websocket, type_="info", payload="SQL 생성 완료")
 
             # 차트 생성
