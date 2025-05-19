@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./ChatLogPanel.module.css";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import { useChatRooms } from "@/features/chat/useChatRooms";
@@ -23,6 +23,7 @@ const ChatLogPanel: React.FC = () => {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { chatId } = useParams();
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -31,9 +32,13 @@ const ChatLogPanel: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [chatIdToDelete, setChatIdToDelete] = useState<string | null>(null);
 
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   const handleClickChatRoom = (chatId: string) => {
+    setSelectedId(chatId);
     navigate(`/chat/${chatId}`);
   };
+  
 
   const handleEditComplete = async (chatId: string) => {
     if (!editedTitle.trim()) {
@@ -108,7 +113,9 @@ const ChatLogPanel: React.FC = () => {
         {data?.chatRooms.map((log) => (
           <div
             key={log.id}
-            className={styles["ChatLogPanel-item"]}
+            className={`${styles["ChatLogPanel-item"]} ${
+              chatId === log.id ? styles["ChatLogPanel-item--active"] : ""
+            }`}
             onClick={() => handleClickChatRoom(log.id)}
             role="button"
             tabIndex={0}

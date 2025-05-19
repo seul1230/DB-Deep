@@ -12,6 +12,7 @@
     margin-left: auto;
     margin-right: auto;
     margin: 0 auto;
+    margin-bottom: 24px;
   }
   
   .searchBox input {
