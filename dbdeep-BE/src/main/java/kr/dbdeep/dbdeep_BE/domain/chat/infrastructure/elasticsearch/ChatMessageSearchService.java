@@ -39,7 +39,7 @@ public class ChatMessageSearchService {
                         (existing, replacement) -> existing
                 ))
                 .values().stream()
-                .sorted(Comparator.comparing(ChatMessage::getTimestamp).reversed())
+                .sorted(Comparator.comparing(ChatMessage::getTimestamp))
                 .map(m -> ChatRoomSearchResultResponse.builder()
                         .chatId(m.getChatRoomId())
                         .title(chatRoomNames.getOrDefault(m.getChatRoomId(), "알 수 없음"))
