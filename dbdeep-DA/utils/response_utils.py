@@ -45,9 +45,11 @@ def clean_sql_from_response(response_text: str) -> str:
     lines = sql_code.splitlines()
     cleaned_lines = [line for line in lines if not line.strip().startswith("--")]
     cleaned_sql = "\n".join(cleaned_lines).strip()
+    
+    cleaned_sql = re.sub(r"[^\x20-\x7E\n\t]", "", cleaned_sql)
 
     # 5. 시작 검증
-    if not re.match(r"^\s*(SELECT|WITH)", cleaned_sql, re.IGNORECASE):
+    if not re.match(r"^\s*(SELECT|WITH|DECLARE)", cleaned_sql, re.IGNORECASE):
         logging.warning("⚠️ SQL이 SELECT 또는 WITH로 시작하지 않음. 잘못된 응답일 수 있음.")
         logging.debug(f"🔍 cleaned_sql: {cleaned_sql}")
 
@@ -89,3 +91,10 @@ def remove_json_line_comments(json_str):
 def extract_text_block(response_text: str) -> str:
     text_match = re.search(r"```text\s*(.*?)```", response_text, re.DOTALL)
     return text_match.group(1).strip() if text_match else ""
+
+def extract_need_chart_flag(response_text: str) -> bool:
+    try:
+        match = re.search(r'"need_chart"\s*:\s*(true|false)', response_text, re.IGNORECASE)
+        return match and match.group(1).lower() == "true"
+    except:
+        return False
