@@ -1,5 +1,6 @@
 import { ChatPayload } from '@/features/chat/chatTypes';
 import { showErrorToast } from '@/shared/toast';
+import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
 
 let socket: WebSocket | null = null;
 let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -16,7 +17,8 @@ const startHeartbeat = () => {
   stopHeartbeat();
   heartbeatInterval = setInterval(() => {
     if (socket?.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify({ type: 'ping' }));
+      const ping = { type: 'ping' };
+      socket.send(JSON.stringify(ping));
     }
   }, 10000);
 };
@@ -56,6 +58,17 @@ export const connectSocket = (): Promise<WebSocket> => {
     }
 
     if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+      if (socket.readyState === WebSocket.OPEN) {
+        flushPendingMessages();
+      } else if (socket.readyState === WebSocket.CONNECTING) {
+        socket.onopen = () => {
+          console.log('[Socket] 🔄 CONNECTING 상태 후 연결됨');
+          reconnectAttempts = 0;
+          startHeartbeat();
+          flushPendingMessages();
+          resolve(socket!);
+        };
+      }
       return resolve(socket);
     }
 
@@ -77,7 +90,7 @@ export const connectSocket = (): Promise<WebSocket> => {
     socket.onerror = (err) => {
       console.error('[Socket] ❌ 에러 발생', err);
       stopHeartbeat();
-      reject(err); // ❗ 여기서 tryReconnect() 호출 X
+      reject(err);
     };
 
     socket.onclose = () => {
@@ -87,19 +100,30 @@ export const connectSocket = (): Promise<WebSocket> => {
   });
 };
 
-const flushPendingMessages = () => {
+export const flushPendingMessages = () => {
   console.log(`[Socket] 📤 대기 중 메시지 ${pendingMessages.length}개 전송`);
   while (pendingMessages.length > 0) {
     const msg = pendingMessages.shift();
-    socket?.send(JSON.stringify(msg));
+    if (msg) {
+      console.log('[Socket] 📤 전송 중:', msg);
+      sendMessage(msg);
+    }
   }
 };
 
 export const sendMessage = (data: ChatPayload) => {
+  const json = JSON.stringify(data);
+
+  useWebSocketLogger.getState().addLog({
+    type: 'sent',
+    message: `전송: ${json}`,
+  });
+
   if (socket?.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify(data));
+    socket.send(json);
   } else {
     console.warn('[Socket] 연결 안 됨. 메시지를 큐에 저장합니다.');
+    console.log('[Socket] ⏳ 대기열에 추가된 메시지:', data);
     pendingMessages.push(data);
   }
 };

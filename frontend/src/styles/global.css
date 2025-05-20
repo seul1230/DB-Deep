@@ -13,6 +13,7 @@
   --background-color: white;
   --text-color: black;
   --modal-overlay-bg: rgba(0, 0, 0, 0.4);
+  --console-font: 'Fira Code', monospace;
 }
 
 body {
@@ -85,7 +86,7 @@ body.dark {
 
 /* ✅ 기본 스크롤바 스타일 모든 요소에 적용 */
 * {
-  scrollbar-width: thin;
+  scrollbar-width: auto;
   scrollbar-color: var(--icon-blue) var(--background-color);
 }
 

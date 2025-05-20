@@ -1,45 +1,52 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 import styles from './TypewriterText.module.css';
 import ReactMarkdown from 'react-markdown';
+import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 
 interface Props {
   chatId: string;
 }
 
 export const TypewriterText = ({ chatId }: Props) => {
-  const { insightQueue } = useChatMessageStore();
-  const [displayedText, setDisplayedText] = useState('');
+  const { insightText, messages } = useChatMessageStore();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const fullText = useMemo(() => insightText[chatId] || '', [insightText, chatId]);
+
+  const [typed, setTyped] = useState('');
   const [charIndex, setCharIndex] = useState(0);
-  const scrollAnchorRef = useRef<HTMLDivElement>(null);
 
-  // ✅ 전체 인사이트 문자열 생성 (빈 배열 방어 포함)
-  const fullText = useMemo(() => {
-    const lines = insightQueue[chatId];
-    return Array.isArray(lines) ? lines.join('') : '';
-  }, [insightQueue, chatId]);
+  const isLive = useMemo(() => {
+    const list = messages[chatId] || [];
+    const last = list[list.length - 1];
+    return last?.isLive;
+  }, [messages, chatId]);
 
-  // ✅ 한 글자씩 타자 효과
   useEffect(() => {
-    if (!fullText || charIndex >= fullText.length) return;
+    if (!isLive || charIndex >= fullText.length) return;
 
     const timeout = setTimeout(() => {
-      setDisplayedText((prev) => prev + fullText[charIndex]);
+      setTyped((prev) => prev + fullText[charIndex]);
       setCharIndex((prev) => prev + 1);
-    }, 25);
+    }, 20);
 
     return () => clearTimeout(timeout);
-  }, [charIndex, fullText]);
+  }, [charIndex, fullText, isLive]);
 
-  // ✅ 자동 스크롤
   useEffect(() => {
-    scrollAnchorRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [displayedText]);
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [typed]);
+
+  // ✅ 메시지 새로 시작될 때 초기화
+  useEffect(() => {
+    setTyped('');
+    setCharIndex(0);
+  }, [chatId]);
 
   return (
     <div className={styles['typewriterText-wrapper']}>
-      <ReactMarkdown>{displayedText}</ReactMarkdown>
-      <div ref={scrollAnchorRef} />
+      <ReactMarkdown>{typed}</ReactMarkdown>
+      <div ref={scrollRef} style={{ height: 1 }} />
     </div>
   );
 };

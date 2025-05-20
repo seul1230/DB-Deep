@@ -7,10 +7,11 @@ import { InlineQuery } from "@/shared/ui/Chat/InlineQuery/InlineQuery";
 import { InlineChart } from "@/shared/ui/Chat/InlineChart/InlineChart";
 import { InlineTable } from "@/shared/ui/Chat/InlineTable/InlineTable";
 import { ChatMarkdownRenderers } from "@/shared/ui/Chat/ChatBubbleDBDeep/markdownRenderers";
+import { CustomChartData } from "@/types/chart";
 
 interface Props {
   message: ChatStreamMessage;
-  onChartClick?: (chartId: string) => void;
+  onChartClick?: (chartData: CustomChartData) => void;
 }
 
 const ArchivedChatBubble: React.FC<Props> = ({ message, onChartClick = () => {} }) => {

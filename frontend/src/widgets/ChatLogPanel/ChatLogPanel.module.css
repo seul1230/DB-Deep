@@ -40,7 +40,13 @@
     padding: 12px 8px;
     display: flex;
     flex-direction: column;
-    gap: 4px; /* 블럭 간 미세 여백 */
+    gap: 4px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .ChatLogPanel-list::-webkit-scrollbar {
+    display: none;
   }
   
   .ChatLogPanel-item {

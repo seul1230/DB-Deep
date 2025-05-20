@@ -13,13 +13,14 @@ import { ChatBubbleMenuOverlay } from '@/entities/chat/ChatBubbleMenuOverlay/Cha
 import { showErrorToast, showSuccessToast } from '@/shared/toast';
 import { archiveChatMessage } from '@/features/archive/archiveApi';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
+import { CustomChartData } from '@/types/chart';
 
 interface Props {
   parts: ChatPart[];
   isLive: boolean;
   uuid: string;
   messageId: string;
-  onChartClick: (chartId: string) => void;
+  onChartClick: (chartData: CustomChartData) => void;
   showMenu?: boolean;
 }
 
@@ -33,6 +34,7 @@ export const ChatBubbleDBDeep = ({
 }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const { getRealChatId } = useChatMessageStore();
 
   useEffect(() => {
@@ -45,6 +47,12 @@ export const ChatBubbleDBDeep = ({
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  useEffect(() => {
+    if (isLive && scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [parts, isLive]);
+
   const textParts = parts.filter((p) => p.type === 'text');
   const sql = parts.find((p) => p.type === 'sql')?.content;
   const chart = parts.find((p) => p.type === 'chart')?.content;
@@ -52,10 +60,9 @@ export const ChatBubbleDBDeep = ({
   const status = parts.find((p) => p.type === 'status')?.content;
 
   return (
-    <div className={styles['chatBubbleDBDeep-wrapper']}>
+    <div className={styles['chatBubbleDBDeep-wrapper']} ref={scrollRef}>
       <div className={styles['chatBubbleDBDeep-bubbleWithMenu']}>
         <div className={styles['chatBubbleDBDeep-bubble']}>
-
           {sql && (
             <div className={styles['chatBubbleDBDeep-section']}>
               <InlineQuery sql={sql} />
@@ -69,9 +76,10 @@ export const ChatBubbleDBDeep = ({
           )}
 
           {chart && (
-            <div className={styles['chatBubbleDBDeep-section']}>
-              <InlineChart chartJson={JSON.stringify(chart)} />
-            </div>
+            <InlineChart
+              chartJson={JSON.stringify(chart)}
+              onClick={(chartData) => onChartClick(chartData)}
+            />
           )}
 
           {status && (
@@ -81,20 +89,34 @@ export const ChatBubbleDBDeep = ({
             </div>
           )}
 
-          {textParts.length > 0 && (
+          {isLive ? (
             <div className={styles['chatBubbleDBDeep-section']}>
-              {isLive ? (
-                <TypewriterText chatId={uuid} />
-              ) : (
+              <TypewriterText chatId={uuid} />
+            </div>
+          ) : (
+            textParts.map((part, idx) => (
+              <div className={styles['chatBubbleDBDeep-section']} key={idx}>
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={ChatMarkdownRenderers(onChartClick)}
                 >
-                  {textParts.map(p => p.content).join('\n')}
+                  {part.content}
                 </ReactMarkdown>
-              )}
-            </div>
+              </div>
+            ))
           )}
+
+          {parts.map((part, idx) => {
+            if (part.type === 'hr') {
+              return (
+                <hr
+                  key={idx}
+                  className={styles['chatBubbleDBDeep-bubble-hr']}
+                />
+              );
+            }
+            return null;
+          })}
         </div>
 
         {showMenu && (
@@ -102,7 +124,7 @@ export const ChatBubbleDBDeep = ({
             <div className={styles['chatBubbleDBDeep-menuButtonWrapper']}>
               <button
                 className={styles['chatBubbleDBDeep-menuButton']}
-                onClick={() => setMenuOpen(prev => !prev)}
+                onClick={() => setMenuOpen((prev) => !prev)}
               >
                 <FiMoreVertical size={18} />
               </button>
@@ -110,12 +132,13 @@ export const ChatBubbleDBDeep = ({
                 <div className={styles['chatBubbleDBDeep-menuOverlayContainer']}>
                   <ChatBubbleMenuOverlay
                     onCopy={() => {
-                      navigator.clipboard.writeText(textParts.map(p => p.content).join('\n'));
+                      navigator.clipboard.writeText(
+                        textParts.map((p) => p.content).join('\n')
+                      );
                       showSuccessToast('채팅이 복사되었습니다.');
                     }}
                     onArchive={async () => {
                       const realChatId = getRealChatId(uuid);
-
                       const archiveIdToUse = realChatId || messageId;
 
                       if (!archiveIdToUse) {

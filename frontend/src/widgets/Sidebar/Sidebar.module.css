@@ -10,7 +10,7 @@
   justify-content: space-between;
   align-items: center;
   border-right: 1px solid var(--light-gray);
-  z-index: 10;
+  z-index: 0;
 }
 
 .Sidebar-top {
@@ -88,7 +88,6 @@
   border-radius: 34px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  padding: 2px;
   display: flex;
   align-items: center;
 }
@@ -103,6 +102,7 @@
   justify-content: center;
   transition: transform 0.3s ease;
   position: relative;
+  transform: translateX(4px);
 }
 
 .Sidebar-toggleInput:checked + .Sidebar-toggleSlider .Sidebar-toggleKnob {

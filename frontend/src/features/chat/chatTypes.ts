@@ -38,7 +38,8 @@ export type ChatPart =
   | { type: 'sql'; content: string }
   | { type: 'status'; content: string }
   | { type: 'chart'; content: ChartData }
-  | { type: 'data'; content: Record<string, string | number>[] };
+  | { type: 'data'; content: Record<string, string | number>[] }
+  | { type: 'hr'; content?: null };;
 
 export interface ChatStreamMessage {
   id: string;
@@ -46,6 +47,7 @@ export interface ChatStreamMessage {
   parts: ChatPart[];
   senderType: 'ai' | 'user';
   isLive: boolean;
+  type?: string;
 }
 
 // ==============================

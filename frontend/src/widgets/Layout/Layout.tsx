@@ -2,38 +2,57 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "@/widgets/Sidebar/Sidebar";
 import { usePanelStore } from "@/shared/store/usePanelStore";
+import { useWebSocketConsoleStore } from "@/features/chat/useWebSocketConsoleStore";
 import NotificationPanel from "../NotificationPanel/NotificationPanel";
 import ChatLogPanel from "../ChatLogPanel/ChatLogPanel";
 import ProjectPanel from "../ProjectPanel/ProjectPanel";
 import Header from "@/shared/ui/Header/Header";
+import WebSocketConsole from "@/widgets/WebSocketConsole/WebSocketConsole";
 
 const SIDEBAR_WIDTH = 68;
 const PANEL_WIDTH = 240;
+const CONSOLE_WIDTH = 260;
 
 const Layout: React.FC = () => {
   const { openPanel } = usePanelStore();
+  const { isOpen: isConsoleOpen } = useWebSocketConsoleStore();
 
   const isNotificationOpen = openPanel === "notification";
   const isChatLogOpen = openPanel === "chatLog";
   const isProjectOpen = openPanel === "project";
   const isAnyPanelOpen = isNotificationOpen || isChatLogOpen || isProjectOpen;
 
+  const leftWidth = isAnyPanelOpen ? SIDEBAR_WIDTH + PANEL_WIDTH : SIDEBAR_WIDTH;
+  const rightOffset = isConsoleOpen ? CONSOLE_WIDTH : 0;
+
   return (
-    <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
-      {/* 왼쪽 영역 (Sidebar + 패널) */}
-      <div style={{
+    <div
+      style={{
         display: 'flex',
-        flexShrink: 0,
-        flexDirection: 'row',
-        width: isAnyPanelOpen ? SIDEBAR_WIDTH + PANEL_WIDTH : SIDEBAR_WIDTH,
-        transition: 'width 0.3s ease',
-      }}>
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        boxSizing: 'border-box'
+      }}
+    >
+      {/* 왼쪽 영역 (Sidebar + 패널) */}
+      <div
+        style={{
+          display: 'flex',
+          flexShrink: 0,
+          flexDirection: 'row',
+          width: leftWidth,
+          transition: 'width 0.3s ease',
+          boxSizing: 'border-box'
+        }}
+      >
         {/* Sidebar */}
         <div
           style={{
             width: SIDEBAR_WIDTH,
             flexShrink: 0,
             position: 'relative',
+            boxSizing: 'border-box'
           }}
         >
           <Sidebar />
@@ -51,6 +70,7 @@ const Layout: React.FC = () => {
               flexDirection: 'column',
               height: '100vh',
               transition: 'all 0.3s ease',
+              boxSizing: 'border-box'
             }}
           >
             <NotificationPanel isOpen />
@@ -66,6 +86,7 @@ const Layout: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               height: '100vh',
+              boxSizing: 'border-box'
             }}
           >
             <ChatLogPanel />
@@ -81,6 +102,7 @@ const Layout: React.FC = () => {
               display: 'flex',
               flexDirection: 'column',
               height: '100vh',
+              boxSizing: 'border-box'
             }}
           >
             <ProjectPanel />
@@ -95,13 +117,21 @@ const Layout: React.FC = () => {
           display: 'flex',
           flexDirection: 'column',
           minWidth: 0,
+          boxSizing: 'border-box',
+          overflowX: 'hidden',
+          transition: 'padding-right 0.3s ease',
+          paddingRight: `${rightOffset}px`
         }}
       >
+      
         <Header />
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          <Outlet />
-        </div>
+          <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+              <Outlet />
+          </div>
       </div>
+     
+      {/* ✅ WebSocket 콘솔 */}
+      <WebSocketConsole />
     </div>
   );
 };
