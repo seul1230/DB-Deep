@@ -18,6 +18,9 @@ import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
 );
+const GlossaryModal = React.lazy(() =>
+  import('@/entities/chat/GlossaryModal/GlossaryModal')
+);
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
@@ -29,6 +32,7 @@ const ChatDetailPage = () => {
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
   const [showChartOverlay, setShowChartOverlay] = useState(false);
   const [overlayChartData, setOverlayChartData] = useState<CustomChartData | null>(null);
+  const [showGlossary, setShowGlossary] = useState(false);
 
   const chatMessages = useMemo(() => {
     return chatId ? messages[chatId] || [] : [];
@@ -114,14 +118,23 @@ const ChatDetailPage = () => {
         <div className={styles['chatDetailPage-inputWrapper']} style={layoutStyle}>
           <div className={styles['chatDetailPage-inputContainer']}>
             <div className={styles['chatDetailPage-inputArea']}>
-              <QuestionInput value={value} onChange={onChange} onSubmit={onSubmit} />
-              <Button
-                label="지금까지의 채팅 공유"
-                onClick={() => setShowModal(true)}
-                borderColor="var(--icon-blue)"
-                backgroundColor="var(--icon-blue)"
-                textColor="var(--background-color)"
-              />
+              <QuestionInput value={value} onChange={onChange} onSubmit={onSubmit} /> 
+              <div className={styles['chatDetailPage-buttonGroup']}>
+                <Button
+                  label="용어 사전"
+                  onClick={() => setShowGlossary(true)}
+                  borderColor="var(--icon-blue)"
+                  backgroundColor="var(--icon-blue)"
+                  textColor="var(--background-color)"
+                />
+                <Button
+                  label="지금까지의 채팅 공유"
+                  onClick={() => setShowModal(true)}
+                  borderColor="var(--icon-blue)"
+                  backgroundColor="var(--icon-blue)"
+                  textColor="var(--background-color)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -137,6 +150,8 @@ const ChatDetailPage = () => {
             }}
           />
         )}
+
+        {showGlossary && <GlossaryModal onClose={() => setShowGlossary(false)} />}
       </Suspense>
 
       {showChartOverlay && overlayChartData && (

@@ -79,3 +79,9 @@
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
+
+.chatDetailPage-buttonGroup {
+  display: flex;
+  gap: 0.75rem;
+  margin-left: auto;
+}
