@@ -23,9 +23,12 @@ const GlossaryModal = React.lazy(() =>
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
-  const { messages, setMessages } = useChatMessageStore();
+  const {
+    messages,
+    startUserMessage,
+    startLiveMessage,
+  } = useChatMessageStore();
   const { profile } = useAuth();
-  const { startUserMessage, startLiveMessage } = useChatMessageStore();
 
   const [showModal, setShowModal] = useState(false);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
@@ -33,12 +36,12 @@ const ChatDetailPage = () => {
   const [overlayChartData, setOverlayChartData] = useState<CustomChartData | null>(null);
   const [showGlossary, setShowGlossary] = useState(false);
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollBottomRef = useRef<HTMLDivElement>(null);
+
   const chatMessages = useMemo(() => {
     return chatId ? messages[chatId] || [] : [];
   }, [chatId, messages]);
-
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const scrollBottomRef = useRef<HTMLDivElement>(null);
 
   const { value, onChange, onSubmit } = useQuestionInput(async (text) => {
     if (!chatId) return;
@@ -56,13 +59,17 @@ const ChatDetailPage = () => {
   });
 
   useEffect(() => {
-    if (!chatId || messages[chatId]?.length > 0) return;
+    if (!chatId) return;
+
+    const alreadyFetched = useChatMessageStore.getState().messages[chatId]?.length > 0;
+    if (alreadyFetched) return;
+
     fetchChatDetail(chatId).then((res) => {
       const converted = res.messages.map(convertToStreamMessage);
-      setMessages(chatId, converted);
+      useChatMessageStore.getState().setMessages(chatId, converted);
       setShouldScrollToBottom(true);
     });
-  }, [chatId, messages, setMessages]);
+  }, [chatId]);
 
   useEffect(() => {
     if (shouldScrollToBottom && scrollBottomRef.current) {

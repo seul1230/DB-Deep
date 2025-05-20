@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import styles from './GlossaryModal.module.css';
 import { glossaryApi } from '@/features/chat/glossaryApi';
 import { FaPencilAlt, FaTrash, FaCheck, FaPlus, FaTimes } from 'react-icons/fa';
+import { createPortal } from "react-dom";
 
 type GlossaryItem = {
   id: string;
@@ -75,7 +76,7 @@ const GlossaryModal = ({ onClose }: { onClose: () => void }) => {
     }
   };
 
-  return (
+  return createPortal(
     <div className={styles['glossaryModal-overlay']} onClick={onClose}>
       <div
         className={styles['glossaryModal-content']}
@@ -157,6 +158,7 @@ const GlossaryModal = ({ onClose }: { onClose: () => void }) => {
         </div>
       </div>
     </div>
+    , document.body
   );
 };
 

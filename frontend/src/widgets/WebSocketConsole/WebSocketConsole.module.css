@@ -18,7 +18,7 @@
   overflow: hidden;
   transform: translateX(100%);
   transition: transform 0.3s ease;
-  z-index: 90;
+  z-index: 400;
   padding-bottom: 100px;
   box-shadow: -2px 0 6px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
@@ -41,7 +41,7 @@
   font-weight: bold;
   border-radius: 4px 0 0 4px;
   cursor: pointer;
-  z-index: 100;
+  z-index: 900;
   transition: right 0.3s ease;
 }
 

@@ -8,6 +8,7 @@ import TeamMemberList from "../TeamMemberList/TeamMemberList";
 import { shareChat } from "@/features/chat/chatApi";
 import { useParams } from "react-router-dom";
 import { showSuccessToast, showErrorToast } from "@/shared/toast";
+import { createPortal } from "react-dom";
 
 interface Props {
   onClose: () => void;
@@ -47,7 +48,7 @@ const TeamMemberSelectModal: React.FC<Props> = ({ onClose }) => {
   
   const isSharing = status === 'pending';  
 
-  return (
+  return createPortal(
     <div className={styles["TeamMemberSelectModal-overlay"]} onClick={onClose}>
       <div className={styles["TeamMemberSelectModal-container"]} onClick={(e) => e.stopPropagation()}>
         <div className={styles["TeamMemberSelectModal-header"]}>
@@ -116,6 +117,7 @@ const TeamMemberSelectModal: React.FC<Props> = ({ onClose }) => {
         </div>
       </div>
     </div>
+    , document.body
   );
 };
 

@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./DeleteConfirmModal.module.css";
+import { createPortal } from "react-dom";
 
 interface DeleteConfirmModalProps {
   title?: string;
@@ -18,7 +19,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   confirmText = "삭제",
   cancelText = "취소",
 }) => {
-  return (
+  return createPortal(
     <div className={styles.overlay}>
       <div className={styles.modal}>
         <h2 className={styles.title}>{title}</h2>
@@ -33,6 +34,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         </div>
       </div>
     </div>
+    , document.body
   );
 };
 
