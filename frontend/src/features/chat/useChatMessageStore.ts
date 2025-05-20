@@ -9,9 +9,8 @@ interface State {
   startLiveMessage: (chatId: string) => void;
   appendToLast: (chatId: string, part: ChatPart) => void;
   finalizeLast: (chatId: string) => void;
-  insightQueue: Record<string, string[]>;
-  setInsightQueue: (chatId: string, updater: (prev?: string[]) => string[]) => void;
-  appendInsightLine: (chatId: string, line: string) => void;
+  insightText: Record<string, string>;
+  setInsightText: (chatId: string, updater: (prev?: string) => string) => void;
   chatIdMap: Record<string, string>;
   setRealChatId: (uuid: string, realId: string) => void;
   getRealChatId: (uuid: string) => string | undefined;
@@ -68,7 +67,6 @@ export const useChatMessageStore = create<State>((set, get) => ({
 
     let updatedParts = [...last.parts];
 
-    // ✅ status 제거 조건 추가
     if (['sql', 'data', 'chart'].includes(part.type)) {
       updatedParts = updatedParts.filter((p) => p.type !== 'status');
       updatedParts = updatedParts.filter((p) => p.type !== part.type);
@@ -90,39 +88,31 @@ export const useChatMessageStore = create<State>((set, get) => ({
     const last = { ...msgs[msgs.length - 1], isLive: false };
     set({
       messages: { ...get().messages, [chatId]: [...msgs.slice(0, -1), last] },
-      insightQueue: { ...get().insightQueue, [chatId]: [] }, // ✅ 여기서 비워줌
+      insightText: { ...get().insightText, [chatId]: '' },
     });
   },
 
-  insightQueue: {},
-  setInsightQueue: (chatId, updater) =>
+  insightText: {},
+  setInsightText: (chatId, updater) =>
     set((state) => ({
-      insightQueue: {
-        ...state.insightQueue,
-        [chatId]: updater(state.insightQueue[chatId]),
+      insightText: {
+        ...state.insightText,
+        [chatId]: updater(state.insightText[chatId]),
       },
     })),
-
-  appendInsightLine: (chatId, line) => {
-    const prev = get().insightQueue[chatId] || [];
-    set({ insightQueue: { ...get().insightQueue, [chatId]: [...prev, line] } });
-  },
 
   chatIdMap: {},
   setRealChatId: (uuid, realId) =>
     set((s) => ({ chatIdMap: { ...s.chatIdMap, [uuid]: realId } })),
 
   getRealChatId: (uuid) => get().chatIdMap[uuid],
+
   setIsLive: (chatId, isLive) => {
     const msgs = get().messages[chatId] || [];
     if (!msgs.length) return;
-
     const updated = { ...msgs[msgs.length - 1], isLive };
     set({
-      messages: {
-        ...get().messages,
-        [chatId]: [...msgs.slice(0, -1), updated],
-      },
+      messages: { ...get().messages, [chatId]: [...msgs.slice(0, -1), updated] },
     });
   },
 }));

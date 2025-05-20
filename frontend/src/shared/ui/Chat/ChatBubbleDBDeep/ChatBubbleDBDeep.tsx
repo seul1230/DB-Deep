@@ -13,7 +13,7 @@ import { ChatBubbleMenuOverlay } from '@/entities/chat/ChatBubbleMenuOverlay/Cha
 import { showErrorToast, showSuccessToast } from '@/shared/toast';
 import { archiveChatMessage } from '@/features/archive/archiveApi';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
-import { CustomChartData} from '@/types/chart';
+import { CustomChartData } from '@/types/chart';
 
 interface Props {
   parts: ChatPart[];
@@ -63,7 +63,6 @@ export const ChatBubbleDBDeep = ({
     <div className={styles['chatBubbleDBDeep-wrapper']} ref={scrollRef}>
       <div className={styles['chatBubbleDBDeep-bubbleWithMenu']}>
         <div className={styles['chatBubbleDBDeep-bubble']}>
-
           {sql && (
             <div className={styles['chatBubbleDBDeep-section']}>
               <InlineQuery sql={sql} />
@@ -79,7 +78,7 @@ export const ChatBubbleDBDeep = ({
           {chart && (
             <InlineChart
               chartJson={JSON.stringify(chart)}
-              onClick={chartData => onChartClick(chartData)}
+              onClick={(chartData) => onChartClick(chartData)}
             />
           )}
 
@@ -90,30 +89,34 @@ export const ChatBubbleDBDeep = ({
             </div>
           )}
 
-          {parts.map((part, idx) => {
-          if (part.type === 'text') {
-            return (
+          {isLive ? (
+            <div className={styles['chatBubbleDBDeep-section']}>
+              <TypewriterText chatId={uuid} />
+            </div>
+          ) : (
+            textParts.map((part, idx) => (
               <div className={styles['chatBubbleDBDeep-section']} key={idx}>
-                {isLive ? (
-                  <TypewriterText chatId={uuid} />
-                ) : (
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={ChatMarkdownRenderers(onChartClick)}
-                  >
-                    {part.content}
-                  </ReactMarkdown>
-                )}
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={ChatMarkdownRenderers(onChartClick)}
+                >
+                  {part.content}
+                </ReactMarkdown>
               </div>
-            );
-          }
+            ))
+          )}
 
-          if (part.type === 'hr') {
-            return <hr key={idx} className={styles['chatBubbleDBDeep-bubble-hr']} />;
-          }
-
-          return null;
-        })}
+          {parts.map((part, idx) => {
+            if (part.type === 'hr') {
+              return (
+                <hr
+                  key={idx}
+                  className={styles['chatBubbleDBDeep-bubble-hr']}
+                />
+              );
+            }
+            return null;
+          })}
         </div>
 
         {showMenu && (
@@ -121,7 +124,7 @@ export const ChatBubbleDBDeep = ({
             <div className={styles['chatBubbleDBDeep-menuButtonWrapper']}>
               <button
                 className={styles['chatBubbleDBDeep-menuButton']}
-                onClick={() => setMenuOpen(prev => !prev)}
+                onClick={() => setMenuOpen((prev) => !prev)}
               >
                 <FiMoreVertical size={18} />
               </button>
@@ -129,12 +132,13 @@ export const ChatBubbleDBDeep = ({
                 <div className={styles['chatBubbleDBDeep-menuOverlayContainer']}>
                   <ChatBubbleMenuOverlay
                     onCopy={() => {
-                      navigator.clipboard.writeText(textParts.map(p => p.content).join('\n'));
+                      navigator.clipboard.writeText(
+                        textParts.map((p) => p.content).join('\n')
+                      );
                       showSuccessToast('채팅이 복사되었습니다.');
                     }}
                     onArchive={async () => {
                       const realChatId = getRealChatId(uuid);
-
                       const archiveIdToUse = realChatId || messageId;
 
                       if (!archiveIdToUse) {

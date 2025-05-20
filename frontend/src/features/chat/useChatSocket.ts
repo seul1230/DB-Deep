@@ -15,10 +15,9 @@ export const useChatSocket = (chatId?: string) => {
     startNewMessage,
     appendToLast,
     finalizeLast,
-    setInsightQueue,
-    appendInsightLine,
+    setInsightText, // ✅ 새로 추가
     setRealChatId,
-    setIsLive
+    setIsLive,
   } = useChatMessageStore();
 
   const queryClient = useQueryClient();
@@ -65,9 +64,11 @@ export const useChatSocket = (chatId?: string) => {
             const cache = queryClient.getQueryData<{ chatRooms: ChatRoom[] }>(['chatRooms']);
             const chatRoom = cache?.chatRooms?.find((room) => room.id === chatId);
             if (chatRoom?.title === '새 채팅방') {
-              updateChatTitle(chatId, payload).then(() => {
-                queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
-              }).catch(console.error);
+              updateChatTitle(chatId, payload)
+                .then(() => {
+                  queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
+                })
+                .catch(console.error);
             }
             return;
           }
@@ -84,7 +85,7 @@ export const useChatSocket = (chatId?: string) => {
             } else if (payload === '차트 생성 중...') {
               appendToLast(chatId, { type: 'status', content: '차트 생성 중...' });
             } else if (payload === '인사이트 생성 중') {
-              setInsightQueue(chatId, () => []);
+              setInsightText(chatId, () => '');
               appendToLast(chatId, { type: 'status', content: '' });
             } else if (payload === '인사이트 생성 완료') {
               finalizeLast(chatId);
@@ -107,24 +108,20 @@ export const useChatSocket = (chatId?: string) => {
             appendToLast(chatId, { type: 'chart', content: payload });
             return;
 
-          case 'data_summary':
           case 'insight_stream':
-            setInsightQueue(chatId, (prev = []) => [...prev, payload]);
-            appendToLast(chatId, {
-              type: 'text',
-              content: '',
-            });
+          case 'data_summary': {
+            setInsightText(chatId, (prev = '') => prev + payload); // ✅ 누적
+            appendToLast(chatId, { type: 'text', content: payload }); // ✅ 렌더링용
             setIsLive(chatId, true);
             return;
+          }
 
-          case 'follow_up_stream':
-            setInsightQueue(chatId, (prev = []) => [...prev, payload]);
-            appendToLast(chatId, {
-              type: 'text',
-              content: '',
-            });
+          case 'follow_up_stream': {
+            setInsightText(chatId, (prev = '') => prev + payload);
+            appendToLast(chatId, { type: 'text', content: payload });
             setIsLive(chatId, false);
             return;
+          }
 
           default:
             console.warn('❓ 알 수 없는 type:', type);
@@ -143,11 +140,10 @@ export const useChatSocket = (chatId?: string) => {
     startNewMessage,
     appendToLast,
     finalizeLast,
-    setInsightQueue,
-    appendInsightLine,
+    setInsightText,
     setRealChatId,
     queryClient,
     addLog,
-    setIsLive
+    setIsLive,
   ]);
 };

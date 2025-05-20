@@ -1,7 +1,9 @@
 .typewriterText-wrapper {
-  white-space: pre-wrap;
+  white-space: pre-wrap;        /* 줄바꿈 문자(\n)는 유지하되, 나머지는 자동 줄바꿈 */
   font-size: 11px;
   line-height: 1.6;
-  word-break: break-word;
+  word-break: break-word;       /* 긴 단어 잘림 방지 */
   max-width: 100%;
+  overflow-wrap: break-word;    /* 단어 단위 줄바꿈 보완 */
+  word-wrap: break-word;        /* 오래된 브라우저 대응 */
 }
