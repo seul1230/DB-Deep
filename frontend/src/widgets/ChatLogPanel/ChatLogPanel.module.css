@@ -70,6 +70,11 @@
     background-color: var(--sidebar-bg);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
+
+  .ChatLogPanel-item--active {
+    background-color: var(--primary-light-blue);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
   
   
   .ChatLogPanel-content {
