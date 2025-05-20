@@ -7,8 +7,7 @@ import styles from './ChatDetailPage.module.css';
 import { fetchChatDetail } from '@/features/chat/chatApi';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 import { useQuestionInput } from '@/features/chat/useQuestionInput';
-import { useChatSocket } from '@/features/chat/useChatSocket';
-import { sendMessage } from '@/shared/api/socketManager';
+import { sendMessageSafely } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
 import { useAuth } from '@/features/auth/useAuth';
 import ChartOverlay from '@/entities/chat/ChartOverlay/ChartOverlay';
@@ -41,22 +40,20 @@ const ChatDetailPage = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollBottomRef = useRef<HTMLDivElement>(null);
 
-  const { value, onChange, onSubmit } = useQuestionInput((text) => {
+  const { value, onChange, onSubmit } = useQuestionInput(async (text) => {
     if (!chatId) return;
 
     startUserMessage(chatId, text);
     startLiveMessage(chatId);
 
-    sendMessage({
-      uuid: chatId,
+    await sendMessageSafely({
+      chatId,
+      department: profile?.teamName ?? '알 수 없음',
       question: text,
-      user_department: profile?.teamName ?? '알 수 없음',
     });
 
     setShouldScrollToBottom(true);
   });
-
-  useChatSocket(chatId);
 
   useEffect(() => {
     if (!chatId || messages[chatId]?.length > 0) return;
@@ -76,7 +73,7 @@ const ChatDetailPage = () => {
 
   useEffect(() => {
     if (showChartOverlay) {
-      useWebSocketLogger.getState().setConnected(false); // WebSocketConsole 닫기용
+      useWebSocketLogger.getState().setConnected(false);
     }
   }, [showChartOverlay]);
 
@@ -91,11 +88,7 @@ const ChatDetailPage = () => {
       <div
         className={styles['chatDetailPage-scrollContainer']}
         ref={scrollContainerRef}
-        style={{
-          transition: 'margin 0.3s ease',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-        }}
+        style={{ transition: 'margin 0.3s ease', overflowY: 'auto', overflowX: 'hidden' }}
       >
         <div className={styles['chatDetailPage-contentWrapper']}>
           {chatId && (
@@ -118,7 +111,7 @@ const ChatDetailPage = () => {
         <div className={styles['chatDetailPage-inputWrapper']} style={layoutStyle}>
           <div className={styles['chatDetailPage-inputContainer']}>
             <div className={styles['chatDetailPage-inputArea']}>
-              <QuestionInput value={value} onChange={onChange} onSubmit={onSubmit} /> 
+              <QuestionInput value={value} onChange={onChange} onSubmit={() => onSubmit(chatId!)} />
               <div className={styles['chatDetailPage-buttonGroup']}>
                 <Button
                   label="용어 사전"
@@ -155,10 +148,7 @@ const ChatDetailPage = () => {
       </Suspense>
 
       {showChartOverlay && overlayChartData && (
-        <ChartOverlay
-          onClose={() => setShowChartOverlay(false)}
-          chartData={overlayChartData}
-        />
+        <ChartOverlay onClose={() => setShowChartOverlay(false)} chartData={overlayChartData} />
       )}
     </div>
   );

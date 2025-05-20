@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
+import { useLocation, useMatch } from 'react-router-dom'; 
 import {
   connectSocket,
   getSocket,
   tryReconnect,
-  flushPendingMessages,
 } from '@/shared/api/socketManager';
 import { useChatMessageStore } from './useChatMessageStore';
 import { useQueryClient } from '@tanstack/react-query';
@@ -11,20 +11,24 @@ import { updateChatTitle, ChatRoom } from '@/features/chat/chatApi';
 import { useWebSocketLogger } from './useWebSocketLogger';
 
 export const useChatSocket = (chatId?: string) => {
+  const location = useLocation(); // ✅ 현재 페이지 경로 확인
+
   const {
     startNewMessage,
     appendToLast,
     finalizeLast,
-    setInsightText, // ✅ 새로 추가
+    setInsightText,
     setRealChatId,
     setIsLive,
   } = useChatMessageStore();
 
   const queryClient = useQueryClient();
   const { addLog } = useWebSocketLogger();
-
+  const match = useMatch("/chat/:chatId");
+  
   useEffect(() => {
-    if (!chatId) return;
+    // ✅ 1. chatId 없거나 현재 페이지가 /chat/{id}가 아니면 연결하지 않음
+    if (!match || !chatId) return;
 
     connectSocket().then(() => {
       const socket = getSocket();
@@ -33,7 +37,6 @@ export const useChatSocket = (chatId?: string) => {
       socket.onopen = () => {
         console.log('✅ WebSocket 연결 성공');
         startNewMessage(chatId);
-        flushPendingMessages();
       };
 
       socket.onmessage = (event) => {
@@ -41,13 +44,6 @@ export const useChatSocket = (chatId?: string) => {
         if (!raw) return;
 
         addLog({ type: 'data', message: `수신: ${raw}` });
-
-        if (typeof raw === 'string' && raw.includes('서버 처리 중 오류')) {
-          appendToLast(chatId, { type: 'status', content: '' });
-          appendToLast(chatId, { type: 'status', content: `❌ ${raw}` });
-          finalizeLast(chatId);
-          return;
-        }
 
         let msg;
         try {
@@ -109,19 +105,17 @@ export const useChatSocket = (chatId?: string) => {
             return;
 
           case 'insight_stream':
-          case 'data_summary': {
-            setInsightText(chatId, (prev = '') => prev + payload); // ✅ 누적
-            appendToLast(chatId, { type: 'text', content: payload }); // ✅ 렌더링용
+          case 'data_summary':
+            setInsightText(chatId, (prev = '') => prev + payload);
+            appendToLast(chatId, { type: 'text', content: payload });
             setIsLive(chatId, true);
             return;
-          }
 
-          case 'follow_up_stream': {
+          case 'follow_up_stream':
             setInsightText(chatId, (prev = '') => prev + payload);
             appendToLast(chatId, { type: 'text', content: payload });
             setIsLive(chatId, false);
             return;
-          }
 
           default:
             console.warn('❓ 알 수 없는 type:', type);
@@ -137,6 +131,8 @@ export const useChatSocket = (chatId?: string) => {
     });
   }, [
     chatId,
+    match,
+    location.pathname,
     startNewMessage,
     appendToLast,
     finalizeLast,

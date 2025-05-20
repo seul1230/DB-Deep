@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { ChatStreamMessage, ChatPart } from './chatTypes';
+import { v4 as uuidv4 } from 'uuid';
 
 interface State {
   messages: Record<string, ChatStreamMessage[]>;
@@ -25,7 +26,7 @@ export const useChatMessageStore = create<State>((set, get) => ({
   startNewMessage: (chatId) => {
     const current = get().messages[chatId] || [];
     const newMsg: ChatStreamMessage = {
-      id: `${Date.now()}`,
+      id: uuidv4(),
       uuid: chatId,
       parts: [],
       senderType: 'ai',
@@ -37,7 +38,7 @@ export const useChatMessageStore = create<State>((set, get) => ({
   startUserMessage: (chatId, content) => {
     const current = get().messages[chatId] || [];
     const newMsg: ChatStreamMessage = {
-      id: `${Date.now()}-user`,
+      id: uuidv4(),
       uuid: chatId,
       parts: [{ type: 'text', content }],
       senderType: 'user',
@@ -49,7 +50,7 @@ export const useChatMessageStore = create<State>((set, get) => ({
   startLiveMessage: (chatId) => {
     const current = get().messages[chatId] || [];
     const newMsg: ChatStreamMessage = {
-      id: `${Date.now()}-live`,
+      id: uuidv4(),
       uuid: chatId,
       parts: [{ type: 'status', content: '응답 생성 중...' }],
       senderType: 'ai',

@@ -1,6 +1,4 @@
-import { ChatPayload } from '@/features/chat/chatTypes';
 import { showErrorToast } from '@/shared/toast';
-import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
 
 let socket: WebSocket | null = null;
 let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -9,7 +7,7 @@ let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 10;
 const WS_URL = 'wss://da.dbdeep.kr/ws/chat';
 
-const pendingMessages: ChatPayload[] = [];
+let hasConnectedWithId = false;
 
 export const getSocket = () => socket;
 
@@ -17,8 +15,7 @@ const startHeartbeat = () => {
   stopHeartbeat();
   heartbeatInterval = setInterval(() => {
     if (socket?.readyState === WebSocket.OPEN) {
-      const ping = { type: 'ping' };
-      socket.send(JSON.stringify(ping));
+      socket.send(JSON.stringify({ type: 'ping' }));
     }
   }, 10000);
 };
@@ -51,21 +48,26 @@ export const connectSocket = (): Promise<WebSocket> => {
   return new Promise((resolve, reject) => {
     const stored = localStorage.getItem('auth-storage');
     const token = stored ? JSON.parse(stored)?.state?.accessToken : null;
-
+    console.log('[Socket] Connecting to:', `${WS_URL}?token=${token}`);
+    console.log('[DEBUG] connectSocket 호출 스택:', new Error().stack); 
+    
     if (!token) {
       showErrorToast('인증 정보가 없습니다. 다시 로그인해주세요.');
       return reject('No token');
     }
 
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      console.log('[Socket] 이미 연결된 소켓 있음');
+      return resolve(socket);
+    }
+
     if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
       if (socket.readyState === WebSocket.OPEN) {
-        flushPendingMessages();
-      } else if (socket.readyState === WebSocket.CONNECTING) {
+        resolve(socket);
+      } else {
         socket.onopen = () => {
-          console.log('[Socket] 🔄 CONNECTING 상태 후 연결됨');
           reconnectAttempts = 0;
           startHeartbeat();
-          flushPendingMessages();
           resolve(socket!);
         };
       }
@@ -80,58 +82,80 @@ export const connectSocket = (): Promise<WebSocket> => {
     }
 
     socket.onopen = () => {
-      console.log('[Socket] ✅ 연결 성공');
       reconnectAttempts = 0;
       startHeartbeat();
-      flushPendingMessages();
       resolve(socket!);
     };
 
     socket.onerror = (err) => {
-      console.error('[Socket] ❌ 에러 발생', err);
       stopHeartbeat();
       reject(err);
     };
 
     socket.onclose = () => {
-      console.warn('[Socket] 🔌 연결 종료');
       stopHeartbeat();
     };
   });
 };
 
-export const flushPendingMessages = () => {
-  console.log(`[Socket] 📤 대기 중 메시지 ${pendingMessages.length}개 전송`);
-  while (pendingMessages.length > 0) {
-    const msg = pendingMessages.shift();
-    if (msg) {
-      console.log('[Socket] 📤 전송 중:', msg);
-      sendMessage(msg);
+export const sendInitialConnection = (uuid: string, department: string) => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    console.warn('🔌 소켓 연결 안됨');
+    return;
+  }
+  socket.send(JSON.stringify({ uuid, department }));
+  hasConnectedWithId = true;
+};
+
+export const sendMessage = (msg: { question: string }) => {
+  const socket = getSocket();
+  if (!socket || socket.readyState !== WebSocket.OPEN || !hasConnectedWithId) {
+    console.warn('🔌 소켓 연결 안됨 또는 초기 연결 미완료');
+    return;
+  }
+  socket.send(JSON.stringify({ question: msg.question }));
+};
+
+export const sendMessageSafely = async ({
+  chatId,
+  department,
+  question,
+}: {
+  chatId: string;
+  department: string;
+  question: string;
+}) => {
+  const socket = getSocket();
+
+  if (!socket || socket.readyState !== WebSocket.OPEN) {
+    await connectSocket();
+    resetInitialConnectionState();
+    sendInitialConnection(chatId, department);
+    setTimeout(() => {
+      sendMessage({ question });
+    }, 200);
+  } else {
+    if (!hasConnectedWithId) {
+      sendInitialConnection(chatId, department);
+      setTimeout(() => {
+        sendMessage({ question });
+      }, 200);
+    } else {
+      sendMessage({ question });
     }
   }
 };
 
-export const sendMessage = (data: ChatPayload) => {
-  const json = JSON.stringify(data);
-
-  useWebSocketLogger.getState().addLog({
-    type: 'sent',
-    message: `전송: ${json}`,
-  });
-
-  if (socket?.readyState === WebSocket.OPEN) {
-    socket.send(json);
-  } else {
-    console.warn('[Socket] 연결 안 됨. 메시지를 큐에 저장합니다.');
-    console.log('[Socket] ⏳ 대기열에 추가된 메시지:', data);
-    pendingMessages.push(data);
-  }
+export const resetInitialConnectionState = () => {
+  hasConnectedWithId = false;
 };
 
 export const closeSocket = () => {
   if (reconnectTimeout) clearTimeout(reconnectTimeout);
   reconnectTimeout = null;
   stopHeartbeat();
+  resetInitialConnectionState();
   socket?.close();
   socket = null;
 };
