@@ -6,6 +6,7 @@ import lombok.Builder;
 @Builder
 public record ProfileDto(
         String name,
+        Integer memberId,
         String email,
         String imageUrl,
         String teamName,
@@ -15,6 +16,7 @@ public record ProfileDto(
     public static ProfileDto from(Member member) {
         return ProfileDto.builder()
                 .email(member.getEmail())
+                .memberId(member.getId())
                 .name(member.getName())
                 .imageUrl(member.getProfileImage())
                 .teamName(member.getDepartment().getName())
