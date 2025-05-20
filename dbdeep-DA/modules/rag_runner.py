@@ -89,8 +89,8 @@ async def run_follow_up_chain_async(question: str, chat_history: str, websocket:
     return result
 
 
-async def run_sql_pipeline(request: QueryRequest, websocket: WebSocket, max_retry: int = 5) -> Dict:
-    sql_chain, inputs = build_sql_chain(request.question, request.user_department)
+async def run_sql_pipeline(request: QueryRequest, websocket: WebSocket, max_retry: int = 5, customer_dict: dict = []) -> Dict:
+    sql_chain, inputs = build_sql_chain(request.question, request.user_department, customer_dict)
 
     result_dict = None
     for attempt in range(max_retry):

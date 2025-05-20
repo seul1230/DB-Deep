@@ -10,6 +10,7 @@ from services.chat_service import chat_room_exists, update_chatroom_summary, gen
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from infrastructure.es_message_service import save_chat_message_to_es
+from services.glossary_service import get_glossary_terms_by_member_id
 
 async def handle_chat_websocket(websocket: WebSocket):
     
@@ -17,11 +18,12 @@ async def handle_chat_websocket(websocket: WebSocket):
         try:
             data = await websocket.receive_text()
             data_dict = json.loads(data)
-
             request = QueryRequest(**data_dict)
             uuid = request.uuid
             question = request.question
             department = request.user_department
+            member_id = 5 # TODO: request.member_id, Header에서 member Id 가져오는 로직 필요
+            member_dict = get_glossary_terms_by_member_id(member_id)
 
             # 제목 자동 생성
             try:
@@ -96,9 +98,10 @@ async def handle_chat_websocket(websocket: WebSocket):
 
             # SQL & 테이블 생성
             await send_ws_message(websocket, type_="info", payload="SQL & 데이터 생성 중")
-
-            result_dict = await run_sql_pipeline(request, websocket)
+            member_dict = get_glossary_terms_by_member_id(member_id)
+            result_dict = await run_sql_pipeline(request, websocket, 5, member_dict)
             need_chart = result_dict.get("need_chart")
+            print(member_dict)
             if isinstance(need_chart, str):
                 need_chart = need_chart.lower() != "false"
 
