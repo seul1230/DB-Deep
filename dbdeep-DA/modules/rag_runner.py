@@ -7,7 +7,7 @@ from typing import Dict
 from utils.ws_utils import send_ws_message
 from fastapi import WebSocket
 from starlette.websockets import WebSocketDisconnect
-
+from utils.ws_session_manager import is_stop_requested
 from utils.response_utils import clean_json_from_response
 from services.sql_executor import SQLExecutor
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
@@ -89,8 +89,8 @@ async def run_follow_up_chain_async(question: str, chat_history: str, websocket:
     return result
 
 
-async def run_sql_pipeline(request: QueryRequest, websocket: WebSocket, max_retry: int = 5, customer_dict: dict = []) -> Dict:
-    sql_chain, inputs = build_sql_chain(request.question, request.user_department, customer_dict)
+async def run_sql_pipeline(request: QueryRequest, websocket: WebSocket, max_retry: int = 5, custom_dict: dict = []) -> Dict:
+    sql_chain, inputs = build_sql_chain(request.question, request.user_department, custom_dict)
 
     result_dict = None
     for attempt in range(max_retry):
@@ -134,7 +134,7 @@ def run_chart_pipeline(chart_request: ChartRequest) -> ChartRequest:
         "data_summary": extract_text_block(response_text)
     })
 
-async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSocket):
+async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSocket, uuid: str):
     logging.info("🧠 인사이트 추출 중...")
     chain, inputs = build_insight_chain(request.dict())
     result = ""
@@ -142,6 +142,9 @@ async def run_insight_pipeline_async(request: InsightRequest, websocket: WebSock
 
     try:
         async for chunk in generator:
+            if await is_stop_requested(uuid):
+                await send_ws_message(websocket, type_="info", payload="🛑 인사이트 생성 중단됨")
+                break
             try:
                 await send_ws_message(websocket, type_="insight_stream", payload=chunk)
                 result += chunk

@@ -195,7 +195,7 @@ def get_prompt_for_sql(user_department):
     {context_term}
     
     [사용자별 용어 사전]
-    {customer_dict}
+    {custom_dict}
 
     [BigQuery SQL 문법 가이드 및 용어 정의]
     {context_sql}
@@ -213,7 +213,7 @@ def get_prompt_for_sql(user_department):
 
     prompt_template = PromptTemplate(
         input_variables=["question", "chat_history", "user_department", "hr_schema", "hr_schema_json_str", # "card_schema_json_str",
-                         "card_schema", "context_term", "customer_dict", "context_sql"],
+                         "card_schema", "context_term", "custom_dict", "context_sql"],
         template=base_template.replace("{hr_rule}", hr_rule)
     )
 

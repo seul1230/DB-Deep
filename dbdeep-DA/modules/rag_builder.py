@@ -35,7 +35,7 @@ def build_question_clf_chain(question: str) -> tuple:
 
     return chain
 
-def build_follow_up_chain(question: str, chat_history: str, customer_dict: dict) -> str:
+def build_follow_up_chain(question: str, chat_history: str, custom_dict: dict) -> str:
     prompt = f"""
 당신은 사용자의 질문 흐름을 이해하는 AI 비서입니다.
 
@@ -49,7 +49,7 @@ def build_follow_up_chain(question: str, chat_history: str, customer_dict: dict)
 {question}
 
 [사용자별 용어 사전]
-{customer_dict}
+{custom_dict}
 
 [답변]
 """
@@ -63,7 +63,7 @@ with open("assets/RAG_docs/bigquery_sql.txt", "r", encoding="utf-8") as f:
 with open("assets/RAG_docs/card_schema_json.txt", "r", encoding="utf-8") as f:
     STATIC_CARD_SCHEMA = f.read()
 
-def build_sql_chain(question: str, user_department: str, customer_dict: dict) -> Tuple[Any, dict]:
+def build_sql_chain(question: str, user_department: str, custom_dict: dict) -> Tuple[Any, dict]:
     
     logging.info("📥 RAG 체인 구성 시작")
     vectorstore = get_vectorstore(index_name="schema-index-v2")
@@ -244,7 +244,7 @@ def build_sql_chain(question: str, user_department: str, customer_dict: dict) ->
             "context_sql": RunnableLambda(lambda x: STATIC_SQL_GUIDE),
             "card_schema_json_str" : RunnableLambda(lambda x: json.dumps(STATIC_CARD_SCHEMA, indent=4, ensure_ascii=False)),
             "hr_schema_json_str": RunnableLambda(lambda x: json.dumps(hr_schema_json, indent=4, ensure_ascii=False)),
-            "customer_dict" : RunnableLambda(lambda x: customer_dict if customer_dict is not None else {})
+            "custom_dict" : RunnableLambda(lambda x: custom_dict if custom_dict is not None else {})
         }
         | get_prompt_for_sql(user_department)
         | llm

@@ -4,9 +4,11 @@ import logging
 import pandas as pd
 
 from fastapi import WebSocket, WebSocketDisconnect
+from utils.ws_session_manager import clear_stop_flag
 from utils.ws_utils import send_ws_message
+from services.ws_stop_listener import listen_for_stop
 from services.message_service import save_chat_message, build_chat_history
-from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title
+from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title, is_first_chat
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from infrastructure.es_message_service import save_chat_message_to_es
@@ -15,30 +17,29 @@ from services.glossary_service import get_glossary_terms_by_member_id
 async def handle_chat_websocket(websocket: WebSocket):
     
     while True:
+        stop_listener = None
+        uuid = websocket.state.uuid
+        member_id = websocket.state.member_id
+        department = websocket.state.department
+
         try:
             data = await websocket.receive_text()
             data_dict = json.loads(data)
             request = QueryRequest(**data_dict)
-            uuid = request.uuid
             question = request.question
-            department = request.user_department
-            member_id = 5 # TODO: request.member_id, Header에서 member Id 가져오는 로직 필요
+
+            stop_listener = asyncio.create_task(listen_for_stop(websocket, uuid))
             member_dict = get_glossary_terms_by_member_id(member_id)
-
-            # 제목 자동 생성
-            try:
-                title = generate_chatroom_title(question)
-                await send_ws_message(websocket, type_="title", payload=title)
-            except Exception as e:
-                logging.warning(f"❗ 채팅방 제목 생성 실패: {e}")
-                await send_ws_message(websocket, type_="title", payload="새 채팅방", error=str(e))
-                title = "새 채팅방"
-
-            # 채팅방 생성 확인
-            if not chat_room_exists(uuid):
-                await send_ws_message(websocket, type_="error", payload="채팅방이 존재하지 않습니다.")
-                await websocket.close()
-                return
+            
+            # 최초 메시지인 경우에만 제목 생성
+            if is_first_chat(uuid):
+                try:
+                    title = generate_chatroom_title(question)
+                    await send_ws_message(websocket, type_="title", payload=title)
+                except Exception as e:
+                    logging.warning(f"❗ 채팅방 제목 생성 실패: {e}")
+                    await send_ws_message(websocket, type_="title", payload="새 채팅방", error=str(e))
+                    title = "새 채팅방"
             
             chat_history = build_chat_history(uuid)
             
@@ -98,13 +99,11 @@ async def handle_chat_websocket(websocket: WebSocket):
 
             # SQL & 테이블 생성
             await send_ws_message(websocket, type_="info", payload="SQL & 데이터 생성 중")
-            member_dict = get_glossary_terms_by_member_id(member_id)
-            result_dict = await run_sql_pipeline(request, websocket, 5, member_dict)
+            result_dict = await run_sql_pipeline(request, websocket, 5, custom_dict=member_dict)
             need_chart = result_dict.get("need_chart")
-            print(member_dict)
             if isinstance(need_chart, str):
                 need_chart = need_chart.lower() != "false"
-
+            print(result_dict)
             result = ChartRequest(**result_dict)
             sql = result.sql_query
             df = pd.DataFrame(result.data)
@@ -154,7 +153,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             insight_text = ""
             for attempt in range(1, max_retries + 1):
                 try:
-                    insight_text = await run_insight_pipeline_async(insight_request, websocket)
+                    insight_text = await run_insight_pipeline_async(insight_request, websocket, uuid)
                     print(insight_text)
                     break
                 except WebSocketDisconnect:
@@ -171,6 +170,9 @@ async def handle_chat_websocket(websocket: WebSocket):
                         except:
                             pass
                         break
+                finally:
+                    await clear_stop_flag(uuid)
+
 
             await send_ws_message(websocket, type_="info", payload="인사이트 생성 완료")
 
@@ -216,3 +218,13 @@ async def handle_chat_websocket(websocket: WebSocket):
         except Exception as e:
             logging.error(f"예상치 못한 에러 발생 : {e}")
             await websocket.send_text("서버 처리 중 오류가 발생했습니다. 다시 시도해주세요.")
+
+        finally:
+            if stop_listener:
+                stop_listener.cancel()
+                try:
+                    await stop_listener
+                except asyncio.CancelledError:
+                    pass
+            if uuid:
+                await clear_stop_flag(uuid)
