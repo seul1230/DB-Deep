@@ -18,11 +18,11 @@
   border-radius: 16px;
   border-top-left-radius: 4px;
   font-size: 0.875rem;
-  line-height: 1.4;
+  line-height: 1.6;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   word-break: break-word;
   overflow-wrap: break-word;
-  white-space: pre-wrap;
+  /* white-space: pre-wrap; */
 }
 
 /* 점3개 메뉴 영역 */
@@ -62,28 +62,48 @@
 .chatBubbleDBDeep-bubble h1,
 .chatBubbleDBDeep-bubble h2,
 .chatBubbleDBDeep-bubble h3 {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
+  line-height: 1.6;
   margin: 12px 0 8px;
 }
 
 .chatBubbleDBDeep-bubble p {
-  margin: 4px 0;
-  font-size: 0.95rem;
+  margin: 6px 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
 .chatBubbleDBDeep-bubble ul {
   padding-left: 1.2rem;
-  margin: 8px 0;
+  line-height: 1.6;
+  margin: 10px 0 14px;
 }
 
 .chatBubbleDBDeep-bubble li {
-  font-size: 0.95rem;
-  margin-bottom: 4px;
+  font-size: 0.875rem;
+  margin: 10px 0 14px;
+  line-height: 1.5;
   list-style: disc;
 }
 
-.chatBubbleDBDeep-bubble hr {
+.chatBubbleDBDeep-bubble li > p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.chatBubbleDBDeep-bubble ol {
+  padding-left: 1.4rem;
+  margin: 10px 0;
+}
+
+.chatBubbleDBDeep-bubble ol > li {
+  list-style-type: decimal;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.chatBubbleDBDeep-bubble-hr {
   border: none;
   border-top: 1px solid var(--light-gray);
   margin: 12px 0;

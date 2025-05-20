@@ -15,6 +15,7 @@ interface State {
   chatIdMap: Record<string, string>;
   setRealChatId: (uuid: string, realId: string) => void;
   getRealChatId: (uuid: string) => string | undefined;
+  setIsLive: (chatId: string, isLive: boolean) => void;
 }
 
 export const useChatMessageStore = create<State>((set, get) => ({
@@ -112,4 +113,16 @@ export const useChatMessageStore = create<State>((set, get) => ({
     set((s) => ({ chatIdMap: { ...s.chatIdMap, [uuid]: realId } })),
 
   getRealChatId: (uuid) => get().chatIdMap[uuid],
+  setIsLive: (chatId, isLive) => {
+    const msgs = get().messages[chatId] || [];
+    if (!msgs.length) return;
+
+    const updated = { ...msgs[msgs.length - 1], isLive };
+    set({
+      messages: {
+        ...get().messages,
+        [chatId]: [...msgs.slice(0, -1), updated],
+      },
+    });
+  },
 }));

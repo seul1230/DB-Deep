@@ -6,6 +6,53 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import clsx from 'clsx';
 
+const renderConsoleJson = (raw: string) => {
+  try {
+    const cleaned = raw
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/, '');
+
+    const parsed = JSON.parse(cleaned);
+    const {
+      question,
+      analysis_direction,
+      sql_thinking_flow,
+      need_chart,
+      sql_code,
+    } = parsed;
+
+    return (
+      <div className={styles['webSocketConsole-consoleBlock']}>
+        {question && <div><strong>Question:</strong> {question}</div>}
+        {analysis_direction && <div><strong>Analysis Direction:</strong> {analysis_direction}</div>}
+        {sql_thinking_flow && (
+          <div>
+            <strong>SQL Thinking Flow:</strong>
+            <pre className={styles['webSocketConsole-pre']}>{sql_thinking_flow}</pre>
+          </div>
+        )}
+        {typeof need_chart === 'boolean' && (
+          <div>
+            <strong>Need Chart:</strong>{' '}
+            <span className={need_chart ? styles['boolean-true'] : styles['boolean-false']}>
+              {need_chart ? 'true' : 'false'}
+            </span>
+          </div>
+        )}
+        {sql_code && (
+          <div>
+            <strong>SQL Code:</strong>
+            <pre className={styles['webSocketConsole-pre']}>{sql_code}</pre>
+          </div>
+        )}
+      </div>
+    );
+  } catch {
+    return <div className={styles['webSocketConsole-consoleBlock']}>{raw}</div>;
+  }
+};
+
 const WebSocketConsole = () => {
   const { logs } = useWebSocketLogger();
   const { isOpen, toggleConsole, setConsoleOpen } = useWebSocketConsoleStore();
@@ -15,14 +62,12 @@ const WebSocketConsole = () => {
 
   const isMainPage = location.pathname === '/main';
 
-  // ✅ 로그 자동 스크롤
   useEffect(() => {
     if (logEndRef.current) {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [logs]);
 
-  // ✅ /main에서는 콘솔 무조건 닫힘
   useEffect(() => {
     if (isMainPage && isOpen) {
       setConsoleOpen(false);
@@ -37,22 +82,17 @@ const WebSocketConsole = () => {
         })}
       >
         <div className={styles['webSocketConsole-logWrapper']}>
-          {logs.map((log, idx) => (
-            <div
-              key={idx}
-              className={clsx(
-                styles['webSocketConsole-logLine'],
-                styles[`webSocketConsole-${log.type}`]
-              )}
-            >
-              [{log.type.toUpperCase()}] {log.message}
-            </div>
-          ))}
+          {logs
+            .filter((log) => log.type === 'console')
+            .map((log, idx) => (
+              <div key={idx} className={styles['webSocketConsole-logLine']}>
+                {renderConsoleJson(log.message)}
+              </div>
+            ))}
           <div ref={logEndRef} />
         </div>
       </div>
 
-      {/* ✅ 메인 페이지거나 차트 오버레이 열려 있으면 버튼 숨김 */}
       {!isMainPage && !chart && (
         <button
           className={clsx(styles['webSocketConsole-toggleButton'], {

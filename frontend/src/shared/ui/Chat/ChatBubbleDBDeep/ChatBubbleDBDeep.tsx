@@ -90,20 +90,30 @@ export const ChatBubbleDBDeep = ({
             </div>
           )}
 
-          {(isLive || textParts.length > 0) && (
-            <div className={styles['chatBubbleDBDeep-section']}>
-              {isLive ? (
-                <TypewriterText chatId={uuid} />
-              ) : (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  components={ChatMarkdownRenderers(onChartClick)}
-                >
-                  {textParts.map(p => p.content).join('')}
-                </ReactMarkdown>
-              )}
-            </div>
-          )}
+          {parts.map((part, idx) => {
+          if (part.type === 'text') {
+            return (
+              <div className={styles['chatBubbleDBDeep-section']} key={idx}>
+                {isLive ? (
+                  <TypewriterText chatId={uuid} />
+                ) : (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={ChatMarkdownRenderers(onChartClick)}
+                  >
+                    {part.content}
+                  </ReactMarkdown>
+                )}
+              </div>
+            );
+          }
+
+          if (part.type === 'hr') {
+            return <hr key={idx} className={styles['chatBubbleDBDeep-bubble-hr']} />;
+          }
+
+          return null;
+        })}
         </div>
 
         {showMenu && (

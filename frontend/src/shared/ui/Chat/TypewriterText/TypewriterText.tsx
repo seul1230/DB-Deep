@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import styles from './TypewriterText.module.css';
 import ReactMarkdown from 'react-markdown';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
@@ -9,6 +9,7 @@ interface Props {
 
 export const TypewriterText = ({ chatId }: Props) => {
   const { insightQueue, messages } = useChatMessageStore();
+  const insightLines = useMemo(() => insightQueue[chatId] || [], [insightQueue, chatId]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const [displayedText, setDisplayedText] = useState('');
@@ -18,23 +19,25 @@ export const TypewriterText = ({ chatId }: Props) => {
 
   const isLive = (() => {
     const list = messages[chatId] || [];
-    return list.length > 0 && list[list.length - 1].isLive;
+    const last = list[list.length - 1];
+    return last?.isLive && last?.type !== 'follow_up_stream';
   })();
 
-  // 1. insightQueue가 바뀔 때마다 내부 큐에 복사
+  // 새 줄이 들어오면 bufferQueue에 추가
+  useEffect(() => {
+    if (!isLive) return;
+    setBufferQueue((prev) => {
+      if (currentLine !== '') return prev;
+      const alreadyBuffered = prev.length + (currentLine ? 1 : 0);
+      const unseen = insightLines.slice(alreadyBuffered);
+      return [...prev, ...unseen];
+    });
+  }, [insightLines, isLive, currentLine]);
+
+  // 타자 효과
   useEffect(() => {
     if (!isLive) return;
 
-    const newLines = insightQueue[chatId] || [];
-    const unseenLines = newLines.slice(bufferQueue.length);
-    if (unseenLines.length > 0) {
-      setBufferQueue(prev => [...prev, ...unseenLines]);
-    }
-  }, [insightQueue, chatId, isLive, bufferQueue.length]);
-
-  // 2. 타자 효과 (줄 → 글자 단위)
-  useEffect(() => {
-    if (!isLive) return;
     if (!currentLine && bufferQueue.length > 0) {
       const [nextLine, ...rest] = bufferQueue;
       setCurrentLine(nextLine);
@@ -45,20 +48,25 @@ export const TypewriterText = ({ chatId }: Props) => {
 
     if (currentLine && charIndex < currentLine.length) {
       const timeout = setTimeout(() => {
-        setDisplayedText(prev => prev + currentLine[charIndex]);
-        setCharIndex(prev => prev + 1);
-      }, 60); // 타자 속도
-
+        setDisplayedText((prev) => prev + currentLine[charIndex]);
+        setCharIndex((prev) => prev + 1);
+      }, 60);
       return () => clearTimeout(timeout);
     }
 
     if (currentLine && charIndex === currentLine.length) {
-      setDisplayedText(prev => prev + '\n');
+      setDisplayedText((prev) => prev + currentLine);
       setCurrentLine('');
+      setCharIndex(0);
+      if (bufferQueue.length === 0) {
+        requestAnimationFrame(() => {
+          scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+        });
+      }
     }
   }, [isLive, currentLine, charIndex, bufferQueue]);
 
-  // 3. 자동 스크롤
+  // 스크롤 동기화
   useEffect(() => {
     if (!isLive) return;
     requestAnimationFrame(() => {
@@ -66,7 +74,7 @@ export const TypewriterText = ({ chatId }: Props) => {
     });
   }, [displayedText, isLive]);
 
-  // 4. 새 메시지 시작 시 초기화
+  // 새 메시지 도착 시 초기화
   useEffect(() => {
     if (!isLive) return;
     setDisplayedText('');
@@ -77,7 +85,14 @@ export const TypewriterText = ({ chatId }: Props) => {
 
   return (
     <div className={styles['typewriterText-wrapper']}>
-      <ReactMarkdown>{displayedText}</ReactMarkdown>
+      <ReactMarkdown
+        components={{
+          p: (props) => <p style={{ marginBottom: '0.25rem' }} {...props} />,
+        }}
+        skipHtml
+      >
+        {displayedText}
+      </ReactMarkdown>
       <div ref={scrollRef} style={{ height: 1 }} />
     </div>
   );

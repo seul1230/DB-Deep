@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-type LogType = 'info' | 'error' | 'data' | 'status' | 'sent';
+type LogType = 'info' | 'error' | 'data' | 'status' | 'sent' | 'console';
 
 interface LogEntry {
   type: LogType;

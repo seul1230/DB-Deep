@@ -11,7 +11,7 @@ import WebSocketConsole from "@/widgets/WebSocketConsole/WebSocketConsole";
 
 const SIDEBAR_WIDTH = 68;
 const PANEL_WIDTH = 240;
-const CONSOLE_WIDTH = 300;
+const CONSOLE_WIDTH = 260;
 
 const Layout: React.FC = () => {
   const { openPanel } = usePanelStore();

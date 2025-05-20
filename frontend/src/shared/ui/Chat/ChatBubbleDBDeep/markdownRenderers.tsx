@@ -5,20 +5,26 @@ import { CustomChartData } from '@/types/chart';
 export const ChatMarkdownRenderers = (
   onChartClick: (chartData: CustomChartData) => void
 ): Components => ({
-  p: ({ children, ...props }) => <p {...props}>{children}</p>,
+  p: ({ children }) => <>{children}</>,
+
   h2: ({ children, ...props }) => <h2 {...props}>{children}</h2>,
   hr: (props) => <hr {...props} />,
+  li: ({ children, ...props }) => <li {...props}>{children}</li>,
+  ol: ({ children, ...props }) => <ol {...props}>{children}</ol>,
+
   code: (props) => {
     const { inline, className, children } = props as {
       inline?: boolean;
       className?: string;
       children?: ReactNode;
     };
-    const content = typeof children === 'string'
-      ? children
-      : Array.isArray(children)
-      ? children.join('')
-      : '';
+
+    const content =
+      typeof children === 'string'
+        ? children
+        : Array.isArray(children)
+        ? children.join('')
+        : '';
 
     if (!inline && className === 'language-json') {
       try {
@@ -36,7 +42,11 @@ export const ChatMarkdownRenderers = (
                 y_label: parsed.y_label,
               })
             }
-            style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+            style={{
+              cursor: 'pointer',
+              color: 'blue',
+              textDecoration: 'underline',
+            }}
           >
             📊 차트 보러가기 (자동 차트)
           </div>
@@ -45,6 +55,11 @@ export const ChatMarkdownRenderers = (
         return <pre>{content}</pre>;
       }
     }
-    // ...
+
+    return inline ? (
+      <code className={className}>{content}</code>
+    ) : (
+      <pre className={className}>{content}</pre>
+    );
   },
 });

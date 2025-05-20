@@ -8,9 +8,9 @@
   padding: 16px 20px;
   border-radius: 10px;
   font-family: 'Fira Code', 'Courier New', monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  max-height: 280px;
+  font-size: 12px;
+  line-height: 1.4;
+  max-height: 240px;
   overflow-x: auto;
   overflow-y: auto;
   white-space: pre-wrap;
