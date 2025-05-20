@@ -12,29 +12,24 @@ from services.chat_service import chat_room_exists, update_chatroom_summary, gen
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from infrastructure.es_message_service import save_chat_message_to_es
+from services.glossary_service import get_glossary_terms_by_member_id
 
 async def handle_chat_websocket(websocket: WebSocket):
     
     while True:
-
         stop_listener = None
-        uuid = None
+        uuid = websocket.state.uuid
+        member_id = websocket.state.member_id
+        department = websocket.state.department
 
         try:
             data = await websocket.receive_text()
             data_dict = json.loads(data)
-
             request = QueryRequest(**data_dict)
-            uuid = request.uuid
             question = request.question
-            department = request.user_department
-            stop_listener = asyncio.create_task(listen_for_stop(websocket, uuid))
 
-            # 채팅방 생성 확인
-            if not chat_room_exists(uuid):
-                await send_ws_message(websocket, type_="error", payload="채팅방이 존재하지 않습니다.")
-                await websocket.close()
-                return
+            stop_listener = asyncio.create_task(listen_for_stop(websocket, uuid))
+            member_dict = get_glossary_terms_by_member_id(member_id)
             
             # 최초 메시지인 경우에만 제목 생성
             if is_first_chat(uuid):
@@ -104,12 +99,11 @@ async def handle_chat_websocket(websocket: WebSocket):
 
             # SQL & 테이블 생성
             await send_ws_message(websocket, type_="info", payload="SQL & 데이터 생성 중")
-
-            result_dict = await run_sql_pipeline(request, websocket)
+            result_dict = await run_sql_pipeline(request, websocket, 5, custom_dict=member_dict)
             need_chart = result_dict.get("need_chart")
             if isinstance(need_chart, str):
                 need_chart = need_chart.lower() != "false"
-
+            print(result_dict)
             result = ChartRequest(**result_dict)
             sql = result.sql_query
             df = pd.DataFrame(result.data)

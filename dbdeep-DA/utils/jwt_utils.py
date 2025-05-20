@@ -39,6 +39,6 @@ def decode_jwt_token(token: str) -> dict:
     except JWTError as e:
         logging.warning(f"[JWT] ❌ JWT 오류: {e}")
         return {
-            "member_id": 5,
+            "member_id": "5",
             "roles": roles.split(",") if roles else []
         }
