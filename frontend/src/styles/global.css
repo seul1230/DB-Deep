@@ -29,14 +29,14 @@ body.dark {
   --primary-dark-blue: #8379ff;
   --primary-mid-blue: #7273e6;
   --primary-light-blue: #2b2e44;
-  --sidebar-bg: #1f1f1f;
+  --sidebar-bg: #242424;
   --icon-blue: #bfc8ff;
   --icon-blue-hover: #e0e6ff;
   --gray-text: #aaaaaa;
   --light-gray: #444444;
   --red-alert: #f87171;
   --yellow: #facc15;
-  --background-color: #18181b;
+  --background-color: #1f1f22;
   --text-color: #f3f4f6;
   --modal-overlay-bg: rgba(255, 255, 255, 0.2);
 }
@@ -84,13 +84,14 @@ body.dark {
   background: var(--icon-blue) !important;
 }
 
-/* ✅ 기본 스크롤바 스타일 모든 요소에 적용 */
+/* ——— 전역 스크롤바 스타일 (light-gray thumb) ——— */
 * {
-  scrollbar-width: auto;
-  scrollbar-color: var(--icon-blue) var(--background-color);
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--light-gray) transparent;
 }
 
-/* ✅ WebKit 브라우저용 */
+/* WebKit */
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -98,11 +99,10 @@ body.dark {
 
 *::-webkit-scrollbar-track {
   background: var(--background-color);
-  border-radius: 10px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--icon-blue);
+  background-color: var(--light-gray);
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: content-box;

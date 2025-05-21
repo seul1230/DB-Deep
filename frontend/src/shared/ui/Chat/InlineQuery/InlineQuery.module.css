@@ -31,3 +31,21 @@
   background-color: var(--gray-600);
   border-radius: 4px;
 }
+
+.inlineQuery-toggleButton {
+  all: unset;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--icon-blue);
+  background-color: var(--primary-light-blue);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.inlineQuery-toggleButton:hover {
+  background-color: var(--primary-mid-blue);
+  color: white;
+}

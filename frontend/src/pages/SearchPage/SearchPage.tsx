@@ -1,92 +1,64 @@
-import React, { useState } from "react";
+// SearchPage.tsx
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import styles from "./SearchPage.module.css";
 import SearchInput from "@/entities/search/SearchInput/SearchInput";
-// import SearchTabs from "@/entities/search/SearchTabs/SearchTabs";
 import SearchCard from "@/entities/search/SearchCard/SearchCard";
-import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
-import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
-import { useMutation } from "@tanstack/react-query";
+import ChartOverlay from "@/entities/chat/ChartOverlay/ChartOverlay";
+import SectionTitle from "@/entities/archive/SectionTitle/SectionTitle";
 import { searchChats } from "@/features/search/searchApi";
 import { SearchChatResult } from "@/features/search/searchTypes";
-import { useNavigate } from "react-router-dom";
-import { showErrorToast, showSuccessToast } from "@/shared/toast";
+import { CustomChartData } from "@/types/chart";
 
-const SearchPage: React.FC = () => {
+const SearchPage = () => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchChatResult[]>([]);
-  // const [selectedTab, setSelectedTab] = useState("전체");
-  const { isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
-  const navigate = useNavigate(); 
+  const [selectedChart, setSelectedChart] = useState<CustomChartData | null>(null);
+  const navigate = useNavigate();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: searchChats,
     onSuccess: (data) => {
       setResults(data.result);
     },
-    onError: (error) => {
-      console.error("❌ 검색 실패:", error);
+    onError: (err) => {
+      console.error("검색 실패", err);
     },
   });
-  
-  const handleCopy = (id: string) => {
-    const result = results.find((r) => r.chatId === id);
-    const textToCopy = result?.message.insight || result?.message.question;
-  
-    if (textToCopy) {
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        showSuccessToast("클립보드에 복사되었습니다.");
-      }).catch(() => {
-        showErrorToast("복사 실패");
-      });
-    }
+
+  const handleSearch = () => {
+    if (!query.trim()) return;
+    mutate(query);
   };
-  
 
   return (
-    <div className={styles.container}>
-      <div className={styles.inner}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>검색</h1>
-          <div className={styles.titleDivider}></div>
-          <SearchInput value={query} onChange={setQuery} onSubmit={() => mutate(query)} />
-          {/* <SearchTabs active={selectedTab} onSelect={setSelectedTab} /> */}
-        </div>
+    <div className={styles.searchPage_container}>
+      <div className={styles.searchPage_inner}>
+        <SectionTitle text="검색 결과" />
+        <SearchInput value={query} onChange={setQuery} onSubmit={handleSearch} />
 
-        <div className={styles.resultList}>
-          {results.map((result) => {
-            const chart = result.message.chart;
-            const chartData =
-              chart && Array.isArray(chart.x) && Array.isArray(chart.y)
-                ? chart.x.map((label: string, i: number) => ({
-                    label,
-                    value: chart.y?.[i] ?? 0,
-                  }))
-                : undefined;
-
-            return (
+        <div className={styles.searchPage_cardList}>
+          {isPending ? (
+            <div className={styles.searchPage_loading}>검색 중...</div>
+          ) : results.length === 0 ? (
+            <div className={styles.searchPage_empty}>검색 결과가 없습니다.</div>
+          ) : (
+            results.map((result) => (
               <SearchCard
                 key={result.chatId}
-                id={result.chatId}
-                title={result.title}
-                date={new Date(result.updatedAt).toLocaleString()}
-                content={result.message.insight || result.message.question}
-                highlight={query}
-                chartData={chartData}
+                chat={result}
                 onClick={() => navigate(`/chat/${result.chatId}`)}
+                onChartClick={setSelectedChart}
               />
-            );
-          })}
+            ))
+          )}
         </div>
-
-        {isOpen && targetId && (
-          <CardOverlay
-            position={position}
-            targetId={targetId}
-            onCopy={handleCopy}
-            onClose={closeOverlay}
-          />
-        )}
       </div>
+
+      {selectedChart && (
+        <ChartOverlay chartData={selectedChart} onClose={() => setSelectedChart(null)} />
+      )}
     </div>
   );
 };

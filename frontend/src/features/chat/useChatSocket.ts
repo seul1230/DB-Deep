@@ -10,7 +10,9 @@ import type { ChartData } from '@/features/chat/chatTypes';
 
 export const useChatSocket = (chatId?: string) => {
   const queryClient = useQueryClient();
+  const { ignoreIncoming, setIgnoreIncoming } = useChatMessageStore();
   const { addLog } = useWebSocketLogger();
+  const { ignoreConsoleLogs } = useWebSocketLogger()
   const {
     appendToLast,
     finalizeLast,
@@ -37,13 +39,20 @@ export const useChatSocket = (chatId?: string) => {
           return;
         }
 
-        socket.onopen = () => {
-          console.log('[useChatSocket] onopen');
-        };
-
         socket.onmessage = (event) => {
-          console.log('[useChatSocket] onmessage raw:', event.data);
           const raw = event.data;
+
+          if (ignoreIncoming) {
+            try {
+              const m = JSON.parse(raw);
+              if (m.type === 'info' && m.payload === '🛑 생성 중단 요청 완료'){
+                setIgnoreIncoming(false);
+              }
+            } catch {
+              // Json 파싱 에러 무시시
+            }
+            return;
+          }
 
           // 1) 순수 텍스트 에러: JSON 아니면 곧바로 에러 처리
           if (typeof raw === 'string' && !raw.trim().startsWith('{')) {
@@ -80,14 +89,17 @@ export const useChatSocket = (chatId?: string) => {
             case 'error':
               // JSON 형태로 내려오는 에러
               if (typeof payload === 'string') {
-                showErrorToast(payload);
+                if (!payload.includes('알 수 없는 type: ping')) {
+                  showErrorToast(payload);
+                }
               }
               finalizeLast(chatId);
               return;
 
             case 'console':
-              // 오직 WebSocket 콘솔에만 표시
-              addLog({ type: 'console', message: String(payload) });
+              if (!ignoreConsoleLogs){
+                addLog({ type: 'console', message: String(payload) });
+              }
               return;
 
             case 'title':
@@ -189,5 +201,8 @@ export const useChatSocket = (chatId?: string) => {
     setRealChatId,
     setIsLive,
     setMessages,
+    ignoreConsoleLogs,
+    ignoreIncoming,
+    setIgnoreIncoming,
   ]);
 };

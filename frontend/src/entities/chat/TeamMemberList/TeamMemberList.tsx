@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./TeamMemberList.module.css";
 import { Member } from "@/features/chat/memberApi";
+import defaultProfile from "@/assets/default-profile.jpg"
 
 interface Props {
   members: Member[];
@@ -27,9 +28,9 @@ const TeamMemberList: React.FC<Props> = ({ members, selectedIds, onToggle }) => 
         >
           <div className={styles["TeamMemberList-profile"]}>
             <img
-              src={member.avatarUrl || "/default-avatar.png"}
+              src={member.profileImage || defaultProfile}
               alt={member.name || "이름없음"}
-              className={styles["TeamMemberList-avatar"]}
+              className={styles["TeamMemberList-profileImage"]}
             />
             <div className={styles["TeamMemberList-text"]}>
               <div className={styles["TeamMemberList-name"]}>{member.name || "이름없음"}</div>

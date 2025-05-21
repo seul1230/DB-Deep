@@ -53,14 +53,17 @@ const WebSocketConsole = () => {
   const { isOpen, toggleConsole, setConsoleOpen } = useWebSocketConsoleStore();
   const { chart } = useChartOverlayStore();
   const logEndRef = useRef<HTMLDivElement>(null);
+  const prevLogsLength = useRef<number>(0);
   const location = useLocation();
 
   const isMainPage = location.pathname === '/main';
 
   useEffect(() => {
-    if (logEndRef.current) {
+    const isNewLogAdded = logs.length > prevLogsLength.current;
+    if (isNewLogAdded && logEndRef.current) {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
+    prevLogsLength.current = logs.length;
   }, [logs]);
 
   useEffect(() => {
