@@ -8,13 +8,15 @@ import defaultProfileImage from "@/assets/default-profile.jpg";
 import { useThemeStore } from "@/shared/store/themeStore";
 import ProfileOverlay from "../ProfileOverlay/ProfileOverlay";
 import { useAuth } from "@/features/auth/useAuth";
-import { usePanelStore } from "@/shared/store/usePanelStore"; //
+import { usePanelStore } from "@/shared/store/usePanelStore";
+import { useChartOverlayStore } from "@/features/chat/useChartOverlaystore";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useThemeStore();
   const { clearTokens, profile } = useAuth();
+  const { chart, closeChart } = useChartOverlayStore();
 
   const [showOverlay, setShowOverlay] = useState(false);
   const { hasNotification, toggleNotification, toggleChatLog, toggleProject } = usePanelStore();
@@ -80,7 +82,10 @@ const Sidebar: React.FC = () => {
               <FiBell
                 size={20}
                 className={styles["Sidebar-icon"]}
-                onClick={toggleNotification}
+                onClick={() => {
+                  if (chart) closeChart();
+                  toggleNotification();
+                }}
                 style={{ cursor: "pointer" }}
               />
               {hasNotification && (
@@ -103,7 +108,10 @@ const Sidebar: React.FC = () => {
             <FiSearch
               size={20}
               className={styles["Sidebar-icon"]}
-              onClick={handleGoToSearch}
+              onClick={() => {
+                if (chart) closeChart();
+                handleGoToSearch();
+              }}
               style={{ cursor: "pointer" }}
             />
           </li>
@@ -111,7 +119,10 @@ const Sidebar: React.FC = () => {
             <FiPlusSquare
               size={20}
               className={styles["Sidebar-icon"]}
-              onClick={handleGoToMain}
+              onClick={() => {
+                if (chart) closeChart();
+                handleGoToMain();
+              }}
               style={{ cursor: "pointer" }}
             />
           </li>
@@ -119,7 +130,10 @@ const Sidebar: React.FC = () => {
             <PiChatsBold
               size={20}
               className={styles["Sidebar-icon"]}
-              onClick={toggleChatLog}
+              onClick={() => {
+                if (chart) closeChart();
+                toggleChatLog();
+              }}
               style={{ cursor: "pointer" }}
             />
           </li>
@@ -127,7 +141,10 @@ const Sidebar: React.FC = () => {
             <LuBookmarkMinus
               size={20}
               className={styles["Sidebar-icon"]}
-              onClick={handleGoToArchive}
+              onClick={() => {
+                if (chart) closeChart();
+                handleGoToArchive();
+              }}
               style={{ cursor: "pointer" }}
             />
           </li>
@@ -135,7 +152,10 @@ const Sidebar: React.FC = () => {
             <FiFolderMinus
               size={20}
               className={styles["Sidebar-icon"]}
-              onClick={toggleProject}
+              onClick={() => {
+                if (chart) closeChart();
+                toggleProject();
+              }}
               style={{ cursor: "pointer" }}
             />
           </li>
@@ -147,7 +167,10 @@ const Sidebar: React.FC = () => {
           <input
             type="checkbox"
             checked={theme === "dark"}
-            onChange={toggleTheme}
+            onChange={() => {
+              if (chart) closeChart();
+              toggleTheme();
+            }}
             className={styles["Sidebar-toggleInput"]}
           />
           <span className={styles["Sidebar-toggleSlider"]}>

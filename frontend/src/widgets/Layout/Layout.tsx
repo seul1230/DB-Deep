@@ -8,6 +8,9 @@ import ChatLogPanel from "../ChatLogPanel/ChatLogPanel";
 import ProjectPanel from "../ProjectPanel/ProjectPanel";
 import Header from "@/shared/ui/Header/Header";
 import WebSocketConsole from "@/widgets/WebSocketConsole/WebSocketConsole";
+import ChartOverlay from "@/entities/chat/ChartOverlay/ChartOverlay";
+import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
+import { convertChartData } from '@/types/chart';
 
 const SIDEBAR_WIDTH = 68;
 const PANEL_WIDTH = 240;
@@ -16,6 +19,7 @@ const CONSOLE_WIDTH = 260;
 const Layout: React.FC = () => {
   const { openPanel } = usePanelStore();
   const { isOpen: isConsoleOpen } = useWebSocketConsoleStore();
+  const { chart, closeChart } = useChartOverlayStore();
 
   const isNotificationOpen = openPanel === "notification";
   const isChatLogOpen = openPanel === "chatLog";
@@ -32,10 +36,10 @@ const Layout: React.FC = () => {
         width: '100vw',
         height: '100vh',
         overflow: 'hidden',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
       }}
     >
-      {/* 왼쪽 영역 (Sidebar + 패널) */}
+      {/* 사이드바 및 패널 영역 */}
       <div
         style={{
           display: 'flex',
@@ -43,22 +47,20 @@ const Layout: React.FC = () => {
           flexDirection: 'row',
           width: leftWidth,
           transition: 'width 0.3s ease',
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
         }}
       >
-        {/* Sidebar */}
         <div
           style={{
             width: SIDEBAR_WIDTH,
             flexShrink: 0,
             position: 'relative',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
           }}
         >
           <Sidebar />
         </div>
-
-        {/* 열려 있는 패널만 표시 */}
+  
         {isNotificationOpen && (
           <div
             style={{
@@ -109,8 +111,8 @@ const Layout: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* 메인 컨텐츠 */}
+  
+      {/* 메인 콘텐츠 영역 */}
       <div
         style={{
           flex: 1,
@@ -120,20 +122,26 @@ const Layout: React.FC = () => {
           boxSizing: 'border-box',
           overflowX: 'hidden',
           transition: 'padding-right 0.3s ease',
-          paddingRight: `${rightOffset}px`
+          paddingRight: `${rightOffset}px`,
         }}
       >
-      
-        <Header />
-          <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+        {chart ? (
+          <ChartOverlay chartData={convertChartData(chart)} onClose={closeChart} />
+        ) : (
+          <>
+            <Header />
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
               <Outlet />
-          </div>
+            </div>
+          </>
+        )}
       </div>
-     
-      {/* ✅ WebSocket 콘솔 */}
+  
+      {/* WebSocket 우측 콘솔 */}
       <WebSocketConsole />
     </div>
   );
+  
 };
 
 export default Layout;
