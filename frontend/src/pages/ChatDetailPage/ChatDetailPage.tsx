@@ -11,10 +11,10 @@ import { useQuestionInput } from '@/features/chat/useQuestionInput';
 import { sendMessageSafely } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
 import { useAuth } from '@/features/auth/useAuth';
-import ChartOverlay from '@/entities/chat/ChartOverlay/ChartOverlay';
-import { CustomChartData } from '@/types/chart';
+import { convertToChartData } from '@/types/chart';
 import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
 import { useChatSocket } from '@/features/chat/useChatSocket';
+import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -30,9 +30,8 @@ const ChatDetailPage: React.FC = () => {
   const { profile } = useAuth();
 
   const [showModal, setShowModal] = useState(false);
+  const [showChartOverlay] = useState(false);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
-  const [showChartOverlay, setShowChartOverlay] = useState(false);
-  const [overlayChartData, setOverlayChartData] = useState<CustomChartData | null>(null);
   const [showGlossary, setShowGlossary] = useState(false);
 
   const scrollBottomRef = useRef<HTMLDivElement>(null);
@@ -107,8 +106,8 @@ const ChatDetailPage: React.FC = () => {
                 chatId={chatId}
                 chatList={chatMessages}
                 onChartClick={(chartData) => {
-                  setOverlayChartData(chartData);
-                  setShowChartOverlay(true);
+                  useWebSocketLogger.getState().setConnected(false);
+                  useChartOverlayStore.getState().openChart(convertToChartData(chartData));
                 }}
               />
               <div ref={scrollBottomRef} style={{ height: 0 }} />
@@ -117,31 +116,29 @@ const ChatDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {!showChartOverlay && (
-        <div className={styles['chatDetailPage-inputWrapper']} style={layoutStyle}>
-          <div className={styles['chatDetailPage-inputContainer']}>
-            <div className={styles['chatDetailPage-inputArea']}>
-              <QuestionInput value={value} onChange={onChange} onSubmit={() => onSubmit(chatId!)} />
-              <div className={styles['chatDetailPage-buttonGroup']}>
-                <Button
-                  label="용어 사전"
-                  onClick={() => setShowGlossary(true)}
-                  borderColor="var(--icon-blue)"
-                  backgroundColor="var(--icon-blue)"
-                  textColor="var(--background-color)"
-                />
-                <Button
-                  label="지금까지의 채팅 공유"
-                  onClick={() => setShowModal(true)}
-                  borderColor="var(--icon-blue)"
-                  backgroundColor="var(--icon-blue)"
-                  textColor="var(--background-color)"
-                />
-              </div>
+      <div className={styles['chatDetailPage-inputWrapper']} style={layoutStyle}>
+        <div className={styles['chatDetailPage-inputContainer']}>
+          <div className={styles['chatDetailPage-inputArea']}>
+            <QuestionInput value={value} onChange={onChange} onSubmit={() => onSubmit(chatId!)} />
+            <div className={styles['chatDetailPage-buttonGroup']}>
+              <Button
+                label="용어 사전"
+                onClick={() => setShowGlossary(true)}
+                borderColor="var(--icon-blue)"
+                backgroundColor="var(--icon-blue)"
+                textColor="var(--background-color)"
+              />
+              <Button
+                label="지금까지의 채팅 공유"
+                onClick={() => setShowModal(true)}
+                borderColor="var(--icon-blue)"
+                backgroundColor="var(--icon-blue)"
+                textColor="var(--background-color)"
+              />
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       <Suspense fallback={<div style={{ display: 'none' }} />}>
         {showModal && (
@@ -155,10 +152,6 @@ const ChatDetailPage: React.FC = () => {
         )}
         {showGlossary && <GlossaryModal onClose={() => setShowGlossary(false)} />}
       </Suspense>
-
-      {showChartOverlay && overlayChartData && (
-        <ChartOverlay onClose={() => setShowChartOverlay(false)} chartData={overlayChartData} />
-      )}
     </div>
   );
 };
