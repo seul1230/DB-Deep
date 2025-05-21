@@ -46,8 +46,7 @@ const ChatLogPanel: React.FC = () => {
     try {
       await updateChatTitle(chatId, editedTitle);
       await queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
-    } catch (err) {
-      console.error("제목 수정 실패:", err);
+    } catch {
       alert("채팅방 제목 수정에 실패했습니다.");
     } finally {
       setEditingId(null);
@@ -59,8 +58,7 @@ const ChatLogPanel: React.FC = () => {
     try {
       await deleteChatRoom(chatIdToDelete);
       await queryClient.invalidateQueries({ queryKey: ["chatRooms"] });
-    } catch (err) {
-      console.error("삭제 실패", err);
+    } catch {
       alert("채팅 삭제에 실패했습니다.");
     } finally {
       setShowDeleteModal(false);
@@ -101,7 +99,7 @@ const ChatLogPanel: React.FC = () => {
       </div>
 
       <div className={styles["ChatLogPanel-list"]}>
-        {isLoading && <p>로딩 중...</p>}
+        {isLoading && <p>""</p>}
         {isError && <p>채팅방을 불러오는 데 실패했습니다.</p>}
         {!isLoading && !isError && data?.chatRooms.length === 0 && (
           <p className={styles.emptyMessage}>채팅방이 없습니다.</p>

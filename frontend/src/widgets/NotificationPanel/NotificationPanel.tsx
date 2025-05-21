@@ -48,7 +48,7 @@ const NotificationPanel: React.FC<Props> = ({ isOpen }) => {
       </div>
       <div className={styles["NotificationPanel-list"]}>
         {isLoading ? (
-          <p>로딩 중...</p>
+          <p>""</p>
         ) : isServerError ? (
           <p style={{ fontStyle: "italic", textAlign: "center", fontSize: "12px", color: "var(--gray-text)" }}>
             알림을 불러오지 못했습니다.

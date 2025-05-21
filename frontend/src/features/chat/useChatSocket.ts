@@ -12,7 +12,7 @@ export const useChatSocket = (chatId?: string) => {
   const queryClient = useQueryClient();
   const { ignoreIncoming, setIgnoreIncoming } = useChatMessageStore();
   const { addLog } = useWebSocketLogger();
-  const { ignoreConsoleLogs } = useWebSocketLogger()
+  const { ignoreConsoleLogs } = useWebSocketLogger();
   const {
     appendToLast,
     finalizeLast,
@@ -23,21 +23,12 @@ export const useChatSocket = (chatId?: string) => {
   } = useChatMessageStore();
 
   useEffect(() => {
-    console.log('[useChatSocket] mount', { chatId });
-    if (!chatId) {
-      console.log('[useChatSocket] no chatId, skip');
-      return;
-    }
+    if (!chatId) return;
 
     connectSocket()
-      .then((sock) => {
-        console.log('[useChatSocket] connected', sock);
-
+      .then(() => {
         const socket = getSocket();
-        if (!socket) {
-          console.error('[useChatSocket] getSocket() returned null');
-          return;
-        }
+        if (!socket) return;
 
         socket.onmessage = (event) => {
           const raw = event.data;
@@ -45,24 +36,22 @@ export const useChatSocket = (chatId?: string) => {
           if (ignoreIncoming) {
             try {
               const m = JSON.parse(raw);
-              if (m.type === 'info' && m.payload === '🛑 생성 중단 요청 완료'){
+              if (m.type === 'info' && m.payload === '🛑 생성 중단 요청 완료') {
                 setIgnoreIncoming(false);
               }
             } catch {
-              // Json 파싱 에러 무시시
+              /* 무시 */
             }
             return;
           }
 
-          // 1) 순수 텍스트 에러: JSON 아니면 곧바로 에러 처리
+          // 1) 순수 텍스트 에러 처리
           if (typeof raw === 'string' && !raw.trim().startsWith('{')) {
-            setMessages(
-              chatId,
-              useChatMessageStore
-                .getState()
-                .messages[chatId]
-                .slice(0, -1)
-            );
+            const prev = useChatMessageStore
+              .getState()
+              .messages[chatId]
+              .slice(0, -1);
+            setMessages(chatId, prev);
             return;
           }
 
@@ -71,15 +60,11 @@ export const useChatSocket = (chatId?: string) => {
           try {
             msg = JSON.parse(raw);
           } catch {
-            console.error('[useChatSocket] JSON 파싱 실패:', raw);
             return;
           }
 
           // 타입 가드
-          if (typeof msg !== 'object' || msg === null || !('type' in msg)) {
-            console.warn('[useChatSocket] unexpected msg shape', msg);
-            return;
-          }
+          if (typeof msg !== 'object' || msg === null || !('type' in msg)) return;
           const { type, payload } = msg as { type: string; payload: unknown };
 
           switch (type) {
@@ -87,17 +72,14 @@ export const useChatSocket = (chatId?: string) => {
               return;
 
             case 'error':
-              // JSON 형태로 내려오는 에러
-              if (typeof payload === 'string') {
-                if (!payload.includes('알 수 없는 type: ping')) {
-                  showErrorToast(payload);
-                }
+              if (typeof payload === 'string' && !payload.includes('알 수 없는 type: ping')) {
+                showErrorToast(payload);
               }
               finalizeLast(chatId);
               return;
 
             case 'console':
-              if (!ignoreConsoleLogs){
+              if (!ignoreConsoleLogs) {
                 addLog({ type: 'console', message: String(payload) });
               }
               return;
@@ -105,22 +87,31 @@ export const useChatSocket = (chatId?: string) => {
             case 'title':
               if (typeof payload === 'string') {
                 updateChatTitle(chatId, payload)
-                  .then(() => queryClient.invalidateQueries({ queryKey: ['chatRooms'] }))
-                  .catch(console.error);
+                  .then(() =>
+                    queryClient.invalidateQueries({ queryKey: ['chatRooms'] })
+                  )
+                  .catch(() => {
+                    /* 무시 */
+                  });
               }
               return;
 
             case 'info':
-              if (payload === 'SQL & 데이터 생성 중'
-               || payload === 'SQL 생성 중...'
-               || payload === '차트 생성 중...') {
+              if (
+                payload === 'SQL & 데이터 생성 중' ||
+                payload === 'SQL 생성 중...' ||
+                payload === '차트 생성 중...'
+              ) {
                 appendToLast(chatId, { type: 'status', content: payload as string });
               } else if (payload === '인사이트 생성 중') {
                 setInsightText(chatId, () => '');
                 appendToLast(chatId, { type: 'status', content: '' });
               } else if (payload === '인사이트 생성 완료') {
                 finalizeLast(chatId);
-              } else if (typeof payload === 'string' && /^[A-Za-z0-9_-]+$/.test(payload)) {
+              } else if (
+                typeof payload === 'string' &&
+                /^[A-Za-z0-9_-]+$/.test(payload)
+              ) {
                 setRealChatId(chatId, payload);
                 finalizeLast(chatId);
               }
@@ -134,7 +125,10 @@ export const useChatSocket = (chatId?: string) => {
 
             case 'data':
               if (Array.isArray(payload)) {
-                appendToLast(chatId, { type: 'data', content: payload as Record<string, string|number>[] });
+                appendToLast(chatId, {
+                  type: 'data',
+                  content: payload as Record<string, string | number>[],
+                });
               }
               return;
 
@@ -152,7 +146,7 @@ export const useChatSocket = (chatId?: string) => {
             case 'insight_stream':
             case 'data_summary':
               if (typeof payload === 'string') {
-                setInsightText(chatId, (prev='') => prev + payload);
+                setInsightText(chatId, (prev = '') => prev + payload);
                 appendToLast(chatId, { type: 'text', content: payload });
                 setIsLive(chatId, true);
               }
@@ -160,7 +154,7 @@ export const useChatSocket = (chatId?: string) => {
 
             case 'follow_up_stream':
               if (typeof payload === 'string') {
-                setInsightText(chatId, (prev='') => prev + payload);
+                setInsightText(chatId, (prev = '') => prev + payload);
                 appendToLast(chatId, { type: 'text', content: payload });
                 setIsLive(chatId, false);
               }
@@ -174,22 +168,20 @@ export const useChatSocket = (chatId?: string) => {
               return;
 
             default:
-              console.warn('[useChatSocket] unknown type:', type);
+              return;
           }
         };
 
-        socket.onerror = (err) => {
-          console.error('[useChatSocket] error', err);
+        socket.onerror = () => {
           finalizeLast(chatId);
         };
         socket.onclose = () => {
-          console.warn('[useChatSocket] closed');
           finalizeLast(chatId);
           tryReconnect();
         };
       })
-      .catch((err) => {
-        console.error('[useChatSocket] connectSocket failed', err);
+      .catch(() => {
+        /* 무시 */
       });
   }, [
     chatId,

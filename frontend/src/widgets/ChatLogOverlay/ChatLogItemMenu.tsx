@@ -26,8 +26,7 @@ const ChatLogItemMenu = forwardRef<HTMLDivElement, Props>(
         await addChatToProject(projectId, selectedChatId);
 
         alert("채팅이 프로젝트에 저장되었습니다.");
-      } catch (err) {
-        console.error("프로젝트에 채팅 저장 실패:", err);
+      } catch {
         alert("프로젝트에 저장 실패했습니다.");
       } finally {
         setIsHoveringProject(false);

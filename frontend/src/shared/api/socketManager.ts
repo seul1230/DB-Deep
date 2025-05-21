@@ -1,3 +1,4 @@
+// src/shared/api/socketManager.ts
 import { showErrorToast } from '@/shared/toast';
 
 let socket: WebSocket | null = null;
@@ -17,7 +18,7 @@ const startHeartbeat = () => {
     if (socket?.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify({ type: 'ping' }));
     }
-  }, 10000);
+  }, 10_000);
 };
 
 const stopHeartbeat = () => {
@@ -34,14 +35,10 @@ export const tryReconnect = () => {
   reconnectTimeout = setTimeout(() => {
     reconnectTimeout = null;
     reconnectAttempts++;
-    console.warn(`[Socket] 🔁 재연결 시도 (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-    connectSocket()
-      .then(() => console.log('[Socket] 🔁 재연결 성공'))
-      .catch((err) => {
-        console.error('[Socket] 재연결 실패', err);
-        tryReconnect();
-      });
-  }, 2000 * reconnectAttempts);
+    connectSocket().catch(() => {
+      tryReconnect();
+    });
+  }, 2_000 * reconnectAttempts);
 };
 
 export const connectSocket = (): Promise<WebSocket> => {
@@ -55,11 +52,14 @@ export const connectSocket = (): Promise<WebSocket> => {
     }
 
     if (socket && socket.readyState === WebSocket.OPEN) {
-      console.log('[Socket] 이미 연결된 소켓 있음');
       return resolve(socket);
     }
 
-    if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+    if (
+      socket &&
+      (socket.readyState === WebSocket.OPEN ||
+        socket.readyState === WebSocket.CONNECTING)
+    ) {
       if (socket.readyState === WebSocket.OPEN) {
         resolve(socket);
       } else {
@@ -69,14 +69,14 @@ export const connectSocket = (): Promise<WebSocket> => {
           resolve(socket!);
         };
       }
-      return resolve(socket);
+      return;
     }
 
     try {
       socket = new WebSocket(`${WS_URL}?token=${token}`);
-    } catch (err) {
+    } catch {
       showErrorToast('웹소켓 생성에 실패했습니다.');
-      return reject(err);
+      return reject('WebSocket creation error');
     }
 
     socket.onopen = () => {
@@ -85,9 +85,9 @@ export const connectSocket = (): Promise<WebSocket> => {
       resolve(socket!);
     };
 
-    socket.onerror = (err) => {
+    socket.onerror = () => {
       stopHeartbeat();
-      reject(err);
+      reject('WebSocket error');
     };
 
     socket.onclose = () => {
@@ -97,22 +97,22 @@ export const connectSocket = (): Promise<WebSocket> => {
 };
 
 export const sendInitialConnection = (uuid: string, department: string) => {
-  const socket = getSocket();
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    console.warn('🔌 소켓 연결 안됨');
+  const ws = getSocket();
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
+    showErrorToast('소켓이 연결되지 않았습니다.');
     return;
   }
-  socket.send(JSON.stringify({ uuid, user_department: department }));
+  ws.send(JSON.stringify({ uuid, user_department: department }));
   hasConnectedWithId = true;
 };
 
 export const sendMessage = (msg: { question: string }) => {
-  const socket = getSocket();
-  if (!socket || socket.readyState !== WebSocket.OPEN || !hasConnectedWithId) {
-    console.warn('🔌 소켓 연결 안됨 또는 초기 연결 미완료');
+  const ws = getSocket();
+  if (!ws || ws.readyState !== WebSocket.OPEN || !hasConnectedWithId) {
+    showErrorToast('소켓이 준비되지 않았습니다.');
     return;
   }
-  socket.send(JSON.stringify({ question: msg.question }));
+  ws.send(JSON.stringify({ question: msg.question }));
 };
 
 export const sendMessageSafely = async ({
@@ -124,9 +124,9 @@ export const sendMessageSafely = async ({
   department: string;
   question: string;
 }) => {
-  const socket = getSocket();
+  const ws = getSocket();
 
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) {
     await connectSocket();
     resetInitialConnectionState();
     sendInitialConnection(chatId, department);
