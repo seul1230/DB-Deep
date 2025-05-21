@@ -8,6 +8,7 @@ from utils.ws_session_manager import set_stop_flag, clear_stop_flag
 from utils.ws_utils import send_ws_message
 from utils.response_utils import replace_nulls_with_zero
 from services.message_service import save_chat_message, build_chat_history
+from services.glossary_service import get_glossary_terms_by_member_id
 from services.chat_service import update_chatroom_summary, generate_chatroom_title, is_first_chat
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
