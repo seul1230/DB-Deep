@@ -14,6 +14,9 @@ from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from infrastructure.es_message_service import save_chat_message_to_es
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+
 async def handle_chat_websocket(websocket: WebSocket):
     
     while True:
@@ -63,7 +66,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             # 🔍 질문 유형 분류
             clf_result = run_question_clf_chain(question=question, chat_history=chat_history)
             clf_type = clf_result.get("classification", "")
-            print(clf_type)
+            logging.info("완료: %s", clf_type)
 
             await send_ws_message(websocket, type_="info", payload=f"질문 분류 결과: {clf_type}")
 
