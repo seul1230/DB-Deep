@@ -4,14 +4,12 @@ import { ArchiveItem } from "@/features/archive/archiveTypes";
 import { convertArchiveToParsedContent } from "@/features/archive/convertArchiveToParsedContent";
 import { convertToStreamMessage } from "@/features/chat/chatTypes";
 import ArchivedChatBubble from "@/entities/archive/ArchiveChatBubble/ArchivedChatBubble";
-import ChartOverlay from "@/entities/chat/ChartOverlay/ChartOverlay";
-import { useState } from "react";
-import { CustomChartData } from "@/types/chart";
+import { convertToChartData } from "@/types/chart";
+import { useChartOverlayStore } from "@/features/chat/useChartOverlaystore";
 
 const ArchiveDetailPage = () => {
   const location = useLocation();
   const archive = location.state as ArchiveItem;
-  const [chart, setChart] = useState<CustomChartData | null>(null);
 
   if (!archive) {
     return <div className={styles.error}>❌ 잘못된 접근입니다.</div>;
@@ -34,17 +32,10 @@ const ArchiveDetailPage = () => {
         <ArchivedChatBubble
           message={streamMessage}
           onChartClick={(c) => {
-            setChart(c);
+            useChartOverlayStore.getState().openChart(convertToChartData(c)); // 전역 상태로 열기
           }}
         />
       </div>
-
-      {chart && (
-  <>
-    <ChartOverlay chartData={chart} onClose={() => setChart(null)} />
-  </>
-)}
-
     </div>
   );
 };
