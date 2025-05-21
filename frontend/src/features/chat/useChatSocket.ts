@@ -11,6 +11,7 @@ import type { ChartData } from '@/features/chat/chatTypes';
 export const useChatSocket = (chatId?: string) => {
   const queryClient = useQueryClient();
   const { addLog } = useWebSocketLogger();
+  const { ignoreConsoleLogs } = useWebSocketLogger()
   const {
     appendToLast,
     finalizeLast,
@@ -88,8 +89,9 @@ export const useChatSocket = (chatId?: string) => {
               return;
 
             case 'console':
-              // 오직 WebSocket 콘솔에만 표시
-              addLog({ type: 'console', message: String(payload) });
+              if (!ignoreConsoleLogs){
+                addLog({ type: 'console', message: String(payload) });
+              }
               return;
 
             case 'title':
@@ -191,5 +193,6 @@ export const useChatSocket = (chatId?: string) => {
     setRealChatId,
     setIsLive,
     setMessages,
+    ignoreConsoleLogs,
   ]);
 };

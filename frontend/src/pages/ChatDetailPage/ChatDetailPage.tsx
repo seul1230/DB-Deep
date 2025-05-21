@@ -8,7 +8,7 @@ import styles from './ChatDetailPage.module.css';
 import { fetchChatDetail } from '@/features/chat/chatApi';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 import { useQuestionInput } from '@/features/chat/useQuestionInput';
-import { sendMessageSafely } from '@/shared/api/socketManager';
+import { sendMessageSafely, getSocket } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
 import { useAuth } from '@/features/auth/useAuth';
 import { convertToChartData } from '@/types/chart';
@@ -27,10 +27,11 @@ const GlossaryModal = React.lazy(() =>
 const ChatDetailPage: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   useChatSocket(chatId);
-  const { messages, insightText } = useChatMessageStore();
+  const { messages, insightText, setMessages } = useChatMessageStore();
   const { profile } = useAuth();
 
   const { setConsoleOpen } = useWebSocketConsoleStore();
+  const { setIgnoreConsoleLogs } = useWebSocketLogger()
 
   const [showModal, setShowModal] = useState(false);
   const [showChartOverlay] = useState(false);
@@ -44,6 +45,11 @@ const ChatDetailPage: React.FC = () => {
     [chatId, messages]
   );
 
+  const isLoading = useMemo(() => {
+    const last = chatMessages.slice().reverse().find(m => m.senderType === 'ai');
+    return last?.isLive ?? false;
+  }, [chatMessages]);
+
   const currentInsight = chatId ? insightText[chatId] : undefined;
 
   const { value, onChange, onSubmit } = useQuestionInput(async (text) => {
@@ -56,10 +62,18 @@ const ChatDetailPage: React.FC = () => {
     setShouldScrollToBottom(true);
   });
 
+  const handleStop = () => {
+    const socket = getSocket();
+    socket?.send(JSON.stringify({ type: 'stop' }));
+    setIgnoreConsoleLogs(true)
+    const cur = messages[chatId!] || [];
+    setMessages(chatId!, cur.filter(m => !m.isLive));
+  };
+
   useEffect(() => {
     setConsoleOpen(true);
   }, [chatId, setConsoleOpen]);
-  
+
   // 1) 질문 전송 직후 혹은 초기 로드시 한 번만 스크롤
   useEffect(() => {
     if (shouldScrollToBottom && scrollBottomRef.current) {
@@ -126,7 +140,13 @@ const ChatDetailPage: React.FC = () => {
       <div className={styles['chatDetailPage-inputWrapper']} style={layoutStyle}>
         <div className={styles['chatDetailPage-inputContainer']}>
           <div className={styles['chatDetailPage-inputArea']}>
-            <QuestionInput value={value} onChange={onChange} onSubmit={() => onSubmit(chatId!)} />
+            <QuestionInput 
+              value={value} 
+              onChange={onChange} 
+              onSubmit={() => onSubmit(chatId!)}
+              isLoading={isLoading}
+              onStop={handleStop}
+               />
             <div className={styles['chatDetailPage-buttonGroup']}>
               <Button
                 label="용어 사전"

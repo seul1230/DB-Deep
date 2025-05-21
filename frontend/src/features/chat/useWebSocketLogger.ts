@@ -12,9 +12,11 @@ interface LogEntry {
 interface WebSocketLoggerState {
   logs: LogEntry[];
   isConnected: boolean;
+  ignoreConsoleLogs: boolean;
   addLog: (log: LogEntry) => void;
   setConnected: (connected: boolean) => void;
   removeLog: (index: number) => void;
+  setIgnoreConsoleLogs: (ignore: boolean) => void;
 }
 
 export const useWebSocketLogger = create<WebSocketLoggerState>()(
@@ -22,6 +24,7 @@ export const useWebSocketLogger = create<WebSocketLoggerState>()(
     (set) => ({
       logs: [],
       isConnected: false,
+      ignoreConsoleLogs: false,
       addLog: (log) =>
         set((state) => ({
           logs: [...state.logs, log].slice(-100),
@@ -29,8 +32,9 @@ export const useWebSocketLogger = create<WebSocketLoggerState>()(
       setConnected: (connected) => set({ isConnected: connected }),
       removeLog: (index) =>
         set((state) => ({
-          logs: state.logs.filter((_, i) => i !== index), // ✅ 불변성 유지
+          logs: state.logs.filter((_, i) => i !== index),
         })),
+        setIgnoreConsoleLogs: (ignore) => set({ ignoreConsoleLogs: ignore }),
     }),
     {
       name: 'websocket-logger',
