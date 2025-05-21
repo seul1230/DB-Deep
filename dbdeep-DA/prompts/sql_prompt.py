@@ -145,13 +145,13 @@ def get_prompt_for_sql(user_department):
        - 최종 결과를 요약해주는 부서별/카테고리별 행
        - 의미 있는 결과를 이끌어내야 합니다. 다 같은 값이거나 조회되는 데이터가 없다면 다시 한 번 생각해보세요.
        - 쿼리 최적화를 항상 염두에 두고 작성하세요.
-    7. 
+    7. ❗ 질문자가 인사팀이 아님에도 hr_dataset을 참조하려고 하면, "접근 권한이 없습니다" 또는 "해당 데이터는 접근할 수 없습니다" 등의 응답을 생성해야 합니다.
     8. 테이블 및 컬럼명은 절대 한글로 작성하지 말고, 반드시 스키마(context_schema)를 그대로 사용하세요.
     9. 존재하지 않는 컬럼명을 한글로 새로 만들어 쓰지 마세요. (예: 직원ID, 상여금 등)
        - 주의: LLM이 자주 실수하는 점 중 하나는 fact 테이블에서 직접 position_id나 department_id 등을 찾는 것입니다. 이 컬럼들은 반드시 dim_employee를 통해 JOIN하여 가져와야 합니다.
     10. 성능을 고려한 SQL을 작성하세요. 다음 사항을 꼭 지켜야 합니다:
        - 대용량 테이블(card_credit 등)은 반드시 WHERE 절에 job_mon 등 파티셔닝 필드를 기준으로 필터링할 것
-       - job_mon은 문자열로 변환하지 말고, 정수 상태로 활용할 것 (CAST 사용 금지)
+       - job_mon은 문자열로 YYYYMM 형식입니다.
        - COUNT(*)는 꼭 필요한 경우에만 사용하며, GROUP BY 없이 사용하는 것을 지양할 것
        - LIMIT을 포함하여 50건 이하로 결과를 제한할 것
 
@@ -179,7 +179,19 @@ def get_prompt_for_sql(user_department):
     [데이터셋 요약 - card_dataset]
     - 총 8개 테이블(card_members, card_credit, card_sales, card_invoice, card_balance, card_channels, card_marketing, card_performance)로 구성
     - 각 테이블은 '기준년월(job_mon)', '회원번호(member_no)'로 공통 연결 가능
-      - job_mon의 자료형은 INTEGER입니다.
+      - job_mon의 자료형은 STRING입니다.
+        - job_mon 외에도 YYYYMM 형태의 아래의 필드 또한 STRING입니다.
+            — card_members.date_credit_lt_ent
+            — card_members.ym_crdit_ltvl_ups_card
+            — card_members.ym_crdit_ltvl_use_card
+            — card_members.date_lt_card_isu
+            — card sales.day_max_base
+            — card sales.day_max_crsl
+            — card sales.day_max_ca
+            — card sales.day_max_cl
+            — card sales.day_max_chk
+            — card sales.day_max_pif
+            — card sales.day_max_int
       - ratio_로 시작하는 필드의 자료형은 FLOAT입니다.
     - 컬럼명은 영어 식별자를 사용 (예: code_gender, amt_use 등)
     - 자료형: 대부분 STRING / FLOAT / INTEGER 로 구성됨
@@ -206,14 +218,26 @@ def get_prompt_for_sql(user_department):
     2. [분석 방향 요약(analysis_direction)] 질문의 핵심 의도와 판단 기준 해석
     3. [SQL 사고 흐름 요약(sql_thinking_flow)] 어떤 방식으로 쿼리를 구성할 것인지 간단히 설명
     4. 조회된 데이터를 차트로 시각화 하는 과정이 필요한지 (need_chart: bool) - True 혹은 False로 나타내세요. 첫 번째 문자는 대문자로 하세요.
-    5. [SQL 코드(sql_code)]
+    5. [SQL 코드(sql_code)]: 접근 권한이 없는 경우 "impossible"을 출력하세요.
 
     """
-    # {card_schema_json_str}
+
+
+    # ✅ input_variable 구성 시 hr_dataset 접근 제한
+    input_vars = ["question", "chat_history", "user_department", "card_schema", "context_term", "customer_dict", "context_sql"]
+
+
+    # hr 관련 section 제거 or 유지
+    if not is_hr_team(user_department):
+        base_template = base_template.replace("[데이터셋 및 스키마 설명 - hr_schema]", "")
+        base_template = base_template.replace("{hr_schema}", "")
+        base_template = base_template.replace("{hr_schema_json_str}", "")
+    else:
+        input_vars += ["hr_schema", "hr_schema_json_str"]
+
 
     prompt_template = PromptTemplate(
-        input_variables=["question", "chat_history", "user_department", "hr_schema", "hr_schema_json_str", # "card_schema_json_str",
-                         "card_schema", "context_term", "custom_dict", "context_sql"],
+        input_variables=input_vars,
         template=base_template.replace("{hr_rule}", hr_rule)
     )
 

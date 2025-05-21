@@ -79,5 +79,5 @@ def embed_and_upload_documents(
 
 
 if __name__ == "__main__":
-    embed_and_upload_documents(index_name="schema-index-v2")
+    embed_and_upload_documents(index_name="schema-index-v3")
     # embed_and_upload_documents(index_name="kanana-index", embedding_model_name="kakaocorp/kanana-nano-2.1b-embedding")
