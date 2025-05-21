@@ -42,7 +42,7 @@ export const TypewriterText: React.FC<Props> = ({ chatId }) => {
     const tm = setTimeout(() => {
       setTyped((p) => p + fullText[charIndex]);
       setCharIndex((i) => i + 1);
-    }, 20);
+    }, 10);
     return () => clearTimeout(tm);
   }, [charIndex, fullText, isLive]);
 

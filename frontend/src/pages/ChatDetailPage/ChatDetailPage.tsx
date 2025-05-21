@@ -15,6 +15,7 @@ import { convertToChartData } from '@/types/chart';
 import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
 import { useChatSocket } from '@/features/chat/useChatSocket';
 import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
+import { useWebSocketConsoleStore } from '@/features/chat/useWebSocketConsoleStore';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -28,6 +29,8 @@ const ChatDetailPage: React.FC = () => {
   useChatSocket(chatId);
   const { messages, insightText } = useChatMessageStore();
   const { profile } = useAuth();
+
+  const { setConsoleOpen } = useWebSocketConsoleStore();
 
   const [showModal, setShowModal] = useState(false);
   const [showChartOverlay] = useState(false);
@@ -53,6 +56,10 @@ const ChatDetailPage: React.FC = () => {
     setShouldScrollToBottom(true);
   });
 
+  useEffect(() => {
+    setConsoleOpen(true);
+  }, [chatId, setConsoleOpen]);
+  
   // 1) 질문 전송 직후 혹은 초기 로드시 한 번만 스크롤
   useEffect(() => {
     if (shouldScrollToBottom && scrollBottomRef.current) {
