@@ -18,4 +18,4 @@ register_exception_handlers(app)
 # 라우터 등록
 app.include_router(router.router)
 app.include_router(ws_chat.router)
-# app.include_router(rag_router.router)
+app.include_router(glossary_term_controller.router)
