@@ -9,8 +9,8 @@ import ProjectPanel from "../ProjectPanel/ProjectPanel";
 import Header from "@/shared/ui/Header/Header";
 import WebSocketConsole from "@/widgets/WebSocketConsole/WebSocketConsole";
 import ChartOverlay from "@/entities/chat/ChartOverlay/ChartOverlay";
-import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore'; //
-import { convertChartData } from '@/types/chart';//
+import { useChartOverlayStore } from '@/features/chat/useChartOverlaystore';
+import { convertChartData } from '@/types/chart';
 
 const SIDEBAR_WIDTH = 68;
 const PANEL_WIDTH = 240;
@@ -62,17 +62,51 @@ const Layout: React.FC = () => {
         </div>
   
         {isNotificationOpen && (
-          <div style={{ width: PANEL_WIDTH, background: 'var(--sidebar-bg)' }}>
+          <div
+            style={{
+              width: PANEL_WIDTH,
+              flexShrink: 0,
+              borderLeft: '1px solid var(--light-gray)',
+              background: 'var(--sidebar-bg)',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
+              transition: 'all 0.3s ease',
+              boxSizing: 'border-box'
+            }}
+          >
             <NotificationPanel isOpen />
           </div>
         )}
         {isChatLogOpen && (
-          <div style={{ width: PANEL_WIDTH, background: 'var(--sidebar-bg)' }}>
+          <div
+            style={{
+              width: PANEL_WIDTH,
+              flexShrink: 0,
+              borderLeft: '1px solid var(--light-gray)',
+              background: 'var(--sidebar-bg)',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
+              boxSizing: 'border-box'
+            }}
+          >
             <ChatLogPanel />
           </div>
         )}
         {isProjectOpen && (
-          <div style={{ width: PANEL_WIDTH, background: 'var(--sidebar-bg)' }}>
+          <div
+            style={{
+              width: PANEL_WIDTH,
+              flexShrink: 0,
+              borderLeft: '1px solid var(--light-gray)',
+              background: 'var(--sidebar-bg)',
+              display: 'flex',
+              flexDirection: 'column',
+              height: '100vh',
+              boxSizing: 'border-box'
+            }}
+          >
             <ProjectPanel />
           </div>
         )}
@@ -103,7 +137,7 @@ const Layout: React.FC = () => {
         )}
       </div>
   
-      {/* 우측 콘솔 */}
+      {/* WebSocket 우측 콘솔 */}
       <WebSocketConsole />
     </div>
   );
