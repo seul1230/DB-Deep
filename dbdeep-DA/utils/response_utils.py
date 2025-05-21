@@ -98,3 +98,17 @@ def extract_need_chart_flag(response_text: str) -> bool:
         return match and match.group(1).lower() == "true"
     except:
         return False
+
+def replace_nulls_with_zero(data: dict) -> dict:
+    """
+    딕셔너리 안의 value가 리스트일 때, 그 리스트에 None이 포함된 경우에만
+    해당 리스트 내의 None 값을 0으로 바꿔줍니다.
+    문자열 등 다른 타입은 건드리지 않습니다.
+    """
+    result = {}
+    for key, value in data.items():
+        if isinstance(value, list) and any(v is None for v in value):
+            result[key] = [0 if v is None else v for v in value]
+        else:
+            result[key] = value
+    return result
