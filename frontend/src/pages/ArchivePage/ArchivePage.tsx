@@ -5,11 +5,13 @@ import SectionTitle from "@/entities/archive/SectionTitle/SectionTitle";
 import ArchiveCard from "@/entities/archive/ArchiveCard/ArchiveCard";
 import { fetchArchiveList } from "@/features/archive/archiveApi";
 import { ArchiveItem } from "@/features/archive/archiveTypes";
-import dayjs from "dayjs";
+import { CustomChartData } from "@/types/chart";
+import ChartOverlay from "@/entities/chat/ChartOverlay/ChartOverlay";
 
 const ArchivePage = () => {
   const [archives, setArchives] = useState<ArchiveItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedChart, setSelectedChart] = useState<CustomChartData | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,8 +19,8 @@ const ArchivePage = () => {
       try {
         const archiveList = await fetchArchiveList();
         setArchives(archiveList);
-      } catch (error) {
-        console.error("아카이브 목록 불러오기 실패:", error);
+      } catch {
+        // 아카이브 불러오기 실패
       } finally {
         setLoading(false);
       }
@@ -37,6 +39,10 @@ const ArchivePage = () => {
     );
   };
 
+  const handleChartClick = (chart: CustomChartData) => {
+    setSelectedChart(chart);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.inner}>
@@ -52,23 +58,22 @@ const ArchivePage = () => {
             {archives.map((item) => (
               <ArchiveCard
                 key={item.archiveId}
-                id={item.archiveId.toString()}
-                title={item.chatName}
-                description={
-                  item.lastMessage?.insight ||
-                  item.lastMessage?.question ||
-                  item.lastMessage?.query ||
-                  (item.lastMessage?.chart ? `[차트] ${item.lastMessage.chart.title}` : "(내용 없음)")
-                }
-                
-                date={dayjs(item.archivedAt).format("YYYY년 M월 D일 A h시 m분")}
+                archive={item}
                 onClick={() => handleCardClick(item)}
+                onChartClick={handleChartClick}
                 onDeleteSuccess={handleDeleteSuccess}
               />
             ))}
           </div>
         )}
       </div>
+
+      {selectedChart && (
+        <ChartOverlay
+          chartData={selectedChart}
+          onClose={() => setSelectedChart(null)}
+        />
+      )}
     </div>
   );
 };

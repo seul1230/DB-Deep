@@ -28,23 +28,23 @@
 
 .glossaryModal-closeIcon {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 1.5rem;
+  right: 1.5rem;
   cursor: pointer;
-  color: var(--icon-blue);
+  color: var(--text-color);
   font-size: 1.25rem;
   z-index: 10;
 }
 
 .glossaryModal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 10px;
   align-items: center;
-  padding-top: 2rem;
-  padding-bottom: 1rem;
-  font-size: 1rem;
+  padding: 1rem 0 1rem 0.5rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  border-bottom: 1px solid var(--light-gray);
+  border-bottom: 2px solid var(--primary-light-blue);
   background-color: var(--background-color);
   position: sticky;
   top: 0;
@@ -59,11 +59,11 @@
   cursor: pointer;
   color: var(--icon-blue);
   font-size: 1rem;
+  padding-top: 5px;
 }
 
 .glossaryModal-body {
   overflow-y: auto;
-  padding-top: 1rem;
   scrollbar-width: none;         /* Firefox */
   -ms-overflow-style: none;      /* IE 10+ */
   flex: 1;
@@ -76,12 +76,26 @@
 .glossaryModal-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
+
+.glossaryModal-table input {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 8px;
+  border: 1px solid var(--primary-light-blue);
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
 
 .glossaryModal-table th,
 .glossaryModal-table td {
   padding: 0.75rem;
-  border-bottom: 1px solid var(--light-gray);
+  border-bottom: 1px solid var(--primary-light-blue);
   font-size: 0.85rem;
 }
 
@@ -91,15 +105,17 @@
 }
 
 .glossaryModal-table td:first-child {
+  width: 30%; 
   text-align: center;
 }
 
 .glossaryModal-table td:nth-child(2) {
+  width: 55%;
   text-align: left;
 }
 
 .glossaryModal-iconCell {
-  width: 60px;
+  width: 15%;
   text-align: right;
 }
 
@@ -113,6 +129,13 @@
   margin-left: 0.5rem;
   color: var(--icon-blue);
   transition: color 0.2s ease;
+}
+
+.glossaryModal-iconGroup {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .glossaryModal-icon:hover {

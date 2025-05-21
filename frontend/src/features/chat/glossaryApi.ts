@@ -9,7 +9,6 @@ const glossaryInstance = axios.create({
   },
 });
 
-// 요청 시 Authorization 헤더 삽입
 glossaryInstance.interceptors.request.use((config) => {
   const token = useAuth.getState().accessToken;
   if (token) {
@@ -24,8 +23,8 @@ export const glossaryApi = {
     return res.data;
   },
 
-  create: async (data: { key: string; value: string }) => {
-    const res = await glossaryInstance.post(GLOSSARY_API_URL, data);
+  create: async (terms: { key: string; value: string }[]) => {
+    const res = await glossaryInstance.post(GLOSSARY_API_URL, { terms });
     return res.data;
   },
 

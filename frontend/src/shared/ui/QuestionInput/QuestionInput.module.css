@@ -25,6 +25,7 @@
   transition: height 0.2s ease;
   overflow-y: hidden;
   background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 @media (max-width: 768px) {

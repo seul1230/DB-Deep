@@ -22,20 +22,25 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   word-break: break-word;
   overflow-wrap: break-word;
-  /* white-space: pre-wrap; */
 }
 
-/* 점3개 메뉴 영역 */
+.chatBubbleDBDeep-bubbleNoBg {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* 메뉴 버튼 */
 .chatBubbleDBDeep-menuArea {
   position: static;
 }
 
 .chatBubbleDBDeep-menuButtonWrapper {
-  position: relative; /* 오버레이 기준 위치 */
+  position: relative;
   display: inline-block;
 }
 
-/* 점3개 버튼 */
 .chatBubbleDBDeep-menuButton {
   background: none;
   border: none;
@@ -49,55 +54,54 @@
 
 .chatBubbleDBDeep-menuOverlayContainer {
   position: absolute;
-  top: 100%; /* 버튼 아래로 */
-  left: 0; /* 왼쪽 정렬 */
+  top: 100%;
+  left: 0;
   z-index: 30;
 }
 
-/* .chatBubbleDBDeep-menuButton:hover {
-  background-color: var(--light-gray);
-} */
-
-/* 마크다운 내부 스타일 */
+/* 마크다운 */
 .chatBubbleDBDeep-bubble h1,
 .chatBubbleDBDeep-bubble h2,
-.chatBubbleDBDeep-bubble h3 {
+.chatBubbleDBDeep-bubble h3,
+.chatBubbleDBDeep-bubbleNoBg h1,
+.chatBubbleDBDeep-bubbleNoBg h2,
+.chatBubbleDBDeep-bubbleNoBg h3 {
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.6;
   margin: 12px 0 8px;
 }
 
-.chatBubbleDBDeep-bubble p {
+.chatBubbleDBDeep-bubble p,
+.chatBubbleDBDeep-bubbleNoBg p {
   margin: 6px 0;
   font-size: 0.875rem;
   line-height: 1.6;
 }
 
-.chatBubbleDBDeep-bubble ul {
+.chatBubbleDBDeep-bubble ul,
+.chatBubbleDBDeep-bubbleNoBg ul {
   padding-left: 1.2rem;
   line-height: 1.6;
   margin: 10px 0 14px;
 }
 
-.chatBubbleDBDeep-bubble li {
+.chatBubbleDBDeep-bubble li,
+.chatBubbleDBDeep-bubbleNoBg li {
   font-size: 0.875rem;
   margin: 10px 0 14px;
   line-height: 1.5;
   list-style: disc;
 }
 
-.chatBubbleDBDeep-bubble li > p {
-  margin: 0;
-  line-height: 1.6;
-}
-
-.chatBubbleDBDeep-bubble ol {
+.chatBubbleDBDeep-bubble ol,
+.chatBubbleDBDeep-bubbleNoBg ol {
   padding-left: 1.4rem;
   margin: 10px 0;
 }
 
-.chatBubbleDBDeep-bubble ol > li {
+.chatBubbleDBDeep-bubble ol > li,
+.chatBubbleDBDeep-bubbleNoBg ol > li {
   list-style-type: decimal;
   margin-bottom: 8px;
   line-height: 1.6;
@@ -109,29 +113,15 @@
   margin: 12px 0;
 }
 
-.chatBubbleDBDeep-spinner {
-  border: 2px solid var(--primary-dark-blue);
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  width: 14px;
-  height: 14px;
-  animation: spin 0.8s linear infinite;
-  margin-right: 8px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .chatBubbleDBDeep-section {
   margin-bottom: 12px;
-}
-
-.chatArea-wrapper {
-  overflow-y: auto;
-  max-height: 100vh;
-  scroll-behavior: smooth;
 }

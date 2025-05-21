@@ -7,13 +7,13 @@ import styles from './ChatDetailPage.module.css';
 import { fetchChatDetail } from '@/features/chat/chatApi';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 import { useQuestionInput } from '@/features/chat/useQuestionInput';
-import { useChatSocket } from '@/features/chat/useChatSocket';
-import { sendMessage } from '@/shared/api/socketManager';
+import { sendMessageSafely } from '@/shared/api/socketManager';
 import { convertToStreamMessage } from '@/features/chat/chatTypes';
 import { useAuth } from '@/features/auth/useAuth';
 import ChartOverlay from '@/entities/chat/ChartOverlay/ChartOverlay';
 import { CustomChartData } from '@/types/chart';
 import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
+import { useChatSocket } from '@/features/chat/useChatSocket';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -24,9 +24,11 @@ const GlossaryModal = React.lazy(() =>
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
-  const { messages, setMessages } = useChatMessageStore();
+  useChatSocket(chatId);
+  const {
+    messages,
+  } = useChatMessageStore();
   const { profile } = useAuth();
-  const { startUserMessage, startLiveMessage } = useChatMessageStore();
 
   const [showModal, setShowModal] = useState(false);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
@@ -34,38 +36,43 @@ const ChatDetailPage = () => {
   const [overlayChartData, setOverlayChartData] = useState<CustomChartData | null>(null);
   const [showGlossary, setShowGlossary] = useState(false);
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollBottomRef = useRef<HTMLDivElement>(null);
+
   const chatMessages = useMemo(() => {
     return chatId ? messages[chatId] || [] : [];
   }, [chatId, messages]);
 
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const scrollBottomRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (scrollBottomRef.current) {
+      scrollBottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages]);
 
-  const { value, onChange, onSubmit } = useQuestionInput((text) => {
+  const { value, onChange, onSubmit } = useQuestionInput(async (text) => {
     if (!chatId) return;
 
-    startUserMessage(chatId, text);
-    startLiveMessage(chatId);
-
-    sendMessage({
-      uuid: chatId,
+    await sendMessageSafely({
+      chatId,
+      department: profile?.teamName ?? '알 수 없음',
       question: text,
-      user_department: profile?.teamName ?? '알 수 없음',
     });
 
     setShouldScrollToBottom(true);
   });
 
-  useChatSocket(chatId);
-
   useEffect(() => {
-    if (!chatId || messages[chatId]?.length > 0) return;
+    if (!chatId) return;
+
+    const alreadyFetched = useChatMessageStore.getState().messages[chatId]?.length > 0;
+    if (alreadyFetched) return;
+
     fetchChatDetail(chatId).then((res) => {
       const converted = res.messages.map(convertToStreamMessage);
-      setMessages(chatId, converted);
+      useChatMessageStore.getState().setMessages(chatId, converted);
       setShouldScrollToBottom(true);
     });
-  }, [chatId, messages, setMessages]);
+  }, [chatId]);
 
   useEffect(() => {
     if (shouldScrollToBottom && scrollBottomRef.current) {
@@ -76,7 +83,7 @@ const ChatDetailPage = () => {
 
   useEffect(() => {
     if (showChartOverlay) {
-      useWebSocketLogger.getState().setConnected(false); // WebSocketConsole 닫기용
+      useWebSocketLogger.getState().setConnected(false);
     }
   }, [showChartOverlay]);
 
@@ -91,11 +98,7 @@ const ChatDetailPage = () => {
       <div
         className={styles['chatDetailPage-scrollContainer']}
         ref={scrollContainerRef}
-        style={{
-          transition: 'margin 0.3s ease',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-        }}
+        style={{ transition: 'margin 0.3s ease', overflowY: 'auto', overflowX: 'hidden' }}
       >
         <div className={styles['chatDetailPage-contentWrapper']}>
           {chatId && (
@@ -118,7 +121,7 @@ const ChatDetailPage = () => {
         <div className={styles['chatDetailPage-inputWrapper']} style={layoutStyle}>
           <div className={styles['chatDetailPage-inputContainer']}>
             <div className={styles['chatDetailPage-inputArea']}>
-              <QuestionInput value={value} onChange={onChange} onSubmit={onSubmit} /> 
+              <QuestionInput value={value} onChange={onChange} onSubmit={() => onSubmit(chatId!)} />
               <div className={styles['chatDetailPage-buttonGroup']}>
                 <Button
                   label="용어 사전"
@@ -155,10 +158,7 @@ const ChatDetailPage = () => {
       </Suspense>
 
       {showChartOverlay && overlayChartData && (
-        <ChartOverlay
-          onClose={() => setShowChartOverlay(false)}
-          chartData={overlayChartData}
-        />
+        <ChartOverlay onClose={() => setShowChartOverlay(false)} chartData={overlayChartData} />
       )}
     </div>
   );

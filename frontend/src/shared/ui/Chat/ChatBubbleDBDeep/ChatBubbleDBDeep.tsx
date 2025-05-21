@@ -14,6 +14,8 @@ import { showErrorToast, showSuccessToast } from '@/shared/toast';
 import { archiveChatMessage } from '@/features/archive/archiveApi';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 import { CustomChartData } from '@/types/chart';
+import clsx from 'clsx';
+import { ChatSpinner } from '@/entities/chat/ChatSpinner/ChatSpinner';
 
 interface Props {
   parts: ChatPart[];
@@ -22,6 +24,7 @@ interface Props {
   messageId: string;
   onChartClick: (chartData: CustomChartData) => void;
   showMenu?: boolean;
+  noBackground?: boolean;
 }
 
 export const ChatBubbleDBDeep = ({
@@ -31,6 +34,7 @@ export const ChatBubbleDBDeep = ({
   messageId,
   onChartClick,
   showMenu = true,
+  noBackground = false,
 }: Props) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -62,7 +66,13 @@ export const ChatBubbleDBDeep = ({
   return (
     <div className={styles['chatBubbleDBDeep-wrapper']} ref={scrollRef}>
       <div className={styles['chatBubbleDBDeep-bubbleWithMenu']}>
-        <div className={styles['chatBubbleDBDeep-bubble']}>
+        <div
+          className={clsx(
+            styles['chatBubbleDBDeep-bubble'],
+            noBackground && styles['chatBubbleDBDeep-bubbleNoBg']
+          )}
+          style={{ maxWidth: '100%', width: '100%' }}
+        >
           {sql && (
             <div className={styles['chatBubbleDBDeep-section']}>
               <InlineQuery sql={sql} />
@@ -83,9 +93,8 @@ export const ChatBubbleDBDeep = ({
           )}
 
           {status && (
-            <div className={styles['chatBubbleDBDeep-status']}>
-              <span className={styles['chatBubbleDBDeep-spinner']} />
-              {status}
+            <div className={styles['chatBubbleDBDeep-section']}>
+              <ChatSpinner />
             </div>
           )}
 

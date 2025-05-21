@@ -5,7 +5,7 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
   padding: 8px;
   width: 148px;
-  z-index: 1001;
+  z-index: 800;
   position: relative;
 }
 

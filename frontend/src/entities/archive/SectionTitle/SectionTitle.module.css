@@ -19,7 +19,7 @@
   .divider {
     width: 100%;
     height: 1px;
-    background-color: var(--light-gray);
+    background-color: var(--primary-light-blue);
     margin-top: -8px; 
     margin-bottom: 40px;
   }
