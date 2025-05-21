@@ -1,5 +1,5 @@
 import { useThemeStore } from "@/shared/store/themeStore";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { Suspense, useEffect } from "react";
 import AppRoutes from "../app/Router";
 import CustomToastContainer from "@/shared/ui/CustomToastContainer/CustomToastContainer";
@@ -14,12 +14,12 @@ const App = () => {
   }, [theme]);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Suspense fallback={null}>
         <AppRoutes />
         <CustomToastContainer />
       </Suspense>
-    </BrowserRouter>
+    </HashRouter>
   );
 };
 
