@@ -76,9 +76,10 @@ async def handle_chat_websocket(websocket: WebSocket):
             await asyncio.sleep(0)
 
             if clf_type == "follow_up":
+                follow_up_response = ""
                 try:
                     response_text = await run_follow_up_chain_async(question, chat_history, websocket)
-
+                    follow_up_response += response_text
                     # ✅ Follow-up 응답 최종 저장
                     chat_id = save_chat_message(
                         chat_room_id=uuid,
@@ -89,6 +90,7 @@ async def handle_chat_websocket(websocket: WebSocket):
                             "follow_up_response": response_text
                         }
                     )
+                    logging.info(f"Follow-up 답변: {follow_up_response}")
 
                     await send_ws_message(websocket, type_="info", payload=chat_id)
                     await asyncio.sleep(0)
