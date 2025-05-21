@@ -1,11 +1,8 @@
 import json
-import asyncio
 import pandas as pd
 from fastapi import WebSocket
-from services.message_service import save_chat_message, build_chat_history
+from services.message_service import save_chat_message
 from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title
-from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async
-from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 
 async def handle_chat_websocket(websocket: WebSocket):
     uuid, question, department, insight_text = None, None, None, None

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from middleware.member_id_middleware import MemberIdMiddleware
 from exceptions.handlers import register_exception_handlers
-from api import router, ws_chat, rag_router
+from api import router, ws_chat, rag_router, glossary_term_controller
 
 app = FastAPI(
     title="DBDeep API",
@@ -18,4 +18,4 @@ register_exception_handlers(app)
 # 라우터 등록
 app.include_router(router.router)
 app.include_router(ws_chat.router)
-app.include_router(rag_router.router)
+app.include_router(glossary_term_controller.router)

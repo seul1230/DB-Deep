@@ -52,3 +52,7 @@ db-dtypes
 # --- es
 elasticsearch==7.17.0
 pytz
+
+# jwt
+python-jose[cryptography]
+PyJWT>=2.0.0,<3.0.0

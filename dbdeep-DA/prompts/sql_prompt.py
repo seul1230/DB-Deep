@@ -207,7 +207,7 @@ def get_prompt_for_sql(user_department):
     {context_term}
     
     [사용자별 용어 사전]
-    {customer_dict}
+    {custom_dict}
 
     [BigQuery SQL 문법 가이드 및 용어 정의]
     {context_sql}
