@@ -5,7 +5,7 @@ export interface Member {
   name: string | null;
   email: string;
   teamName: string;
-  avatarUrl?: string;
+  profileImage?: string;
 }
 
 export const fetchMembers = async (
