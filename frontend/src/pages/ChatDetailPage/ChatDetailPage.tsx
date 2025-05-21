@@ -31,7 +31,8 @@ const ChatDetailPage: React.FC = () => {
   const { profile } = useAuth();
 
   const { setConsoleOpen } = useWebSocketConsoleStore();
-  const { setIgnoreConsoleLogs } = useWebSocketLogger()
+  const { setIgnoreConsoleLogs } = useWebSocketLogger();
+  const { setIgnoreIncoming } = useChatMessageStore();
 
   const [showModal, setShowModal] = useState(false);
   const [showChartOverlay] = useState(false);
@@ -39,6 +40,10 @@ const ChatDetailPage: React.FC = () => {
   const [showGlossary, setShowGlossary] = useState(false);
 
   const scrollBottomRef = useRef<HTMLDivElement>(null);
+  const stopTimer = useRef<number | null>(null);
+
+  // department 정보
+  const department = profile?.teamName ?? '알 수 없음';
 
   const chatMessages = useMemo(
     () => (chatId ? messages[chatId] || [] : []),
@@ -46,35 +51,63 @@ const ChatDetailPage: React.FC = () => {
   );
 
   const isLoading = useMemo(() => {
-    const last = chatMessages.slice().reverse().find(m => m.senderType === 'ai');
+    const last = [...chatMessages].reverse().find(m => m.senderType === 'ai');
     return last?.isLive ?? false;
   }, [chatMessages]);
 
   const currentInsight = chatId ? insightText[chatId] : undefined;
 
-  const { value, onChange, onSubmit } = useQuestionInput(async (text) => {
+  // 1) 질문 전송 & 3분 자동 중단
+  const { value, onChange, onSubmit } = useQuestionInput(async text => {
     if (!chatId) return;
-    await sendMessageSafely({
-      chatId,
-      department: profile?.teamName ?? '알 수 없음',
-      question: text,
-    });
+
+    // 콘솔 로그 허용
+    setIgnoreConsoleLogs(false);
+    // 기존 타이머 해제
+    if (stopTimer.current) clearTimeout(stopTimer.current);
+
+    // 질문 전송
+    await sendMessageSafely({ chatId, department, question: text });
     setShouldScrollToBottom(true);
+
+    // 3분 뒤 자동 중단
+    stopTimer.current = window.setTimeout(() => {
+      const sock = getSocket();
+      sock?.send(JSON.stringify({ type: 'stop' }));
+      // 이후 콘솔 로그 무시
+      setIgnoreConsoleLogs(true);
+      // 진행 중 AI 메시지 제거
+      const cur = messages[chatId] || [];
+      setMessages(
+        chatId,
+        cur.filter(m => !(m.senderType === 'ai' && m.isLive))
+      );
+      alert('⏰ 응답 시간이 초과되었습니다. 좀 더 구체적으로 질문해주세요.');
+    }, 3 * 60 * 1000);
   });
 
+  // 2) 중단 버튼
   const handleStop = () => {
-    const socket = getSocket();
-    socket?.send(JSON.stringify({ type: 'stop' }));
-    setIgnoreConsoleLogs(true)
+    const sock = getSocket();
+    sock?.send(JSON.stringify({ type: 'stop' }));
+    setIgnoreConsoleLogs(true);
+    setIgnoreIncoming(true);
+    // 라이브 메시지 제거
     const cur = messages[chatId!] || [];
     setMessages(chatId!, cur.filter(m => !m.isLive));
+    // 타이머 해제
+    if (stopTimer.current) {
+      clearTimeout(stopTimer.current);
+      stopTimer.current = null;
+    }
   };
 
+  // 3) 웹소켓 콘솔 자동 열기
   useEffect(() => {
     setConsoleOpen(true);
   }, [chatId, setConsoleOpen]);
 
-  // 1) 질문 전송 직후 혹은 초기 로드시 한 번만 스크롤
+  // 4) 처음 혹은 질문 직후 스크롤
   useEffect(() => {
     if (shouldScrollToBottom && scrollBottomRef.current) {
       scrollBottomRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -82,26 +115,33 @@ const ChatDetailPage: React.FC = () => {
     }
   }, [shouldScrollToBottom]);
 
-  // 2) 초기 데이터 fetch
+  // 5) 초기 채팅 불러오기
   useEffect(() => {
     if (!chatId) return;
     const exists = useChatMessageStore.getState().messages[chatId]?.length > 0;
     if (exists) return;
-    fetchChatDetail(chatId).then((res) => {
+    fetchChatDetail(chatId).then(res => {
       const converted = res.messages.map(convertToStreamMessage);
       useChatMessageStore.getState().setMessages(chatId, converted);
       setShouldScrollToBottom(true);
     });
   }, [chatId]);
 
-  // 3) AI 스트림 완전 종료 시 한 번만 스크롤
+  // 6) 스트림 완전 종료 시 스크롤 + 타이머/콘솔 복원
   useEffect(() => {
     if (currentInsight === '' && scrollBottomRef.current) {
       scrollBottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      // 타이머 해제
+      if (stopTimer.current) {
+        clearTimeout(stopTimer.current);
+        stopTimer.current = null;
+      }
+      // 콘솔 로그 다시 허용
+      setIgnoreConsoleLogs(false);
     }
-  }, [currentInsight]);
+  }, [currentInsight, setIgnoreConsoleLogs]);
 
-  // 차트 오버레이 띄울 때 웹소켓 로그 멈추기
+  // 7) 차트 오버레이 중에는 로그 중단
   useEffect(() => {
     if (showChartOverlay) {
       useWebSocketLogger.getState().setConnected(false);
@@ -126,7 +166,7 @@ const ChatDetailPage: React.FC = () => {
               <ChatList
                 chatId={chatId}
                 chatList={chatMessages}
-                onChartClick={(chartData) => {
+                onChartClick={chartData => {
                   useWebSocketLogger.getState().setConnected(false);
                   useChartOverlayStore.getState().openChart(convertToChartData(chartData));
                 }}
@@ -140,13 +180,13 @@ const ChatDetailPage: React.FC = () => {
       <div className={styles['chatDetailPage-inputWrapper']} style={layoutStyle}>
         <div className={styles['chatDetailPage-inputContainer']}>
           <div className={styles['chatDetailPage-inputArea']}>
-            <QuestionInput 
-              value={value} 
-              onChange={onChange} 
+            <QuestionInput
+              value={value}
+              onChange={onChange}
               onSubmit={() => onSubmit(chatId!)}
               isLoading={isLoading}
               onStop={handleStop}
-               />
+            />
             <div className={styles['chatDetailPage-buttonGroup']}>
               <Button
                 label="용어 사전"
@@ -171,7 +211,7 @@ const ChatDetailPage: React.FC = () => {
         {showModal && (
           <TeamMemberSelectModal
             onClose={() => setShowModal(false)}
-            onSelect={(memberId) => {
+            onSelect={memberId => {
               alert(`팀원 ${memberId}에게 공유했습니다!`);
               setShowModal(false);
             }}

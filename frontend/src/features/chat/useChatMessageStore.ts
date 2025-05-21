@@ -16,6 +16,8 @@ interface State {
   setRealChatId: (uuid: string, realId: string) => void;
   getRealChatId: (uuid: string) => string | undefined;
   setIsLive: (chatId: string, isLive: boolean) => void;
+  ignoreIncoming: boolean;
+  setIgnoreIncoming: (flag: boolean) => void;
 }
 
 export const useChatMessageStore = create<State>((set, get) => ({
@@ -121,4 +123,8 @@ export const useChatMessageStore = create<State>((set, get) => ({
       messages: { ...get().messages, [chatId]: [...msgs.slice(0, -1), updated] },
     });
   },
+
+  ignoreIncoming: false,
+  setIgnoreIncoming: (flag) =>
+    set({ ignoreIncoming: flag }),
 }));

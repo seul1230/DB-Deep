@@ -111,13 +111,19 @@ export const InlineChart: React.FC<InlineChartProps> = ({ chartJson, onClick }) 
           y_label: parsedChart.y_label,
         });
       }}
-      style={{ cursor: 'pointer' }}
+      style={{ 
+        cursor: 'pointer',
+        width: '100%',
+        flex: '1 1 100%',
+        display: 'block',
+      }}
     >
       <Plot
         data={data as Partial<Plotly.PlotData>[]}
         layout={layout}
         style={{ width: '100%', height: '300px', marginTop: '10px' }}
         config={{ responsive: true }}
+        useResizeHandler
       />
     </div>
   );

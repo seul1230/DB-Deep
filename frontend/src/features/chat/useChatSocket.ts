@@ -10,6 +10,7 @@ import type { ChartData } from '@/features/chat/chatTypes';
 
 export const useChatSocket = (chatId?: string) => {
   const queryClient = useQueryClient();
+  const { ignoreIncoming, setIgnoreIncoming } = useChatMessageStore();
   const { addLog } = useWebSocketLogger();
   const { ignoreConsoleLogs } = useWebSocketLogger()
   const {
@@ -38,13 +39,20 @@ export const useChatSocket = (chatId?: string) => {
           return;
         }
 
-        socket.onopen = () => {
-          console.log('[useChatSocket] onopen');
-        };
-
         socket.onmessage = (event) => {
-          console.log('[useChatSocket] onmessage raw:', event.data);
           const raw = event.data;
+
+          if (ignoreIncoming) {
+            try {
+              const m = JSON.parse(raw);
+              if (m.type === 'info' && m.payload === '🛑 생성 중단 요청 완료'){
+                setIgnoreIncoming(false);
+              }
+            } catch {
+              // Json 파싱 에러 무시시
+            }
+            return;
+          }
 
           // 1) 순수 텍스트 에러: JSON 아니면 곧바로 에러 처리
           if (typeof raw === 'string' && !raw.trim().startsWith('{')) {
@@ -194,5 +202,7 @@ export const useChatSocket = (chatId?: string) => {
     setIsLive,
     setMessages,
     ignoreConsoleLogs,
+    ignoreIncoming,
+    setIgnoreIncoming,
   ]);
 };
