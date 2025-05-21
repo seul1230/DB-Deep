@@ -1,7 +1,7 @@
 [테이블명: card_marketing]
 card_marketing 테이블 해당 항목과 관련된 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
 
-- 필드명 '기준년월'(job_mon, INTEGER): 데이터 기준년월 (코드 여부: N)
+- 필드명 '기준년월'(job_mon, STRING): 데이터 기준년월 (코드 여부: N)
 - 필드명 '발급회원번호'(member_no, STRING): 카드발급 회원번호 (코드 여부: N)
 - 필드명 '컨택건수_카드론_TM_B0M'(cnt_CL_TM_B0M, INTEGER): 카드론 TM채널 마케팅 노출 건수 (당월) (코드 여부: N)
 - 필드명 '컨택건수_리볼빙_TM_B0M'(cnt_RV_TM_B0M, INTEGER): 리볼빙 TM채널 마케팅 노출 건수 (당월) (코드 여부: N)

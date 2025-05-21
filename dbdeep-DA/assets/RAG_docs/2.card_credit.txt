@@ -1,7 +1,7 @@
 [테이블명: card_credit]
 card_credit 테이블 해당 항목과 관련된 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
 
-- 필드명 '기준년월'(job_mon, INTEGER): 데이터 기준년월 (코드 여부: N)
+- 필드명 '기준년월'(job_mon, STRING): 데이터 기준년월 (코드 여부: N)
 - 필드명 '발급회원번호'(member_no, STRING): 카드발급 회원번호 (코드 여부: N)
 - 필드명 '최초한도금액'(amt_limit_1st, INTEGER): 최초 한도 금액 (코드 여부: N)
 - 필드명 '카드이용한도금액'(amt_credit_limit_use, INTEGER): 카드 이용 한도금액 (코드 여부: N)

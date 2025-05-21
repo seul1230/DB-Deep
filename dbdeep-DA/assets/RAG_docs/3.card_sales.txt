@@ -1,15 +1,15 @@
 [테이블명: card_sales]
 card_sales 테이블 해당 항목과 관련된 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
 
-- 필드명 '기준년월'(job_mon, INTEGER): 데이터 기준년월 (코드 여부: N)
+- 필드명 '기준년월'(job_mon, STRING): 데이터 기준년월 (코드 여부: N) => 날짜형식 : YYYYMM
 - 필드명 '발급회원번호'(member_no, STRING): 카드발급 회원번호 (코드 여부: N)
-- 필드명 '최종이용일자_기본'(day_max_base, INTEGER): 당사 최종 이용 일자 (코드 여부: N)
-- 필드명 '최종이용일자_신판'(day_max_crsl, INTEGER): 신용카드 최종 이용일자 (코드 여부: N)
-- 필드명 '최종이용일자_CA'(day_max_ca, INTEGER): 현금서비스 최종 이용일자 (코드 여부: N)
-- 필드명 '최종이용일자_카드론'(day_max_cl, INTEGER): 카드론 최종 이용일자 (코드 여부: N)
-- 필드명 '최종이용일자_체크'(day_max_chk, INTEGER): 체크카드 최종 이용일자 (코드 여부: N)
-- 필드명 '최종이용일자_일시불'(day_max_pif, INTEGER): 일시불 최종 이용일자 (코드 여부: N)
-- 필드명 '최종이용일자_할부'(day_max_int, INTEGER): 할부 최종 이용일자 (00010101= 미이용) (코드 여부: N)
+- 필드명 '최종이용일자_기본'(day_max_base, STRING): 당사 최종 이용 일자 (코드 여부: N) => 날짜형식 : YYYYMMDD
+- 필드명 '최종이용일자_신판'(day_max_crsl, STRING): 신용카드 최종 이용일자 (코드 여부: N) => 날짜형식 : YYYYMMDD
+- 필드명 '최종이용일자_CA'(day_max_ca, STRING): 현금서비스 최종 이용일자 (코드 여부: N) => 날짜형식 : YYYYMMDD
+- 필드명 '최종이용일자_카드론'(day_max_cl, STRING): 카드론 최종 이용일자 (코드 여부: N) => 날짜형식 : YYYYMMDD
+- 필드명 '최종이용일자_체크'(day_max_chk, STRING): 체크카드 최종 이용일자 (코드 여부: N) => 날짜형식 : YYYYMMDD
+- 필드명 '최종이용일자_일시불'(day_max_pif, STRING): 일시불 최종 이용일자 (코드 여부: N) => 날짜형식 : YYYYMMDD
+- 필드명 '최종이용일자_할부'(day_max_int, STRING): 할부 최종 이용일자 (10101= 미이용) (코드 여부: N) => 날짜형식 : YYYYMMDD
 - 필드명 '이용건수_신용_B0M'(cnt_ccd_b0m, INTEGER): 이용건수 일시불+할부+현금서비스+카드론 (당월) (코드 여부: N)
 - 필드명 '이용건수_신판_B0M'(cnt_crsl_b0m, INTEGER): 이용건수 일시불+할부 (당월) (코드 여부: N)
 - 필드명 '이용건수_일시불_B0M'(cnt_pif_b0m, INTEGER): 이용건수 일시불 (당월) (코드 여부: N)

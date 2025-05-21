@@ -1,7 +1,7 @@
 [테이블명: card_channels]
 card_channels 테이블 해당 항목과 관련된 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
 
-- 필드명 '기준년월'(job_mon, INTEGER): 데이터 기준년월 (코드 여부: N)
+- 필드명 '기준년월'(job_mon, STRING): 데이터 기준년월 (코드 여부: N)
 - 필드명 '발급회원번호'(member_no, STRING): 카드발급 회원번호 (코드 여부: N)
 - 필드명 '인입횟수_ARS_R6M'(cnt_ARS_R6M, INTEGER): 인입횟수 ARS (최근6개월간) (코드 여부: N)
 - 필드명 '이용메뉴건수_ARS_R6M'(cnt_ARS_menu_R6M, INTEGER): 이용메뉴건수 ARS (최근6개월간) (코드 여부: N)
