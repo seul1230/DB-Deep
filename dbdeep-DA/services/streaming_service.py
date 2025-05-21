@@ -6,12 +6,14 @@ import pandas as pd
 from fastapi import WebSocket, WebSocketDisconnect
 from utils.ws_session_manager import clear_stop_flag
 from utils.ws_utils import send_ws_message
+from utils.response_utils import replace_nulls_with_zero
 from services.ws_stop_listener import listen_for_stop
 from services.message_service import save_chat_message, build_chat_history
 from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title, is_first_chat
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from infrastructure.es_message_service import save_chat_message_to_es
+
 
 async def handle_chat_websocket(websocket: WebSocket):
     
@@ -181,6 +183,8 @@ async def handle_chat_websocket(websocket: WebSocket):
 
 
             await send_ws_message(websocket, type_="info", payload="인사이트 생성 완료")
+
+            chart_obj = replace_nulls_with_zero(chart_obj)
 
             # 최종 메시지 저장 (AI 응답)
             chat_id = save_chat_message(
