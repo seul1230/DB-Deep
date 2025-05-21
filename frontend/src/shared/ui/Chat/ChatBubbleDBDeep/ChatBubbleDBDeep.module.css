@@ -74,9 +74,9 @@
 
 .chatBubbleDBDeep-bubble p,
 .chatBubbleDBDeep-bubbleNoBg p {
-  margin: 6px 0;
+  margin: 4px 0;
   font-size: 0.875rem;
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
 .chatBubbleDBDeep-bubble ul,
@@ -123,5 +123,5 @@
 }
 
 .chatBubbleDBDeep-section {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }

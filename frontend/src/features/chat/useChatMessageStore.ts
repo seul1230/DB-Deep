@@ -94,7 +94,7 @@ export const useChatMessageStore = create<State>((set, get) => ({
     const last = { ...msgs[msgs.length - 1], isLive: false };
     set({
       messages: { ...get().messages, [chatId]: [...msgs.slice(0, -1), last] },
-      insightText: { ...get().insightText, [chatId]: '' },
+      // insightText: { ...get().insightText, [chatId]: '' },
     });
   },
 

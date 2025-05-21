@@ -80,7 +80,9 @@ export const useChatSocket = (chatId?: string) => {
             case 'error':
               // JSON 형태로 내려오는 에러
               if (typeof payload === 'string') {
-                showErrorToast(payload);
+                if (!payload.includes('알 수 없는 type: ping')) {
+                  showErrorToast(payload);
+                }
               }
               finalizeLast(chatId);
               return;
