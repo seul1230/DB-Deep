@@ -8,6 +8,7 @@ public record MemberDto(
         Integer id,
         String name,
         String email,
+        String profileImage,
         String teamName
 ) {
     public static MemberDto from(Member member) {
@@ -15,6 +16,7 @@ public record MemberDto(
                 .id(member.getId())
                 .name(member.getName())
                 .email(member.getEmail())
+                .profileImage(member.getProfileImage())
                 .teamName(member.getDepartment().getName())
                 .build();
     }

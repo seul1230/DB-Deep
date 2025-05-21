@@ -35,6 +35,7 @@ public class MemberQueryRepository {
                         member.id,
                         member.name,
                         member.email,
+                        member.profileImage,
                         department.name))
                 .from(member)
                 .join(member.department, department)
