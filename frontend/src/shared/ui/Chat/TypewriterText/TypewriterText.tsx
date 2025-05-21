@@ -8,23 +8,21 @@ import styles from './TypewriterText.module.css';
 
 interface Props {
   chatId: string;
+  messageId: string;
 }
 
-export const TypewriterText: React.FC<Props> = ({ chatId }) => {
-  const { insightText, messages, setInsightText } =
-    useChatMessageStore();
-  const fullText = useMemo(
-    () => insightText[chatId] || '',
-    [insightText, chatId]
-  );
+export const TypewriterText: React.FC<Props> = ({ chatId, messageId }) => {
+  const { insightText, messages, setInsightText } = useChatMessageStore();
+  const fullText = insightText[messageId] || '';
   const [typed, setTyped] = useState('');
   const [charIndex, setCharIndex] = useState(0);
 
   // 마지막 메시지의 live 상태
   const isLive = useMemo(() => {
     const list = messages[chatId] || [];
-    return list[list.length - 1]?.isLive ?? false;
-  }, [messages, chatId]);
+    const msg = list.find(m => m.id === messageId);
+    return msg?.isLive ?? false;
+  }, [messages, chatId, messageId]);
 
   // live→false 전환 시에만 타자 인덱스 초기화
   const prevLive = useRef(isLive);
@@ -42,7 +40,7 @@ export const TypewriterText: React.FC<Props> = ({ chatId }) => {
     const tm = setTimeout(() => {
       setTyped((p) => p + fullText[charIndex]);
       setCharIndex((i) => i + 1);
-    }, 10);
+    }, 40);
     return () => clearTimeout(tm);
   }, [charIndex, fullText, isLive]);
 

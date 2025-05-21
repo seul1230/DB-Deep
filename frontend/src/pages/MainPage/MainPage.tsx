@@ -6,7 +6,7 @@ import RecommendedList from '@/entities/chat/RecommendedList/RecommendedList';
 import { createChatRoom } from '@/features/chat/chatApi';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { sendMessageSafely } from '@/shared/api/socketManager';
+import { connectSocket, resetInitialConnectionState, sendInitialConnection, sendMessage } from '@/shared/api/socketManager';
 import { useAuth } from '@/features/auth/useAuth';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 
@@ -53,16 +53,13 @@ const MainPage: React.FC = () => {
         },
       ]);
 
-      // 3) 화면 이동
+      await connectSocket();
+      resetInitialConnectionState();
+      sendInitialConnection(chatId, department);
+      sendMessage({ question });
       queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
       navigate(`/chat/${chatId}`);
 
-      // 4) 실제 서버로 전송
-      await sendMessageSafely({
-        chatId,
-        department,
-        question,
-      });
     } catch {
       alert('채팅방 생성 또는 메시지 전송에 실패했습니다.');
     }

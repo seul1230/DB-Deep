@@ -97,7 +97,9 @@ export const ChatBubbleDBDeep: React.FC<Props> = ({
             */}
           {newInsight ? (
             <div className={styles['chatBubbleDBDeep-section']}>
-              <TypewriterText chatId={uuid} />
+              <TypewriterText
+                chatId={uuid} 
+                messageId={messageId} />
             </div>
           ) : (
             textParts.map((part, idx) => (

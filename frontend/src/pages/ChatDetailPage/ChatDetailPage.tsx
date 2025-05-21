@@ -27,7 +27,7 @@ const GlossaryModal = React.lazy(() =>
 const ChatDetailPage: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   useChatSocket(chatId);
-  const { messages, insightText, setMessages } = useChatMessageStore();
+  const { messages, insightText, setMessages, setInsightText } = useChatMessageStore();
   const { profile } = useAuth();
 
   const { setConsoleOpen } = useWebSocketConsoleStore();
@@ -57,9 +57,11 @@ const ChatDetailPage: React.FC = () => {
 
   const currentInsight = chatId ? insightText[chatId] : undefined;
 
-  // 1) 질문 전송 & 3분 자동 중단
+  // 1) 질문 전송 & 2분 자동 중단
   const { value, onChange, onSubmit } = useQuestionInput(async text => {
     if (!chatId) return;
+
+    setInsightText(chatId, () => '');
 
     // 콘솔 로그 허용
     setIgnoreConsoleLogs(false);
@@ -70,7 +72,7 @@ const ChatDetailPage: React.FC = () => {
     await sendMessageSafely({ chatId, department, question: text });
     setShouldScrollToBottom(true);
 
-    // 3분 뒤 자동 중단
+    // 2분 뒤 자동 중단
     stopTimer.current = window.setTimeout(() => {
       const sock = getSocket();
       sock?.send(JSON.stringify({ type: 'stop' }));
@@ -83,7 +85,7 @@ const ChatDetailPage: React.FC = () => {
         cur.filter(m => !(m.senderType === 'ai' && m.isLive))
       );
       alert('⏰ 응답 시간이 초과되었습니다. 좀 더 구체적으로 질문해주세요.');
-    }, 3 * 60 * 1000);
+    }, 2 * 60 * 1000);
   });
 
   // 2) 중단 버튼
@@ -114,6 +116,14 @@ const ChatDetailPage: React.FC = () => {
       setShouldScrollToBottom(false);
     }
   }, [shouldScrollToBottom]);
+
+  useEffect(() => {
+    // 마지막 AI 메시지
+    const lastAI = [...chatMessages].reverse().find(m => m.senderType === 'ai');
+    if (!lastAI) return;
+    // 메시지 파트가 바뀌었거나, live 상태가 바뀌었을 때
+    scrollBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages.map(m => JSON.stringify(m.parts)).join('|'), chatMessages.map(m => m.isLive).join(',')]);
 
   // 5) 초기 채팅 불러오기
   useEffect(() => {
@@ -148,6 +158,20 @@ const ChatDetailPage: React.FC = () => {
     }
   }, [showChartOverlay]);
 
+  useEffect(() => {
+    if (scrollBottomRef.current) {
+      scrollBottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages.length]);
+
+  const realChatId = useChatMessageStore(state => state.chatIdMap[chatId!]);
+  useEffect(() => {
+    if (realChatId && stopTimer.current) {
+      clearTimeout(stopTimer.current);
+      stopTimer.current = null;
+    }
+  }, [realChatId]);
+
   const layoutStyle = {
     transition: 'all 0.3s ease',
     position: 'relative' as const,
@@ -171,7 +195,7 @@ const ChatDetailPage: React.FC = () => {
                   useChartOverlayStore.getState().openChart(convertToChartData(chartData));
                 }}
               />
-              <div ref={scrollBottomRef} style={{ height: 0 }} />
+              <div ref={scrollBottomRef} />
             </>
           )}
         </div>

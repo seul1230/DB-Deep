@@ -11,7 +11,7 @@ interface State {
   appendToLast: (chatId: string, part: ChatPart) => void;
   finalizeLast: (chatId: string) => void;
   insightText: Record<string, string>;
-  setInsightText: (chatId: string, updater: (prev?: string) => string) => void;
+  setInsightText: (messageId: string, updater: (prev?: string) => string) => void;
   chatIdMap: Record<string, string>;
   setRealChatId: (uuid: string, realId: string) => void;
   getRealChatId: (uuid: string) => string | undefined;
@@ -101,11 +101,11 @@ export const useChatMessageStore = create<State>((set, get) => ({
   },
 
   insightText: {},
-  setInsightText: (chatId, updater) =>
-    set((state) => ({
+  setInsightText: (messageId, updater) =>
+    set(state => ({
       insightText: {
         ...state.insightText,
-        [chatId]: updater(state.insightText[chatId]),
+        [messageId]: updater(state.insightText[messageId]),
       },
     })),
 
