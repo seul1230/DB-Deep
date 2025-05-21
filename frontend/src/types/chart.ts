@@ -21,3 +21,12 @@ export const convertChartData = (data: ChartData): CustomChartData => ({
   x_label: data.x_label,
   y_label: data.y_label,
 });
+
+export const convertToChartData = (custom: CustomChartData): ChartData => ({
+  chart_type: custom.type,
+  x: custom.x,
+  y: custom.y,
+  x_label: custom.x_label ?? '',
+  y_label: custom.y_label ?? '',
+  title: custom.name,
+});

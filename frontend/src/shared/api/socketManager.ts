@@ -104,7 +104,7 @@ export const sendInitialConnection = (uuid: string, department: string) => {
     console.warn('🔌 소켓 연결 안됨');
     return;
   }
-  socket.send(JSON.stringify({ uuid, department }));
+  socket.send(JSON.stringify({ uuid, user_department: department }));
   hasConnectedWithId = true;
 };
 

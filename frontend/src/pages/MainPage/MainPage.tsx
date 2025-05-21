@@ -5,7 +5,7 @@ import RecommendedList from '@/entities/chat/RecommendedList/RecommendedList';
 import { createChatRoom } from '@/features/chat/chatApi';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { sendMessageSafely } from '@/shared/api/socketManager';
+import { sendMessage, connectSocket, resetInitialConnectionState, sendInitialConnection } from '@/shared/api/socketManager';
 import { useAuth } from '@/features/auth/useAuth';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 
@@ -21,6 +21,7 @@ const MainPage: React.FC = () => {
   const [input, setInput] = useState('');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
   const { profile } = useAuth();
   const { setMessages } = useChatMessageStore();
 
@@ -33,6 +34,7 @@ const MainPage: React.FC = () => {
     try {
       const chatId = await createChatRoom();
 
+      // 상태 미리 등록
       setMessages(chatId, [
         {
           id: `${Date.now()}-user`,
@@ -50,11 +52,11 @@ const MainPage: React.FC = () => {
         },
       ]);
 
-      await sendMessageSafely({
-        chatId,
-        department,
-        question: text,
-      });
+      // 소켓 연결 → 초기화 후 메시지 전송
+      await connectSocket();
+      resetInitialConnectionState();
+      sendInitialConnection(chatId, department);
+      setTimeout(() => sendMessage({ question: text }), 200);
 
       queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
       navigate(`/chat/${chatId}`);
@@ -64,11 +66,20 @@ const MainPage: React.FC = () => {
     }
   };
 
+  //추천 받은 질문이 구현되면 사용
+  // const handleQuestionSelect = (question: string) => {
+  //   createAndNavigateChatRoom (question);
+  // };
+
+  const handleQuestionSelect = (text: string) => {
+    console.log('선택된 질문:', text);
+  };
+
   return (
     <div className={styles['MainPage-container']}>
       <h1 className={styles['MainPage-title']}>무엇을 도와드릴까요?</h1>
       <QuestionInput value={input} onChange={setInput} onSubmit={handleSubmit} />
-      <RecommendedList questions={recommendedQuestions} onSelect={(text) => setInput(text)} />
+      <RecommendedList questions={recommendedQuestions} onSelect={handleQuestionSelect} />
     </div>
   );
 };

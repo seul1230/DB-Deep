@@ -1,172 +1,168 @@
-import React, { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./ArchiveCard.module.css";
+import { ArchiveItem } from "@/features/archive/archiveTypes";
+import { ChatBubbleDBDeep } from "@/shared/ui/Chat/ChatBubbleDBDeep/ChatBubbleDBDeep";
+import { CustomChartData } from "@/types/chart";
+import { convertLastMessageToParts } from "@/features/archive/convertLastMessageToParts";
 import { FiMessageSquare, FiMoreVertical } from "react-icons/fi";
-import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
 import { useCardOverlayStore } from "@/shared/store/useCardOverlayStore";
-import { deleteArchive } from "@/features/archive/archiveApi";
+import CardOverlay from "@/shared/ui/CardOverlay/CardOverlay";
 import DeleteConfirmModal from "@/shared/ui/DeleteConfirmModal/DeleteConfirmModal";
-import { toast } from "react-toastify";
+import { deleteArchive } from "@/features/archive/archiveApi";
 
-interface Props {
-  id: string;
-  title: string;
-  date: string;
-  description?: string;
-  tableData?: string[][];
-  chartData?: { label: string; value: number }[];
+interface ArchiveCardProps {
+  archive: ArchiveItem;
   onClick?: () => void;
+  onChartClick: (data: CustomChartData) => void;
+  isActive?: boolean;
   onDeleteSuccess?: (id: string) => void;
 }
 
-const ArchiveCard: React.FC<Props> = ({ id, title, date, description, tableData, chartData, onClick, onDeleteSuccess }) => {
+export const ArchiveCard = ({
+  archive,
+  onClick,
+  onChartClick,
+  isActive,
+  onDeleteSuccess,
+}: ArchiveCardProps) => {
+  const parts = convertLastMessageToParts(archive.lastMessage);
   const moreIconRef = useRef<HTMLDivElement>(null);
-  const { toggleOverlayForTarget, isOpen, targetId, position, closeOverlay } = useCardOverlayStore();
+  const cardRef = useRef<HTMLDivElement>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const preventClickRef = useRef(false);
+
+  const {
+    toggleOverlayForTarget,
+    isOpen,
+    targetId,
+    position,
+    closeOverlay,
+  } = useCardOverlayStore();
 
   const handleMoreClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     const rect = moreIconRef.current?.getBoundingClientRect();
     if (rect) {
       toggleOverlayForTarget(
-        { top: rect.bottom + window.scrollY, left: rect.left + window.scrollX + 8 },
-        id
+        {
+          top: rect.bottom + window.scrollY,
+          left: rect.left + window.scrollX + 8,
+        },
+        archive.archiveId.toString()
       );
     }
   };
 
   const handleDelete = async () => {
+    preventClickRef.current = true;
+    setIsDeleting(true);
     try {
-      await deleteArchive(id);
-      onDeleteSuccess?.(id);
+      await deleteArchive(archive.archiveId.toString());
+      onDeleteSuccess?.(archive.archiveId.toString());
     } catch (e) {
       console.error("삭제 실패:", e);
     } finally {
       setShowDeleteModal(false);
+      setTimeout(() => {
+        preventClickRef.current = false;
+      }, 300);
+      setIsDeleting(false);
     }
   };
 
-  const handleCopy = () => {
-    const parts: string[] = [];
-  
-    if (description) {
-      parts.push(`${description}`);
-    }
-  
-    if (tableData && tableData.length > 0) {
-      parts.push("\n📊 테이블 데이터:");
-      const headers = ["세그먼트", "평균구매액", "구매빈도", "선호카테고리"];
-      parts.push(headers.join(" | "));
-      parts.push("-".repeat(headers.join(" | ").length));
-      tableData.forEach(row => {
-        parts.push(row.join(" | "));
-      });
-    }
-  
-    if (chartData && chartData.length > 0) {
-      parts.push("\n📈 차트 데이터:");
-      chartData.forEach((c) => {
-        parts.push(`${c.label}: ${c.value}`);
-      });
-    }
-  
-    const textToCopy = parts.join("\n");
-  
-    navigator.clipboard.writeText(textToCopy)
-      .then(() => {
-        toast.success("채팅 내용이 복사되었습니다!");
-        console.log("✅ 복사된 내용:\n", textToCopy);
-      })
-      .catch((err) => {
-        toast.error("복사에 실패했습니다.");
-        console.error("❌ 복사 실패:", err);
-      });
-  };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeOverlay();
+        setShowDeleteModal(false);
+      }
+    };
+
+    const handleScroll = () => {
+      closeOverlay();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [closeOverlay]);
 
   return (
-    <div className={styles.card} onClick={onClick}>
-      <div className={styles.meta}>
-        <div className={styles.metaInner}>
+    <div
+      ref={cardRef}
+      className={`${styles.archiveCardWrapper} ${isActive ? styles.active : ""}`}
+      onClick={(e) => {
+        if (preventClickRef.current || isDeleting) {
+          e.stopPropagation();
+          return;
+        }
+        onClick?.();
+      }}
+    >
+      <div className={styles.archiveCardHeader}>
+        <div className={styles.headerLeft}>
           <FiMessageSquare className={styles.icon} />
-          <div className={styles.centerArea}>
-            <div className={styles.title}>{title}</div>
-            <div className={styles.date}>{date}</div>
-          </div>
-          <div
-            className={styles.moreIcon}
-            onClick={handleMoreClick}
-            ref={moreIconRef}
-          >
-            <FiMoreVertical />
-          </div>
+          <div className={styles.title}>{archive.chatName}</div>
+          <div className={styles.date}>{new Date(archive.archivedAt).toLocaleString()}</div>
+        </div>
+        <div
+          className={styles.moreIcon}
+          onClick={handleMoreClick}
+          ref={moreIconRef}
+        >
+          <FiMoreVertical />
         </div>
       </div>
 
-      {description && <div className={styles.description}>{description}</div>}
+      <div className={styles.archiveCardContent}>
+        <ChatBubbleDBDeep
+          parts={parts}
+          isLive={false}
+          uuid={archive.chatRoomId}
+          messageId={archive.messageId}
+          onChartClick={onChartClick}
+          showMenu={false}
+          noBackground
+        />
+      </div>
 
-      {tableData && (
-        <div className={styles.contentAligned}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>세그먼트</th>
-                <th>평균구매액</th>
-                <th>구매빈도</th>
-                <th>선호카테고리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.map((row, i) => (
-                <tr key={i}>
-                  {row.map((cell, j) => <td key={j}>{cell}</td>)}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {chartData && (
-        <div className={styles.chartPreview}>
-          {chartData.map((d, i) => (
-            <div className={styles.chartBar} key={i}>
-              <div
-                className={styles.chartValue}
-                style={{ height: `${d.value * 4}px` }}
-              />
-              <div className={styles.chartLabel}>{d.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {isOpen && targetId === id && (
+      {isOpen && targetId === archive.archiveId.toString() && (
         <div onClick={(e) => e.stopPropagation()}>
           <CardOverlay
             position={position}
-            targetId={id}
-            onCopy={handleCopy}
+            targetId={archive.archiveId.toString()}
+            onCopy={() => {
+              const text = parts
+                .map((p) =>
+                  p.type === "text" || p.type === "sql" ? p.content : ""
+                )
+                .join("\n");
+              navigator.clipboard.writeText(text);
+            }}
             onDelete={() => setShowDeleteModal(true)}
-            showDelete
             onClose={closeOverlay}
+            showDelete
           />
         </div>
       )}
 
       {showDeleteModal && (
-        <div onClick={(e) => e.stopPropagation()}>
-          <DeleteConfirmModal
-            title="아카이브 삭제"
-            message={
-              <>
-                <strong>{`"${title}"`}</strong> 아카이브를 삭제하시겠습니까?
-                <br />
-                삭제된 아카이브는 복구할 수 없습니다.
-              </>
-            }
-            onCancel={() => setShowDeleteModal(false)}
-            onConfirm={handleDelete}
-          />
-        </div>
+        <DeleteConfirmModal
+          title="아카이브 삭제"
+          message={
+            <>
+              <strong>{archive.chatName}</strong> 아카이브를 삭제하시겠습니까?
+              <br />삭제된 항목은 복구할 수 없습니다.
+            </>
+          }
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={handleDelete}
+        />
       )}
     </div>
   );
