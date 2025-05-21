@@ -61,6 +61,8 @@ async def run_follow_up_chain_async(question: str, chat_history: str, websocket:
     logging.info("💬 Follow-up 응답 스트리밍 시작")
     chain = build_follow_up_chain()
     
+    logging.info("Follow-up 체인 완성")
+
     inputs = {
         "question": question,
         "chat_history": chat_history
@@ -73,6 +75,7 @@ async def run_follow_up_chain_async(question: str, chat_history: str, websocket:
         async for chunk in generator:
             try:
                 await send_ws_message(websocket, type_="follow_up_stream", payload=chunk)
+                await asyncio.sleep(0)
                 result += chunk
             except (RuntimeError, asyncio.CancelledError, WebSocketDisconnect):
                 logging.warning("⚠️ WebSocket 전송 실패 또는 연결 종료")
@@ -85,6 +88,7 @@ async def run_follow_up_chain_async(question: str, chat_history: str, websocket:
             payload="질문에 대한 답변 생성 중 오류가 발생했습니다.",
             error=str(e)
         )
+        await asyncio.sleep(0)
         raise
     finally:
         await generator.aclose()
