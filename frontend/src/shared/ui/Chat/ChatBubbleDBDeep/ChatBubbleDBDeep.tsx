@@ -15,6 +15,7 @@ import { archiveChatMessage } from '@/features/archive/archiveApi';
 import { useChatMessageStore } from '@/features/chat/useChatMessageStore';
 import { CustomChartData } from '@/types/chart';
 import clsx from 'clsx';
+import { ChatSpinner } from '@/entities/chat/ChatSpinner/ChatSpinner';
 
 interface Props {
   parts: ChatPart[];
@@ -70,6 +71,7 @@ export const ChatBubbleDBDeep = ({
             styles['chatBubbleDBDeep-bubble'],
             noBackground && styles['chatBubbleDBDeep-bubbleNoBg']
           )}
+          style={{ maxWidth: '100%', width: '100%' }}
         >
           {sql && (
             <div className={styles['chatBubbleDBDeep-section']}>
@@ -91,9 +93,8 @@ export const ChatBubbleDBDeep = ({
           )}
 
           {status && (
-            <div className={styles['chatBubbleDBDeep-status']}>
-              <span className={styles['chatBubbleDBDeep-spinner']} />
-              {status}
+            <div className={styles['chatBubbleDBDeep-section']}>
+              <ChatSpinner />
             </div>
           )}
 

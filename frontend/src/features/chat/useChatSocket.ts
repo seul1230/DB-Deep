@@ -1,20 +1,17 @@
+// src/features/chat/useChatSocket.ts
 import { useEffect } from 'react';
-import { useLocation, useMatch } from 'react-router-dom'; 
-import {
-  connectSocket,
-  getSocket,
-  tryReconnect,
-} from '@/shared/api/socketManager';
+import { connectSocket, getSocket, tryReconnect } from '@/shared/api/socketManager';
 import { useChatMessageStore } from './useChatMessageStore';
 import { useQueryClient } from '@tanstack/react-query';
-import { updateChatTitle, ChatRoom } from '@/features/chat/chatApi';
+import { updateChatTitle } from '@/features/chat/chatApi';
 import { useWebSocketLogger } from './useWebSocketLogger';
+import { showErrorToast } from '@/shared/toast';
+import type { ChartData } from '@/features/chat/chatTypes';
 
 export const useChatSocket = (chatId?: string) => {
-  const location = useLocation(); // ✅ 현재 페이지 경로 확인
-
+  const queryClient = useQueryClient();
+  const { addLog } = useWebSocketLogger();
   const {
-    startNewMessage,
     appendToLast,
     finalizeLast,
     setInsightText,
@@ -22,124 +19,155 @@ export const useChatSocket = (chatId?: string) => {
     setIsLive,
   } = useChatMessageStore();
 
-  const queryClient = useQueryClient();
-  const { addLog } = useWebSocketLogger();
-  const match = useMatch("/chat/:chatId");
-  
   useEffect(() => {
-    // ✅ 1. chatId 없거나 현재 페이지가 /chat/{id}가 아니면 연결하지 않음
-    if (!match || !chatId) return;
+    console.log('[useChatSocket] mount', { chatId });
+    if (!chatId) {
+      console.log('[useChatSocket] no chatId, skip');
+      return;
+    }
 
-    connectSocket().then(() => {
-      const socket = getSocket();
-      if (!socket) return;
+    connectSocket()
+      .then((sock) => {
+        console.log('[useChatSocket] connected', sock);
 
-      socket.onopen = () => {
-        console.log('✅ WebSocket 연결 성공');
-        startNewMessage(chatId);
-      };
-
-      socket.onmessage = (event) => {
-        const raw = event.data;
-        if (!raw) return;
-
-        addLog({ type: 'data', message: `수신: ${raw}` });
-
-        let msg;
-        try {
-          msg = JSON.parse(raw);
-        } catch {
-          console.error('❌ JSON 파싱 실패:', raw);
+        const socket = getSocket();
+        if (!socket) {
+          console.error('[useChatSocket] getSocket() returned null');
           return;
         }
 
-        const { type, payload } = msg;
+        socket.onopen = () => {
+          console.log('[useChatSocket] onopen');
+        };
 
-        switch (type) {
-          case 'title': {
-            const cache = queryClient.getQueryData<{ chatRooms: ChatRoom[] }>(['chatRooms']);
-            const chatRoom = cache?.chatRooms?.find((room) => room.id === chatId);
-            if (chatRoom?.title === '새 채팅방') {
-              updateChatTitle(chatId, payload)
-                .then(() => {
-                  queryClient.invalidateQueries({ queryKey: ['chatRooms'] });
-                })
-                .catch(console.error);
-            }
+        socket.onmessage = (event) => {
+          console.log('[useChatSocket] onmessage raw:', event.data);
+          addLog({ type: 'console', message: event.data });
+
+          let msg: unknown;
+          try {
+            msg = JSON.parse(event.data);
+          } catch {
+            console.error('[useChatSocket] JSON parse error', event.data);
             return;
           }
 
-          case 'info':
-            if (typeof payload === 'string' && /^[a-zA-Z0-9_-]+$/.test(payload)) {
-              setRealChatId(chatId, payload);
+          // 타입 가드
+          if (typeof msg !== 'object' || msg === null || !('type' in msg)) {
+            console.warn('[useChatSocket] unexpected msg shape', msg);
+            return;
+          }
+          const { type, payload } = msg as { type: string; payload: unknown };
+
+          switch (type) {
+            case 'ping':
+              return;
+
+            case 'error':
+              if (typeof payload === 'string' && payload.includes('알 수 없는 type: ping')) {
+                return;
+              }
+              showErrorToast(payload as string);
               finalizeLast(chatId);
               return;
-            }
 
-            if (payload === 'SQL 생성 중...') {
-              appendToLast(chatId, { type: 'status', content: 'SQL 생성 중...' });
-            } else if (payload === '차트 생성 중...') {
-              appendToLast(chatId, { type: 'status', content: '차트 생성 중...' });
-            } else if (payload === '인사이트 생성 중') {
-              setInsightText(chatId, () => '');
-              appendToLast(chatId, { type: 'status', content: '' });
-            } else if (payload === '인사이트 생성 완료') {
-              finalizeLast(chatId);
-            }
-            return;
+            case 'title':
+              if (typeof payload === 'string') {
+                updateChatTitle(chatId, payload)
+                  .then(() => queryClient.invalidateQueries({ queryKey: ['chatRooms'] }))
+                  .catch(console.error);
+              }
+              return;
 
-          case 'console':
-            addLog({ type: 'console', message: payload });
-            return;
+            case 'info':
+              if (payload === 'SQL & 데이터 생성 중'
+               || payload === 'SQL 생성 중...'
+               || payload === '차트 생성 중...') {
+                appendToLast(chatId, { type: 'status', content: payload as string });
+              } else if (payload === '인사이트 생성 중') {
+                setInsightText(chatId, () => '');
+                appendToLast(chatId, { type: 'status', content: '' });
+              } else if (payload === '인사이트 생성 완료') {
+                finalizeLast(chatId);
+              } else if (typeof payload === 'string' && /^[A-Za-z0-9_-]+$/.test(payload)) {
+                setRealChatId(chatId, payload);
+                finalizeLast(chatId);
+              }
+              return;
 
-          case 'query':
-            appendToLast(chatId, { type: 'sql', content: payload });
-            return;
+            case 'query':
+              if (typeof payload === 'string') {
+                appendToLast(chatId, { type: 'sql', content: payload });
+              }
+              return;
 
-          case 'data':
-            appendToLast(chatId, { type: 'data', content: payload });
-            return;
+            case 'data':
+              if (Array.isArray(payload)) {
+                appendToLast(chatId, { type: 'data', content: payload as Record<string, string|number>[] });
+              }
+              return;
 
-          case 'chart':
-            appendToLast(chatId, { type: 'chart', content: payload });
-            return;
+            case 'chart':
+              if (
+                typeof payload === 'object' &&
+                payload !== null &&
+                Array.isArray((payload as ChartData).x) &&
+                Array.isArray((payload as ChartData).y)
+              ) {
+                appendToLast(chatId, { type: 'chart', content: payload as ChartData });
+              }
+              return;
 
-          case 'insight_stream':
-          case 'data_summary':
-            setInsightText(chatId, (prev = '') => prev + payload);
-            appendToLast(chatId, { type: 'text', content: payload });
-            setIsLive(chatId, true);
-            return;
+            case 'insight_stream':
+            case 'data_summary':
+              if (typeof payload === 'string') {
+                setInsightText(chatId, (prev='') => prev + payload);
+                appendToLast(chatId, { type: 'text', content: payload });
+                setIsLive(chatId, true);
+              }
+              return;
 
-          case 'follow_up_stream':
-            setInsightText(chatId, (prev = '') => prev + payload);
-            appendToLast(chatId, { type: 'text', content: payload });
-            setIsLive(chatId, false);
-            return;
+            case 'follow_up_stream':
+              if (typeof payload === 'string') {
+                setInsightText(chatId, (prev='') => prev + payload);
+                appendToLast(chatId, { type: 'text', content: payload });
+                setIsLive(chatId, false);
+              }
+              return;
 
-          default:
-            console.warn('❓ 알 수 없는 type:', type);
-        }
-      };
+            case 'insight':
+              if (typeof payload === 'string') {
+                appendToLast(chatId, { type: 'text', content: payload });
+                finalizeLast(chatId);
+              }
+              return;
 
-      socket.onerror = (e) => console.error('❌ WebSocket 오류:', e);
-      socket.onclose = () => {
-        console.warn('🔌 WebSocket 연결 종료');
-        finalizeLast(chatId);
-        tryReconnect();
-      };
-    });
+            default:
+              console.warn('[useChatSocket] unknown type:', type);
+          }
+        };
+
+        socket.onerror = (err) => {
+          console.error('[useChatSocket] error', err);
+          finalizeLast(chatId);
+        };
+        socket.onclose = () => {
+          console.warn('[useChatSocket] closed');
+          finalizeLast(chatId);
+          tryReconnect();
+        };
+      })
+      .catch((err) => {
+        console.error('[useChatSocket] connectSocket failed', err);
+      });
   }, [
     chatId,
-    match,
-    location.pathname,
-    startNewMessage,
+    queryClient,
+    addLog,
     appendToLast,
     finalizeLast,
     setInsightText,
     setRealChatId,
-    queryClient,
-    addLog,
     setIsLive,
   ]);
 };

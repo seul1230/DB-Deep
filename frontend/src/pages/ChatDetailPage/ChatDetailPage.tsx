@@ -13,6 +13,7 @@ import { useAuth } from '@/features/auth/useAuth';
 import ChartOverlay from '@/entities/chat/ChartOverlay/ChartOverlay';
 import { CustomChartData } from '@/types/chart';
 import { useWebSocketLogger } from '@/features/chat/useWebSocketLogger';
+import { useChatSocket } from '@/features/chat/useChatSocket';
 
 const TeamMemberSelectModal = React.lazy(() =>
   import('@/entities/chat/TeamMemberSelectModal/TeamMemberSelectModal')
@@ -23,10 +24,9 @@ const GlossaryModal = React.lazy(() =>
 
 const ChatDetailPage = () => {
   const { chatId } = useParams<{ chatId: string }>();
+  useChatSocket(chatId);
   const {
     messages,
-    startUserMessage,
-    startLiveMessage,
   } = useChatMessageStore();
   const { profile } = useAuth();
 
@@ -43,11 +43,14 @@ const ChatDetailPage = () => {
     return chatId ? messages[chatId] || [] : [];
   }, [chatId, messages]);
 
+  useEffect(() => {
+    if (scrollBottomRef.current) {
+      scrollBottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages]);
+
   const { value, onChange, onSubmit } = useQuestionInput(async (text) => {
     if (!chatId) return;
-
-    startUserMessage(chatId, text);
-    startLiveMessage(chatId);
 
     await sendMessageSafely({
       chatId,

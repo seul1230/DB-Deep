@@ -1,0 +1,48 @@
+.chatspinner-root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1rem;
+  width: 320px;
+  background-color: var(--sidebar-bg);
+}
+
+.chatspinner-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.chatspinner-spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0.25rem solid var(--icon-blue);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: chatspinner-spin 1s linear infinite;
+}
+
+@keyframes chatspinner-spin {
+  to { transform: rotate(360deg); }
+}
+
+.chatspinner-text {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.chatspinner-tipContainer {
+  position: relative;
+  overflow-x: visible;
+  overflow-y: hidden;
+  height: 1.25rem;
+  width: 100%;
+  padding-left: 2px;
+}
+
+.chatspinner-tip {
+  position: absolute;
+  font-size: 0.875rem;
+  color: var(--gray-text);
+}

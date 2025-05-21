@@ -48,9 +48,7 @@ export const connectSocket = (): Promise<WebSocket> => {
   return new Promise((resolve, reject) => {
     const stored = localStorage.getItem('auth-storage');
     const token = stored ? JSON.parse(stored)?.state?.accessToken : null;
-    console.log('[Socket] Connecting to:', `${WS_URL}?token=${token}`);
-    console.log('[DEBUG] connectSocket 호출 스택:', new Error().stack); 
-    
+
     if (!token) {
       showErrorToast('인증 정보가 없습니다. 다시 로그인해주세요.');
       return reject('No token');

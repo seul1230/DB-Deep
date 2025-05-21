@@ -76,7 +76,12 @@ export const useChatMessageStore = create<State>((set, get) => ({
       updatedParts = updatedParts.filter((p) => p.type !== 'status');
       updatedParts.push(part);
     } else if (part.type === 'text') {
-      updatedParts.push(part);
+      const prev = updatedParts[updatedParts.length - 1];
+      if (prev && prev.type === 'text') {
+        prev.content = prev.content + part.content;
+      } else {
+        updatedParts.push(part);
+      }
     }
 
     const updatedLast = { ...last, parts: updatedParts };
