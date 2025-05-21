@@ -91,8 +91,8 @@ export const InlineChart: React.FC<InlineChartProps> = ({ chartJson, onClick }) 
       color: colors.textColor,
       gridcolor: colors.gridColor,
     },
-    paper_bgcolor: colors.bgColor,
-    plot_bgcolor: colors.bgColor,
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
     font: {
       color: colors.textColor,
     },

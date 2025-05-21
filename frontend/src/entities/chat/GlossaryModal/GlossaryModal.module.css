@@ -28,8 +28,8 @@
 
 .glossaryModal-closeIcon {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 1.5rem;
+  right: 1.5rem;
   cursor: pointer;
   color: var(--text-color);
   font-size: 1.25rem;
@@ -76,6 +76,7 @@
 .glossaryModal-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .glossaryModal-table input {
@@ -104,15 +105,17 @@
 }
 
 .glossaryModal-table td:first-child {
+  width: 30%; 
   text-align: center;
 }
 
 .glossaryModal-table td:nth-child(2) {
+  width: 55%;
   text-align: left;
 }
 
 .glossaryModal-iconCell {
-  width: 60px;
+  width: 15%;
   text-align: right;
 }
 
@@ -126,6 +129,13 @@
   margin-left: 0.5rem;
   color: var(--icon-blue);
   transition: color 0.2s ease;
+}
+
+.glossaryModal-iconGroup {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .glossaryModal-icon:hover {

@@ -19,8 +19,8 @@ const ArchivePage = () => {
       try {
         const archiveList = await fetchArchiveList();
         setArchives(archiveList);
-      } catch (error) {
-        console.error("아카이브 목록 불러오기 실패:", error);
+      } catch {
+        // 아카이브 불러오기 실패
       } finally {
         setLoading(false);
       }

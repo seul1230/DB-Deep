@@ -8,20 +8,16 @@ export const convertArchiveToParsedContent = (
 
   const dataStr = archiveMsg.data?.trim();
 
-  // ✅ JSON으로 보이는 경우에만 파싱 시도
   if (dataStr && (dataStr.startsWith("{") || dataStr.startsWith("["))) {
     try {
       const parsed = JSON.parse(dataStr);
       if (Array.isArray(parsed)) {
         parsedData = parsed;
-      } else {
-        console.warn("📌 data는 배열이 아님:", parsed);
       }
-    } catch (e) {
-      console.warn("❗ data 파싱 실패:", e);
+    } catch {
+        // 데이터 파싱 실패는 무시 (Markdown 형태 등 허용)
     }
   } else if (dataStr?.startsWith("|")) {
-    // ✅ markdown 형식일 경우 insight에 붙이기
     archiveMsg.insight += `\n\n${dataStr}`;
   }
 

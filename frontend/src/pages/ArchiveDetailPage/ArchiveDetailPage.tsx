@@ -34,7 +34,6 @@ const ArchiveDetailPage = () => {
         <ArchivedChatBubble
           message={streamMessage}
           onChartClick={(c) => {
-            console.log("✅ 차트 클릭됨", c);
             setChart(c);
           }}
         />
@@ -42,7 +41,6 @@ const ArchiveDetailPage = () => {
 
       {chart && (
   <>
-    {console.log("✅ ChartOverlay 조건 만족", chart)}
     <ChartOverlay chartData={chart} onClose={() => setChart(null)} />
   </>
 )}
