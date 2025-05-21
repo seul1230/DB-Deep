@@ -139,7 +139,7 @@ const LoginPage: React.FC = () => {
                 className={styles["LoginPage-button"]}
                 disabled={loginMutation.isPending}
               >
-                {loginMutation.isPending ? "로딩 중..." : "로그인"}
+                {loginMutation.isPending ? "" : "로그인"}
               </button>
 
               <p className={styles["LoginPage-forgot"]}>

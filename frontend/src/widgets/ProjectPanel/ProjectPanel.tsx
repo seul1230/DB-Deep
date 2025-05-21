@@ -31,9 +31,8 @@ const ProjectPanel: React.FC = () => {
     try {
       await createProject(name, description);
       await queryClient.invalidateQueries({ queryKey: ["projects"] });
-    } catch (err) {
+    } catch {
       alert("프로젝트 생성 중 오류가 발생했습니다.");
-      console.error(err);
     }
   };
 
@@ -54,7 +53,7 @@ const ProjectPanel: React.FC = () => {
       </div>
 
       <div className={styles["ProjectPanel-list"]}>
-        {isLoading && <p className={styles.emptyMessage}>로딩 중...</p>}
+        {isLoading && <p className={styles.emptyMessage}> </p>}
         {isError && <p className={styles.emptyMessage}>에러가 발생했습니다.</p>}
         {!isLoading && !isError && projects?.length === 0 && (
           <p className={styles.emptyMessage}>프로젝트가 없습니다.</p>

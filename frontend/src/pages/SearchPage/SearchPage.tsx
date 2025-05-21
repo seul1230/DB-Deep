@@ -22,8 +22,8 @@ const SearchPage = () => {
     onSuccess: (data) => {
       setResults(data.result);
     },
-    onError: (err) => {
-      console.error("검색 실패", err);
+    onError: () => {
+      // console.error("검색 실패", err);
     },
   });
 

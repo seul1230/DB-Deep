@@ -60,8 +60,8 @@ export const ArchiveCard = ({
     try {
       await deleteArchive(archive.archiveId.toString());
       onDeleteSuccess?.(archive.archiveId.toString());
-    } catch (e) {
-      console.error("삭제 실패:", e);
+    } catch {
+      // console.error("삭제 실패:", e);
     } finally {
       setShowDeleteModal(false);
       setTimeout(() => {

@@ -63,8 +63,7 @@ const MainPage: React.FC = () => {
         department,
         question,
       });
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert('채팅방 생성 또는 메시지 전송에 실패했습니다.');
     }
   };

@@ -7,7 +7,6 @@ import { Project } from "@/features/project/projectTypes";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
-
 interface Props {
   chatId: string;
   onSelect: (projectId: string) => void;
@@ -27,8 +26,8 @@ const ProjectSelectorOverlay: React.FC<Props> = ({ chatId, onClose, onSuccess })
       try {
         const data = await fetchProjects();
         setProjects(data);
-      } catch (error) {
-        console.error("프로젝트 목록 불러오기 실패:", error);
+      } catch {
+        // console.error("프로젝트 목록 불러오기 실패:", error);
       } finally {
         setLoading(false);
       }
@@ -61,7 +60,6 @@ const ProjectSelectorOverlay: React.FC<Props> = ({ chatId, onClose, onSuccess })
           ? "이미 해당 채팅이 프로젝트에 추가되어 있습니다."
           : "채팅 추가에 실패했습니다.";
       toast.error(errorMessage);
-      console.error(err);
     } finally {
       setSelecting(false);
       closeMenu();
