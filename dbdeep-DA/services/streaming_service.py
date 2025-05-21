@@ -32,9 +32,11 @@ async def handle_chat_websocket(websocket: WebSocket):
                 if data_dict["type"] == "stop":
                     await set_stop_flag(uuid)
                     await send_ws_message(websocket, type_="info", payload="🛑 생성 중단 요청 완료")
+                    await asyncio.sleep(0)
                     continue
                 else:
                     await send_ws_message(websocket, type_="error", payload=f"알 수 없는 type: {data_dict['type']}")
+                    await asyncio.sleep(0)
                     continue
             
             data_dict["uuid"] = uuid
@@ -48,9 +50,11 @@ async def handle_chat_websocket(websocket: WebSocket):
                 try:
                     title = generate_chatroom_title(question)
                     await send_ws_message(websocket, type_="title", payload=title)
+                    await asyncio.sleep(0)
                 except Exception as e:
                     logging.warning(f"❗ 채팅방 제목 생성 실패: {e}")
                     await send_ws_message(websocket, type_="title", payload="새 채팅방", error=str(e))
+                    await asyncio.sleep(0)  # flush 기회 줌
                     title = "새 채팅방"
             
             chat_history = build_chat_history(uuid)
@@ -64,11 +68,12 @@ async def handle_chat_websocket(websocket: WebSocket):
             )
 
             # 🔍 질문 유형 분류
-            clf_result = run_question_clf_chain(question=question, chat_history=chat_history)
+            clf_result = await run_question_clf_chain(question=question, chat_history=chat_history)
             clf_type = clf_result.get("classification", "")
             logging.info("완료: %s", clf_type)
 
             await send_ws_message(websocket, type_="info", payload=f"질문 분류 결과: {clf_type}")
+            await asyncio.sleep(0)
 
             if clf_type == "follow_up":
                 try:
@@ -86,6 +91,7 @@ async def handle_chat_websocket(websocket: WebSocket):
                     )
 
                     await send_ws_message(websocket, type_="info", payload=chat_id)
+                    await asyncio.sleep(0)
                     update_chatroom_summary(
                         chat_room_id=uuid,
                         last_question=question,
@@ -106,11 +112,13 @@ async def handle_chat_websocket(websocket: WebSocket):
                 }.get(clf_type, "죄송합니다. 이해할 수 없는 질문입니다. 다시 시도해주세요.")
         
                 await send_ws_message(websocket, type_="info", payload=msg)
+                await asyncio.sleep(0)
                 continue
             
 
             # SQL & 테이블 생성
             await send_ws_message(websocket, type_="info", payload="SQL & 데이터 생성 중")
+            await asyncio.sleep(0)
             result_dict = await run_sql_pipeline(request, websocket, 5, custom_dict=member_dict)
             need_chart = result_dict.get("need_chart")
             if isinstance(need_chart, str):
@@ -121,8 +129,11 @@ async def handle_chat_websocket(websocket: WebSocket):
             df = pd.DataFrame(result.data)
 
             await send_ws_message(websocket, type_="query", payload=sql)
+            await asyncio.sleep(0)
             await send_ws_message(websocket, type_="data", payload=df.to_dict(orient="records"))
+            await asyncio.sleep(0)
             await send_ws_message(websocket, type_="info", payload="SQL 생성 완료")
+            await asyncio.sleep(0)
 
             # 차트 생성
             data_summary = ""
@@ -130,13 +141,16 @@ async def handle_chat_websocket(websocket: WebSocket):
             print("need_chart: ", need_chart)
             if need_chart:
                 await send_ws_message(websocket, type_="info", payload="차트 생성 중")
+                await asyncio.sleep(0)
                 
                 updated_chart_request = run_chart_pipeline(result)
                 chart_obj = updated_chart_request.chart_spec
                 data_summary = updated_chart_request.data_summary
 
                 await send_ws_message(websocket, type_="chart", payload=chart_obj)
+                await asyncio.sleep(0)
                 await send_ws_message(websocket, type_="data_summary", payload=data_summary)
+                await asyncio.sleep(0)
 
                 data_for_insight = None
                 data_summary_for_insight = data_summary
@@ -144,9 +158,11 @@ async def handle_chat_websocket(websocket: WebSocket):
                 data_for_insight = df.to_dict(orient="records")
                 data_summary_for_insight = None
             await send_ws_message(websocket, type_="info", payload="차트 생성 완료")
+            await asyncio.sleep(0)
 
             # 인사이트 생성
             await send_ws_message(websocket, type_="info", payload="인사이트 생성 중")
+            await asyncio.sleep(0)
             chat_history = build_chat_history(uuid)
 
             request_dict = {
@@ -179,6 +195,7 @@ async def handle_chat_websocket(websocket: WebSocket):
                         insight_text = "인사이트 생성에 실패했습니다. 잠시 후 다시 시도해주세요."
                         try:
                             await send_ws_message(websocket, type_="insight", payload=insight_text)
+                            await asyncio.sleep(0)
                         except:
                             pass
                         break
@@ -187,6 +204,7 @@ async def handle_chat_websocket(websocket: WebSocket):
 
 
             await send_ws_message(websocket, type_="info", payload="인사이트 생성 완료")
+            await asyncio.sleep(0)
 
             chart_obj = replace_nulls_with_zero(chart_obj)
 
@@ -218,6 +236,7 @@ async def handle_chat_websocket(websocket: WebSocket):
             )
 
             await send_ws_message(websocket, type_= "info", payload=chat_id)
+            await asyncio.sleep(0)
 
             update_chatroom_summary(
                 chat_room_id=uuid,

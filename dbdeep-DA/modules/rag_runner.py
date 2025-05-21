@@ -35,14 +35,17 @@ def run_bigquery(question, response_text):
         logging.exception("❌ NL2SQL 처리 실패:")
 
 
-def run_question_clf_chain(question: str, chat_history: str = "") -> dict:
+async def run_question_clf_chain(question: str, chat_history: str = "") -> dict:
     question_clf_chain = build_question_clf_chain(question)
 
     try:
-        result = question_clf_chain.invoke({
-            "question": question,
-            "chat_history": chat_history
-        })
+        result = await asyncio.to_thread(
+            question_clf_chain.invoke,
+            {
+                "question": question,
+                "chat_history": chat_history
+            }
+        )
         print("질문 분류: ", result)
         raw_result = clean_json_from_response(result)
         if isinstance(raw_result, str):
