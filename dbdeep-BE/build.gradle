@@ -67,17 +67,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-admin:9.2.0'
 
     // elasticsearch
-//    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
-//    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.10'
-//    implementation 'org.elasticsearch:elasticsearch:7.17.10'
-    implementation 'co.elastic.clients:elasticsearch-java:8.13.0'
-    implementation 'org.springframework.data:spring-data-elasticsearch:5.2.1'
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+    implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.10'
 
     // Firestore SDK Protobuf
     implementation 'com.google.protobuf:protobuf-java:3.23.4'
-
-    implementation("co.elastic.clients:elasticsearch-java:8.13.0") // 최신 버전 기준
-//    implementation 'org.springframework.data:spring-data-elasticsearch:4.2.2'
     implementation("jakarta.json:jakarta.json-api:2.1.1")           // JSON 바인딩용
     implementation("org.glassfish:jakarta.json:2.0.1")
 

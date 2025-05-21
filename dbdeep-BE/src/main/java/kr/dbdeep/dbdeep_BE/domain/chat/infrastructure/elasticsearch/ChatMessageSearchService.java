@@ -20,7 +20,6 @@ public class ChatMessageSearchService {
 
     public List<ChatRoomSearchResultResponse> findLatestUserMessagesByKeyword(Integer memberId, String keyword) {
         List<ChatMessage> messages = customChatMessageRepository.searchByMemberIdAndKeyword(memberId, keyword);
-
         List<String> chatRoomIds = messages.stream()
                 .map(ChatMessage::getChatRoomId)
                 .distinct()
