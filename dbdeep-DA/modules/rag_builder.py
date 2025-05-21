@@ -63,7 +63,7 @@ with open("assets/RAG_docs/card_schema_json.txt", "r", encoding="utf-8") as f:
 def build_sql_chain(question: str, user_department: str) -> Tuple[Any, dict]:
     
     logging.info("📥 RAG 체인 구성 시작")
-    vectorstore = get_vectorstore(index_name="schema-index-v2")
+    vectorstore = get_vectorstore(index_name="schema-index-v3")
     
     hr_schema_retriever = vectorstore.as_retriever(
         search_type='mmr',
