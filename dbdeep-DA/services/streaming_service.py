@@ -8,7 +8,7 @@ from utils.ws_session_manager import clear_stop_flag
 from utils.ws_utils import send_ws_message
 from services.ws_stop_listener import listen_for_stop
 from services.message_service import save_chat_message, build_chat_history
-from services.chat_service import chat_room_exists, update_chatroom_summary, generate_chatroom_title, is_first_chat
+from services.chat_service import update_chatroom_summary, generate_chatroom_title, is_first_chat
 from modules.rag_runner import run_sql_pipeline, run_chart_pipeline, run_insight_pipeline_async, run_question_clf_chain, run_follow_up_chain_async
 from schemas.rag import QueryRequest, ChartRequest, InsightRequest
 from infrastructure.es_message_service import save_chat_message_to_es
@@ -25,6 +25,8 @@ async def handle_chat_websocket(websocket: WebSocket):
         try:
             data = await websocket.receive_text()
             data_dict = json.loads(data)
+            data_dict["uuid"] = uuid
+            data_dict["user_department"] = department
             request = QueryRequest(**data_dict)
             question = request.question
 
