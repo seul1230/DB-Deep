@@ -17,6 +17,7 @@ export const useChatSocket = (chatId?: string) => {
     setInsightText,
     setRealChatId,
     setIsLive,
+    setMessages,
   } = useChatMessageStore();
 
   useEffect(() => {
@@ -42,13 +43,26 @@ export const useChatSocket = (chatId?: string) => {
 
         socket.onmessage = (event) => {
           console.log('[useChatSocket] onmessage raw:', event.data);
-          addLog({ type: 'console', message: event.data });
+          const raw = event.data;
 
+          // 1) 순수 텍스트 에러: JSON 아니면 곧바로 에러 처리
+          if (typeof raw === 'string' && !raw.trim().startsWith('{')) {
+            setMessages(
+              chatId,
+              useChatMessageStore
+                .getState()
+                .messages[chatId]
+                .slice(0, -1)
+            );
+            return;
+          }
+
+          // 2) JSON 파싱
           let msg: unknown;
           try {
-            msg = JSON.parse(event.data);
+            msg = JSON.parse(raw);
           } catch {
-            console.error('[useChatSocket] JSON parse error', event.data);
+            console.error('[useChatSocket] JSON 파싱 실패:', raw);
             return;
           }
 
@@ -64,11 +78,16 @@ export const useChatSocket = (chatId?: string) => {
               return;
 
             case 'error':
-              if (typeof payload === 'string' && payload.includes('알 수 없는 type: ping')) {
-                return;
+              // JSON 형태로 내려오는 에러
+              if (typeof payload === 'string') {
+                showErrorToast(payload);
               }
-              showErrorToast(payload as string);
               finalizeLast(chatId);
+              return;
+
+            case 'console':
+              // 오직 WebSocket 콘솔에만 표시
+              addLog({ type: 'console', message: String(payload) });
               return;
 
             case 'title':
@@ -169,5 +188,6 @@ export const useChatSocket = (chatId?: string) => {
     setInsightText,
     setRealChatId,
     setIsLive,
+    setMessages,
   ]);
 };
