@@ -16,7 +16,7 @@ export const ChatSpinner: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % tips.length);
-    }, 5000);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 

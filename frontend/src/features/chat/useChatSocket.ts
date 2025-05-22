@@ -180,7 +180,7 @@ export const useChatSocket = (chatId?: string) => {
                 // ② 해당 메시지 ID 로만 insight 누적
                 setInsightText(mid, prev => (prev ?? '') + payload);
                 appendToLast(chatId, { type: 'text', content: payload });
-                setIsLive(chatId, true);
+                setIsLive(mid, true);
               }
               return;
 
@@ -192,6 +192,7 @@ export const useChatSocket = (chatId?: string) => {
 
                 setInsightText(mid, prev => (prev ?? '') + payload);
                 appendToLast(chatId, { type: 'text', content: payload });
+                setIsLive(mid, true);
               }
               return;
 

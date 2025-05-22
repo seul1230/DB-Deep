@@ -46,11 +46,11 @@ export const TypewriterText: React.FC<Props> = ({ chatId, messageId }) => {
 
   // 한 글자씩 타이핑
   useEffect(() => {
-    if (isLive || charIndex >= fullText.length) return;
+    if (!isLive || charIndex >= fullText.length) return;
     const tm = setTimeout(() => {
       setTyped((p) => p + fullText[charIndex]);
       setCharIndex((i) => i + 1);
-    }, 40);
+    }, 20);
     return () => clearTimeout(tm);
   }, [charIndex, fullText, isLive]);
 

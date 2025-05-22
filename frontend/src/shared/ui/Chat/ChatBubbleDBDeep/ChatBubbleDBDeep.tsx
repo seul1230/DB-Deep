@@ -103,7 +103,7 @@ export const ChatBubbleDBDeep: React.FC<Props> = ({
               <TypewriterText 
                 chatId={uuid} 
                 messageId={messageId} 
-                key={`${messageId}-${newInsight?.slice(0, 10)}`}
+                key={messageId}
               />
             </div>
           ) : (
