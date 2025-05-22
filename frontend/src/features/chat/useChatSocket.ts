@@ -172,6 +172,7 @@ export const useChatSocket = (chatId?: string) => {
 
             case 'insight_stream':
             case 'data_summary':
+            case 'follow_up_stream':
               if (typeof payload === 'string') {
                 // ① 메시지 리스트에서 방금 추가된 live 메시지의 id 가져오기
                 const msgs = useChatMessageStore.getState().messages[chatId] || [];
@@ -185,16 +186,6 @@ export const useChatSocket = (chatId?: string) => {
               }
               return;
 
-            case 'follow_up_stream':
-              if (typeof payload === 'string') {
-                const msgs = useChatMessageStore.getState().messages[chatId] || [];
-                const lastMsg = msgs[msgs.length - 1];
-                const mid = lastMsg.id;
-
-                setInsightText(mid, prev => (prev ?? '') + payload);
-                setIsLive(mid, true);
-              }
-              return;
 
             case 'insight':
               if (typeof payload === 'string') {
