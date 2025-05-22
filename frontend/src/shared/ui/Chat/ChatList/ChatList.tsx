@@ -25,21 +25,11 @@ const ChatList: React.FC<Props> = ({
       <div className={styles['ChatList-chatBox']}>
         {chatList.map((msg) => {
           if (msg.senderType === 'user') {
-            const userText = msg.parts.find(p => p.type === 'text')?.content ?? '';
-            const aiError = chatList.find(
-              m => m.senderType === 'ai' &&
-              m.uuid === msg.uuid &&
-              m.parts.some(p =>
-                p.type === 'text' &&
-                p.content.includes('서버 처리 중 오류')
-              )
-            );
-
             return (
               <ChatBubbleUser
                 key={msg.id}
-                text={userText}
-                showRetryButton={!!aiError}
+                text={msg.parts.find(p => p.type === 'text')?.content ?? ''}
+                showRetryButton={msg.hasError}
                 onRetry={() => onRetry?.(msg)}
               />
             );

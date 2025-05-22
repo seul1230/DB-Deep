@@ -10,7 +10,6 @@ interface ChatBubbleUserProps {
 export const ChatBubbleUser = ({ text, showRetryButton = false, onRetry }: ChatBubbleUserProps) => {
   return (
     <div className={styles['chatBubbleUser-wrapper']}>
-      <div className={styles['chatBubbleUser-bubble']}>{text}</div>
       {showRetryButton && onRetry && (
         <button
           className={styles['chatBubbleUser-retryButton']}
@@ -20,6 +19,8 @@ export const ChatBubbleUser = ({ text, showRetryButton = false, onRetry }: ChatB
           <FaRedo size={12} />
         </button>
       )}
+      <div className={styles['chatBubbleUser-bubble']}>{text}</div>
     </div>
   );
 };
+

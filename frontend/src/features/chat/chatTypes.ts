@@ -48,6 +48,7 @@ export interface ChatStreamMessage {
   senderType: 'ai' | 'user';
   isLive: boolean;
   type?: string;
+  hasError?: boolean;
 }
 
 // ==============================

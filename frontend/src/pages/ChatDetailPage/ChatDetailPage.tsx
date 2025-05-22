@@ -197,6 +197,24 @@ const ChatDetailPage: React.FC = () => {
                   useWebSocketLogger.getState().setConnected(false);
                   useChartOverlayStore.getState().openChart(convertToChartData(chartData));
                 }}
+                onRetry={(msg) => {
+                  if (!chatId) return;
+                  const question = msg.parts.find(p => p.type === 'text')?.content;
+                  if (!question) return;
+
+                  // ✅ 1. 입력창에 질문 복원
+                  onChange(question);
+
+                  // ✅ 2. 잠시 뒤 자동 전송
+                  setTimeout(() => onSubmit(chatId), 0);
+
+                  // ✅ 3. 에러 표시 제거
+                  const msgs = useChatMessageStore.getState().messages[chatId];
+                  const updated = msgs.map(m =>
+                    m.id === msg.id ? { ...m, hasError: false } : m
+                  );
+                  setMessages(chatId, updated);
+                }}
               />
               <div ref={scrollBottomRef} />
             </>

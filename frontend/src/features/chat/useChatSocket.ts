@@ -47,11 +47,30 @@ export const useChatSocket = (chatId?: string) => {
 
           // 1) 순수 텍스트 에러 처리
           if (typeof raw === 'string' && !raw.trim().startsWith('{')) {
-            const prev = useChatMessageStore
-              .getState()
-              .messages[chatId]
-              .slice(0, -1);
-            setMessages(chatId, prev);
+            if (raw.includes('서버 처리 중 오류가 발생했습니다')) {
+              showErrorToast(raw);
+
+              const state = useChatMessageStore.getState();
+              const prev = state.messages[chatId] || [];
+
+              // 마지막 AI 제거
+              const trimmed = prev.slice(0, -1);
+              const lastUserIndex = trimmed
+                .map((m, idx) => ({ ...m, idx }))
+                .reverse()
+                .find(m => m.senderType === 'user')?.idx;
+
+              // 에러 표시
+              if (lastUserIndex !== undefined) {
+                trimmed[lastUserIndex] = {
+                  ...trimmed[lastUserIndex],
+                  hasError: true,
+                };
+              }
+
+              useChatMessageStore.getState().setMessages(chatId, trimmed);
+            }
+
             return;
           }
 
