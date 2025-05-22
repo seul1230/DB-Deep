@@ -10,6 +10,7 @@ import ProfileOverlay from "../ProfileOverlay/ProfileOverlay";
 import { useAuth } from "@/features/auth/useAuth";
 import { usePanelStore } from "@/shared/store/usePanelStore";
 import { useChartOverlayStore } from "@/features/chat/useChartOverlaystore";
+import { useWebSocketConsoleStore } from "@/features/chat/useWebSocketConsoleStore";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -17,6 +18,7 @@ const Sidebar: React.FC = () => {
   const { theme, toggleTheme } = useThemeStore();
   const { clearTokens, profile } = useAuth();
   const { chart, closeChart } = useChartOverlayStore();
+  const { setConsoleOpen } = useWebSocketConsoleStore();
 
   const [showOverlay, setShowOverlay] = useState(false);
   const { hasNotification, toggleNotification, toggleChatLog, toggleProject } = usePanelStore();
@@ -83,7 +85,10 @@ const Sidebar: React.FC = () => {
                 size={20}
                 className={styles["Sidebar-icon"]}
                 onClick={() => {
-                  if (chart) closeChart();
+                  if (chart) {
+                    closeChart();
+                    setConsoleOpen(false);
+                  }
                   toggleNotification();
                 }}
                 style={{ cursor: "pointer" }}
@@ -109,7 +114,10 @@ const Sidebar: React.FC = () => {
               size={20}
               className={styles["Sidebar-icon"]}
               onClick={() => {
-                if (chart) closeChart();
+                if (chart) {
+                  closeChart();
+                  setConsoleOpen(false);
+                }
                 handleGoToSearch();
               }}
               style={{ cursor: "pointer" }}
@@ -120,7 +128,10 @@ const Sidebar: React.FC = () => {
               size={20}
               className={styles["Sidebar-icon"]}
               onClick={() => {
-                if (chart) closeChart();
+                if (chart) {
+                  closeChart();
+                  setConsoleOpen(false);
+                }
                 handleGoToMain();
               }}
               style={{ cursor: "pointer" }}
@@ -131,7 +142,10 @@ const Sidebar: React.FC = () => {
               size={20}
               className={styles["Sidebar-icon"]}
               onClick={() => {
-                if (chart) closeChart();
+                if (chart) {
+                  closeChart();
+                  setConsoleOpen(false);
+                }
                 toggleChatLog();
               }}
               style={{ cursor: "pointer" }}
@@ -142,7 +156,10 @@ const Sidebar: React.FC = () => {
               size={20}
               className={styles["Sidebar-icon"]}
               onClick={() => {
-                if (chart) closeChart();
+                if (chart) {
+                  closeChart();
+                  setConsoleOpen(false);
+                }
                 handleGoToArchive();
               }}
               style={{ cursor: "pointer" }}
@@ -153,7 +170,10 @@ const Sidebar: React.FC = () => {
               size={20}
               className={styles["Sidebar-icon"]}
               onClick={() => {
-                if (chart) closeChart();
+                if (chart) {
+                  closeChart();
+                  setConsoleOpen(false);
+                }
                 toggleProject();
               }}
               style={{ cursor: "pointer" }}
@@ -168,7 +188,10 @@ const Sidebar: React.FC = () => {
             type="checkbox"
             checked={theme === "dark"}
             onChange={() => {
-              if (chart) closeChart();
+                if (chart) {
+                  closeChart();
+                  setConsoleOpen(false);
+                }
               toggleTheme();
             }}
             className={styles["Sidebar-toggleInput"]}

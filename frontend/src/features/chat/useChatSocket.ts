@@ -132,6 +132,7 @@ export const useChatSocket = (chatId?: string) => {
 
                 if (mid) {
                   setIsLive(mid, false); 
+                  useChatMessageStore.getState().setCanType(mid, true);
                 }
                 finalizeLast(chatId); 
               } else if (
@@ -191,7 +192,6 @@ export const useChatSocket = (chatId?: string) => {
                 const mid = lastMsg.id;
 
                 setInsightText(mid, prev => (prev ?? '') + payload);
-                appendToLast(chatId, { type: 'text', content: payload });
                 setIsLive(mid, true);
               }
               return;

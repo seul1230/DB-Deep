@@ -18,6 +18,8 @@ interface State {
   setIsLive: (chatId: string, isLive: boolean) => void;
   ignoreIncoming: boolean;
   setIgnoreIncoming: (flag: boolean) => void;
+  canType: Record<string, boolean>;
+  setCanType: (messageId: string, value: boolean) => void;
 }
 
 export const useChatMessageStore = create<State>((set, get) => ({
@@ -66,12 +68,14 @@ export const useChatMessageStore = create<State>((set, get) => ({
     if (!msgs.length) return;
 
     const last = msgs[msgs.length - 1];
-    if (!last.isLive) return;
+
+    // ✅ 예외 처리: 종료된 메시지라도 query/data/chart는 허용
+    const allowStatic = ['sql', 'data', 'chart'].includes(part.type);
+    if (!last.isLive && !allowStatic) return;
 
     let updatedParts = [...last.parts];
 
     if (['sql', 'data', 'chart'].includes(part.type)) {
-      updatedParts = updatedParts.filter((p) => p.type !== 'status');
       updatedParts = updatedParts.filter((p) => p.type !== part.type);
       updatedParts.push(part);
     } else if (part.type === 'status') {
@@ -128,4 +132,13 @@ export const useChatMessageStore = create<State>((set, get) => ({
   ignoreIncoming: false,
   setIgnoreIncoming: (flag) =>
     set({ ignoreIncoming: flag }),
+
+  canType: {},
+  setCanType: (messageId, value) =>
+    set(state => ({
+      canType: {
+        ...state.canType,
+        [messageId]: value,
+      },
+    })),
 }));

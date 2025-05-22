@@ -67,10 +67,10 @@ const WebSocketConsole = () => {
   }, [logs]);
 
   useEffect(() => {
-    if (isMainPage && isOpen) {
+    if ((isMainPage || chart) && isOpen) {
       setConsoleOpen(false);
     }
-  }, [isMainPage, isOpen, setConsoleOpen]);
+  }, [isMainPage, chart, isOpen, setConsoleOpen]);
 
   return (
     <>

@@ -113,7 +113,7 @@ export const InlineChart: React.FC<InlineChartProps> = ({ chartJson, onClick }) 
       }}
       style={{ 
         cursor: 'pointer',
-        width: '100%',
+        width: '480px',
         flex: '1 1 100%',
         display: 'block',
       }}
@@ -121,7 +121,7 @@ export const InlineChart: React.FC<InlineChartProps> = ({ chartJson, onClick }) 
       <Plot
         data={data as Partial<Plotly.PlotData>[]}
         layout={layout}
-        style={{ width: '100%', height: '300px', marginTop: '10px' }}
+        style={{ width: '480px', height: '300px', marginTop: '10px' }}
         config={{ responsive: true }}
         useResizeHandler
       />
