@@ -70,7 +70,8 @@ async def handle_chat_websocket(websocket: WebSocket):
             # 🔍 질문 유형 분류
             clf_result = await run_question_clf_chain(question=question, chat_history=chat_history)
             clf_type = clf_result.get("classification", "")
-            logging.info("완료: %s", clf_type)
+            logging.info("완료: %s", clf_result)
+            logging.info("완료: %s", clf_result.get("reason", ""))
 
             await send_ws_message(websocket, type_="info", payload=f"질문 분류 결과: {clf_type}")
             await asyncio.sleep(0)
@@ -210,6 +211,8 @@ async def handle_chat_websocket(websocket: WebSocket):
 
             chart_obj = replace_nulls_with_zero(chart_obj)
 
+
+
             # 최종 메시지 저장 (AI 응답)
             chat_id = save_chat_message(
                 chat_room_id=uuid,
@@ -223,6 +226,19 @@ async def handle_chat_websocket(websocket: WebSocket):
                     "insight": insight_text
                 }
             )
+            
+            # chart["y"]가 dict일 경우 평균값 등으로 요약
+            if isinstance(chart_obj.get("y"), dict):
+                logging.warning("📛 chart.y가 dict 형태입니다. 저장용으로 변환합니다.")
+                # 예: 각 시리즈의 마지막 값만 추출해서 리스트로 변환
+                chart_obj["y"] = [series[-1] for series in chart_obj["y"].values()]
+                
+            if isinstance(chart_obj.get("legend"), dict):
+                # JSON 문자열로 변환해서 저장하거나
+                chart_obj["legend"] = json.dumps(chart_obj["legend"], ensure_ascii=False)
+                # 또는 그냥 key=value 형태로 이어 붙이기
+                # chart_obj["legend"] = ", ".join(f"{k}={v}" for k, v in chart_obj["legend"].items())
+
 
             save_chat_message_to_es(
                 chat_room_id=uuid,

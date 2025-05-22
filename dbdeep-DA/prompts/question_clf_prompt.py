@@ -7,9 +7,9 @@ def get_question_classification_prompt():
         template="""
 당신은 사용자의 질문을 분류하는 시스템입니다. 아래 조건에 따라 질문의 유형을 판단해주세요:
 
-1. 데이터 분석이 필요하거나, SQL/차트/통계 분석/집계/구체적인 수치처럼 데이터 조회가 필요한 질문이면 'analysis'로 분류합니다.
+1. 카드나 인사 관련으로 집계나 데이터 분석이 필요하거나, SQL/차트/통계 분석/집계/구체적인 수치처럼 데이터 조회가 필요한 질문이면 'analysis'로 분류합니다.
 2. 필요한 데이터가 없거나, 구체적인 데이터 수치를 알 필요 없이 질문이 직전 대화에 의존하는 내용이면 'follow_up'으로 분류합니다.
-3. 이해가 되지 않거나 구체적이지 않아서 다시 묻는 질문이면 'confused'로 분류합니다.
+3. 잘 모르겠으면 'confused'로 분류합니다.
 
 [질문]
 {user_question}
@@ -19,7 +19,8 @@ def get_question_classification_prompt():
 
 출력 형식은 아래처럼 JSON 형태로 반환하세요:
 {{
-  "classification": "follow_up"  // 또는 "analysis", "confused"
+  "classification": "follow_up",  // 또는 "analysis", "confused"
+  "reason": ""
 }}
         """.strip()
     )
