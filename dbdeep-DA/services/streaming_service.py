@@ -113,7 +113,7 @@ async def handle_chat_websocket(websocket: WebSocket):
                     "confused": "조금 더 구체적으로 질문해주시면 분석을 도와드릴 수 있어요!"
                 }.get(clf_type, "죄송합니다. 이해할 수 없는 질문입니다. 다시 시도해주세요.")
         
-                await send_ws_message(websocket, type_="info", payload=msg)
+                await send_ws_message(websocket, type_="follow_up_stream", payload=msg)
                 await asyncio.sleep(0)
                 continue
             
