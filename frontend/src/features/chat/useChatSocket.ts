@@ -107,7 +107,14 @@ export const useChatSocket = (chatId?: string) => {
                 setInsightText(chatId, () => '');
                 appendToLast(chatId, { type: 'status', content: '' });
               } else if (payload === '인사이트 생성 완료') {
-                finalizeLast(chatId);
+                const msgs = useChatMessageStore.getState().messages[chatId] || [];
+                const lastMsg = msgs[msgs.length - 1];
+                const mid = lastMsg?.id;
+
+                if (mid) {
+                  setIsLive(mid, false); 
+                }
+                finalizeLast(chatId); 
               } else if (
                 typeof payload === 'string' &&
                 /^[A-Za-z0-9_-]+$/.test(payload)
@@ -166,7 +173,6 @@ export const useChatSocket = (chatId?: string) => {
 
                 setInsightText(mid, prev => (prev ?? '') + payload);
                 appendToLast(chatId, { type: 'text', content: payload });
-                setIsLive(chatId, false);
               }
               return;
 

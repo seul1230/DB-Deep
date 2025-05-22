@@ -27,7 +27,7 @@ const GlossaryModal = React.lazy(() =>
 const ChatDetailPage: React.FC = () => {
   const { chatId } = useParams<{ chatId: string }>();
   useChatSocket(chatId);
-  const { messages, insightText, setMessages, setInsightText } = useChatMessageStore();
+  const { messages, insightText, setMessages, setInsightText, chatIdMap } = useChatMessageStore();
   const { profile } = useAuth();
 
   const { setConsoleOpen } = useWebSocketConsoleStore();
@@ -44,11 +44,14 @@ const ChatDetailPage: React.FC = () => {
 
   // department 정보
   const department = profile?.teamName ?? '알 수 없음';
+  const resolvedChatId = chatIdMap[chatId!] || chatId;
+  const rawUuidMessages = messages[chatId!] || [];
+  const realId = chatIdMap[chatId!];
+  const realIdMessages = realId ? messages[realId] || [] : [];
 
-  const chatMessages = useMemo(
-    () => (chatId ? messages[chatId] || [] : []),
-    [chatId, messages]
-  );
+  const chatMessages = useMemo(() => {
+    return realIdMessages.length > 0 ? realIdMessages : rawUuidMessages;
+  }, [realIdMessages, rawUuidMessages]);
 
   const isLoading = useMemo(() => {
     const last = [...chatMessages].reverse().find(m => m.senderType === 'ai');
@@ -188,7 +191,7 @@ const ChatDetailPage: React.FC = () => {
           {chatId && (
             <>
               <ChatList
-                chatId={chatId}
+                chatId={chatId!}
                 chatList={chatMessages}
                 onChartClick={chartData => {
                   useWebSocketLogger.getState().setConnected(false);

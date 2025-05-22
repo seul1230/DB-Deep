@@ -34,6 +34,16 @@ export const TypewriterText: React.FC<Props> = ({ chatId, messageId }) => {
     prevLive.current = isLive;
   }, [isLive]);
 
+  // fullText가 바뀌면 타이핑 다시 시작
+  const prevTextRef = useRef(fullText);
+  useEffect(() => {
+    if (fullText && fullText !== prevTextRef.current) {
+      prevTextRef.current = fullText;
+      setTyped('');
+      setCharIndex(0);
+    }
+  }, [fullText]);
+
   // 한 글자씩 타이핑
   useEffect(() => {
     if (isLive || charIndex >= fullText.length) return;

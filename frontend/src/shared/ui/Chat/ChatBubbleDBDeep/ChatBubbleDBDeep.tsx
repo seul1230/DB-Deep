@@ -30,6 +30,7 @@ interface Props {
 
 export const ChatBubbleDBDeep: React.FC<Props> = ({
   parts,
+  isLive,
   uuid,
   messageId,
   onChartClick,
@@ -39,7 +40,8 @@ export const ChatBubbleDBDeep: React.FC<Props> = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { getRealChatId, insightText } = useChatMessageStore();
-  const newInsight = insightText[uuid];
+  const newInsight = insightText[messageId];
+  const shouldTypewrite = isLive && !!newInsight;
 
   useEffect(() => {
     const onClickOutside = (e: MouseEvent) => {
@@ -56,6 +58,7 @@ export const ChatBubbleDBDeep: React.FC<Props> = ({
   const data   = parts.find((p) => p.type === 'data')?.content;
   const chart  = parts.find((p) => p.type === 'chart')?.content;
   const status = parts.find((p) => p.type === 'status')?.content;
+  console.log('shouldTypewrite:', isLive, newInsight);
 
   return (
     <div className={styles['chatBubbleDBDeep-wrapper']}>
@@ -95,11 +98,13 @@ export const ChatBubbleDBDeep: React.FC<Props> = ({
             * • newInsight가 있으면 → TypewriterText
             * • 없으면 → 기존 파트들 한 번만 Markdown 렌더링
             */}
-          {newInsight ? (
+          {shouldTypewrite ? (
             <div className={styles['chatBubbleDBDeep-section']}>
-              <TypewriterText
+              <TypewriterText 
                 chatId={uuid} 
-                messageId={messageId} />
+                messageId={messageId} 
+                key={`${messageId}-${newInsight?.slice(0, 10)}`}
+              />
             </div>
           ) : (
             textParts.map((part, idx) => (

@@ -50,7 +50,7 @@ const ChatList: React.FC<Props> = ({
               key={msg.id}
               parts={msg.parts}
               isLive={msg.isLive}
-              uuid={chatId}
+              uuid={msg.uuid}
               messageId={msg.id}
               onChartClick={onChartClick ?? (() => {})}
               showMenu={showMenu}
