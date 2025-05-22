@@ -14,7 +14,7 @@ interface Props {
 }
 
 const ChatList: React.FC<Props> = ({
-  chatId,
+  chatId: _chatId,
   chatList,
   onChartClick,
   showMenu = true,

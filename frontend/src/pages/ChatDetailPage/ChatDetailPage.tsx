@@ -44,7 +44,7 @@ const ChatDetailPage: React.FC = () => {
 
   // department 정보
   const department = profile?.teamName ?? '알 수 없음';
-  const resolvedChatId = chatIdMap[chatId!] || chatId;
+
   const rawUuidMessages = messages[chatId!] || [];
   const realId = chatIdMap[chatId!];
   const realIdMessages = realId ? messages[realId] || [] : [];
