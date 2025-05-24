@@ -1,0 +1,66 @@
+.ChatLogItemMenu {
+  background: var(--background-color);
+  border: 1px solid var(--light-gray);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  padding: 8px;
+  width: 148px;
+  z-index: 800;
+  position: relative;
+}
+
+.ChatLogItemMenuItem {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  font-size: 12px;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-color);
+  transition: background 0.2s;
+  border-radius: 8px;
+}
+
+.ChatLogItemMenuItem:hover {
+  background-color: var(--primary-light-blue);
+}
+
+.ChatLogItemMenuItemDanger {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--red-alert);
+  transition: background 0.2s;
+  border-radius: 8px;
+}
+
+.ChatLogItemMenuItemDanger:hover {
+  background-color: var(--yellow);
+}
+
+/* 내부 컨텐츠: 아이콘 + 텍스트 묶음 */
+.ChatLogItemMenuItemContent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 오른쪽 화살표 */
+.ChatLogItemArrow {
+  font-size: 12px;
+  margin-left: 4px;
+  color: var(--gray-text);
+}
+
+/* 프로젝트 서브메뉴: 메뉴 항목 오른쪽에 뜨도록 위치 조정 */
+.ChatLogItemSubOverlay {
+  position: absolute;
+  top: 34px;
+  left: 90%;
+  margin-left: 6px;
+  z-index: 1002;
+}

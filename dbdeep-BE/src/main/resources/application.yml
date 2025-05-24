@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: dbdeep-BE
+  config:
+    import:
+      - application-mysql.yml
+      - optional:file:.env[.properties]
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  jackson:
+    time-zone: Asia/Seoul
+  mvc:
+    servlet:
+      path: /api
+  elasticsearch:
+    uris: ${ES_URI:http://elasticsearch:9200}
+    connection-timeout: 5s
+    socket-timeout: 5s
+    client:
+      type: rest-high-level
+
+  data:
+    elasticsearch:
+      uris: ${ES_URI}
+      repositories:
+        bootstrap-mode: lazy
+        enabled: true
+    redis:
+      host: redis
+      port: 6379
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secretKey: ${JWT_SECRET}
+
+cors:
+  allowed-origins:
+    - http://localhost:5173
+    - https://k12s104.p.ssafy.io
+    - https://dbdeep.kr
+    - http://k12s104.p.ssafy.io
+    - http://dbdeep.kr
+    - https://www.dbdeep.kr
+    - http://www.dbdeep.kr
+
+firestore:
+  credential-location: ${FIRESTORE_CREDENTIAL_LOCATION}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  api-docs:
+    path: /v3/api-docs

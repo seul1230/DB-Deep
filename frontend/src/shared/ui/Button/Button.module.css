@@ -1,0 +1,11 @@
+.Button-root {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+  
+.Button-root:hover:enabled {
+    filter: brightness(0.95);
+}
+  

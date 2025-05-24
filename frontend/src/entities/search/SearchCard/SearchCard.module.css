@@ -1,0 +1,77 @@
+.searchCardWrapper {
+  background: var(--background-color);
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--primary-light-blue);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  width: 100%;
+  max-width: 640px;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+  cursor: pointer;
+  height: 300px;
+}
+
+.searchCardWrapper:hover {
+  background-color: var(--primary-light-blue);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.searchCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon {
+  color: var(--icon-blue);
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.date {
+  font-size: 12px;
+  color: var(--gray-text);
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.moreIcon {
+  color: var(--gray-text);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.moreIcon:hover {
+  background-color: var(--hover-gray);
+}
+
+.searchCardContent {
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.searchCardContent::-webkit-scrollbar {
+  display: none;
+}

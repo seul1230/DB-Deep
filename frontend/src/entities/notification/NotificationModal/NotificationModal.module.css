@@ -1,0 +1,55 @@
+.NotificationModal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--modal-overlay-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.NotificationModal-content {
+  background: var(--background-color);
+  padding: 32px 28px;
+  border-radius: 20px;
+  width: 640px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.NotificationModal-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 20px 5px;
+  color: var(--text-color);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.NotificationModal-subtitle {
+  font-weight: normal;
+  font-size: 13px;
+  color: var(--gray-text);
+  line-height: 1;
+}
+
+.NotificationModal-previewWrapper {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid var(--icon-blue);
+  border-radius: 12px;
+  background-color: var(--background-color);
+}
+
+.NotificationModal-buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}

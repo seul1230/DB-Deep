@@ -1,0 +1,15 @@
+.ChatPreview-container {
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+  }
+  
+  .ChatPreview-scrollArea {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 16px 0;
+  }
+  

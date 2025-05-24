@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      dialect: org.hibernate.dialect.MySQL8Dialect
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 30

@@ -171,3 +171,21 @@ bin/
 
 confidentials/
 *.sql
+=======
+# Gradle
+.gradle/
+build/
+*/build/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+.env
