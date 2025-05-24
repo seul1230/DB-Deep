@@ -1,0 +1,11 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal() // ✅ 필수: Gradle Plugin Portal에서 플러그인 다운로드
+        mavenCentral()
+    }
+}
+
+rootProject.name = 's12p31s104'
+
+include 'dbdeep-BE'
+include 'dbdeep-gateway'
