@@ -1,0 +1,174 @@
+:root {
+  --console-font: 'Fira Code', monospace;
+}
+
+/* ───────────── Console Wrapper ───────────── */
+.webSocketConsole-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 260px;
+  height: 100vh;
+  padding-bottom: 100px;
+
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: var(--console-font);
+  font-size: 12px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 400;
+
+  box-shadow: -2px 0 6px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.webSocketConsole-open {
+  transform: translateX(0%);
+}
+
+/* ───────────── Toggle Button ───────────── */
+.webSocketConsole-toggleButton {
+  position: fixed;
+  top: 16px;
+  right: 0;
+  z-index: 900;
+
+  width: 32px;
+  height: 40px;
+  border: none;
+  border-radius: 4px 0 0 4px;
+
+  background-color: var(--sidebar-bg);
+  color: var(--icon-blue);
+  font-size: 16px;
+  font-weight: bold;
+
+  cursor: pointer;
+  transition: right 0.3s ease;
+}
+
+/* ───────────── Log Area ───────────── */
+.webSocketConsole-logWrapper {
+  height: 100%;
+  max-height: calc(100vh - 100px);
+  margin: 60px 12px 16px 12px;
+  padding: 12px;
+
+  background-color: var(--sidebar-bg);
+  border-radius: 12px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+
+  box-sizing: border-box;
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.webSocketConsole-logWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* ───────────── Each Log Line ───────────── */
+.webSocketConsole-logLine {
+  position: relative;
+  border-radius: 8px;
+  padding-right: 24px;
+
+  line-height: 1.4;
+  transition: background-color 0.3s ease, opacity 0.3s ease;
+  word-break: break-word;
+}
+
+.webSocketConsole-logLine:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  opacity: 0.95;
+}
+
+/* ───────────── Trash Icon ───────────── */
+.webSocketConsole-trashIcon {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+
+  color: var(--icon-blue);
+  font-size: 12px;
+  opacity: 0;
+
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.webSocketConsole-logLine:hover .webSocketConsole-trashIcon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.webSocketConsole-trashIcon:hover {
+  color: var(--icon-blue-hover);
+  transform: scale(1.2);
+}
+
+/* ───────────── Parsed Console Block ───────────── */
+.webSocketConsole-consoleBlock {
+  color: var(--text-color);
+  font-family: var(--console-font);
+  font-size: 11px;
+  line-height: 1.6;
+
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+
+.webSocketConsole-consoleBlock > div {
+  line-height: 1.4;
+}
+
+.webSocketConsole-consoleBlock strong {
+  color: var(--icon-blue);
+  display: inline-block;
+}
+
+.webSocketConsole-consoleBlock span.boolean-true {
+  color: var(--icon-blue);
+  font-weight: 600;
+}
+
+.webSocketConsole-consoleBlock span.boolean-false {
+  color: var(--red-alert);
+  font-weight: 600;
+}
+
+/* ───────────── Code Block ───────────── */
+.webSocketConsole-pre {
+  color: var(--text-color);
+  font-family: var(--console-font);
+  font-size: 11px;
+  line-height: 1.5;
+
+  white-space: pre-wrap;
+  word-break: break-word;
+
+  overflow-x: hidden;
+  margin: 0;
+  box-sizing: border-box;
+}

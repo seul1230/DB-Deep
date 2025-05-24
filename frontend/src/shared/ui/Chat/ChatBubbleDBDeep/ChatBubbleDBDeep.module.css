@@ -1,0 +1,128 @@
+.chatBubbleDBDeep-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.chatBubbleDBDeep-bubbleWithMenu {
+  display: flex;
+  align-items: flex-start;
+}
+
+.chatBubbleDBDeep-bubble {
+  max-width: 75%;
+  width: 75%;
+  background-color: var(--sidebar-bg);
+  color: var(--text-color);
+  padding: 12px 16px;
+  border-radius: 16px;
+  border-top-left-radius: 4px;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.chatBubbleDBDeep-bubbleNoBg {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* 메뉴 버튼 */
+.chatBubbleDBDeep-menuArea {
+  position: static;
+}
+
+.chatBubbleDBDeep-menuButtonWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.chatBubbleDBDeep-menuButton {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--icon-blue);
+  padding: 4px;
+  border-radius: 50%;
+  transition: background 0.2s ease;
+}
+
+.chatBubbleDBDeep-menuOverlayContainer {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 30;
+}
+
+/* 마크다운 */
+.chatBubbleDBDeep-bubble h1,
+.chatBubbleDBDeep-bubble h2,
+.chatBubbleDBDeep-bubble h3,
+.chatBubbleDBDeep-bubbleNoBg h1,
+.chatBubbleDBDeep-bubbleNoBg h2,
+.chatBubbleDBDeep-bubbleNoBg h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.6;
+  margin: 12px 0 8px;
+}
+
+.chatBubbleDBDeep-bubble p,
+.chatBubbleDBDeep-bubbleNoBg p {
+  margin: 4px 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.chatBubbleDBDeep-bubble ul,
+.chatBubbleDBDeep-bubbleNoBg ul {
+  padding-left: 1.2rem;
+  line-height: 1.6;
+  margin: 10px 0 14px;
+}
+
+.chatBubbleDBDeep-bubble li,
+.chatBubbleDBDeep-bubbleNoBg li {
+  font-size: 0.875rem;
+  margin: 10px 0 14px;
+  line-height: 1.5;
+  list-style: disc;
+}
+
+.chatBubbleDBDeep-bubble ol,
+.chatBubbleDBDeep-bubbleNoBg ol {
+  padding-left: 1.4rem;
+  margin: 10px 0;
+}
+
+.chatBubbleDBDeep-bubble ol > li,
+.chatBubbleDBDeep-bubbleNoBg ol > li {
+  list-style-type: decimal;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.chatBubbleDBDeep-bubble-hr {
+  border: none;
+  border-top: 1px solid var(--light-gray);
+  margin: 12px 0;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.chatBubbleDBDeep-section {
+  margin-bottom: 8px;
+}
