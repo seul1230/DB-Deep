@@ -1,0 +1,115 @@
+.Sidebar-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 68px;
+  height: 100vh;
+  background-color: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  border-right: 1px solid var(--light-gray);
+  z-index: 900;
+}
+
+.Sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  margin-bottom: 32px;
+  margin-top: 10px;
+  position: relative;
+}
+
+.Sidebar-profile {
+  width: 36px;
+  height: 36px;
+  border-radius: 40%;
+  object-fit: cover;
+  border: 1px solid var(--light-gray);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.Sidebar-nav ul {
+  list-style: none;
+  padding: 0 0 176px 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  align-items: center;
+}
+
+.Sidebar-nav li {
+  cursor: pointer;
+}
+
+.Sidebar-icon {
+  color: var(--icon-blue);
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.Sidebar-nav li:hover .Sidebar-icon {
+  color: var(--icon-blue-hover);
+  transform: scale(1.15);
+}
+
+.Sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 27px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.Sidebar-toggleWrapper {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+  margin-bottom: 50px;
+}
+
+.Sidebar-toggleInput {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.Sidebar-toggleSlider {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  background-color: var(--primary-light-blue);
+  border-radius: 34px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.Sidebar-toggleKnob {
+  width: 20px;
+  height: 20px;
+  background-color: var(--background-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  position: relative;
+  transform: translateX(4px);
+}
+
+.Sidebar-toggleInput:checked + .Sidebar-toggleSlider .Sidebar-toggleKnob {
+  transform: translateX(24px);
+}
+
+.Sidebar-iconToggle {
+  font-size: 14px;
+  color: var(--icon-blue);
+}

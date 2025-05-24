@@ -1,0 +1,64 @@
+.TeamMemberList-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: 8px;
+  }
+  
+  .TeamMemberList-item:hover {
+    background-color: var(--primary-light-blue);
+  }
+  
+  .TeamMemberList-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--icon-blue);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .TeamMemberList-checkbox:checked::after {
+    content: "✔";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--icon-blue);
+    font-size: 11px;
+  }
+  
+  .TeamMemberList-profile {
+    display: flex;
+    align-items: center;
+  }
+  
+  .TeamMemberList-profileImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    margin-right: 14px;
+    border: 1.5px solid var(--icon-blue);
+    object-fit: cover;
+  }
+  
+  .TeamMemberList-text {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .TeamMemberList-name {
+    font-weight: 600;
+  }
+  
+  .TeamMemberList-email {
+    font-size: 12px;
+    color: var(--gray-text);
+  }
+  

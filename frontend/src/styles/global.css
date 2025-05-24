@@ -1,0 +1,109 @@
+:root {
+  /* Light mode colors */
+  --primary-dark-blue: #4333C7;
+  --primary-mid-blue: #9192F4;
+  --primary-light-blue: #E0E7FF;
+  --sidebar-bg: #F6F9FB;
+  --icon-blue: #353E80;
+  --icon-blue-hover: #272e5e;
+  --gray-text: #9CA3AF;
+  --light-gray: #DBDBDB;
+  --red-alert: #EF4444;
+  --yellow: #FCF3C6;
+  --background-color: white;
+  --text-color: black;
+  --modal-overlay-bg: rgba(0, 0, 0, 0.4);
+  --console-font: 'Fira Code', monospace;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Dark mode overrides */
+body.dark {
+  --primary-dark-blue: #8379ff;
+  --primary-mid-blue: #7273e6;
+  --primary-light-blue: #2b2e44;
+  --sidebar-bg: #242424;
+  --icon-blue: #bfc8ff;
+  --icon-blue-hover: #e0e6ff;
+  --gray-text: #aaaaaa;
+  --light-gray: #444444;
+  --red-alert: #f87171;
+  --yellow: #facc15;
+  --background-color: #1f1f22;
+  --text-color: #f3f4f6;
+  --modal-overlay-bg: rgba(255, 255, 255, 0.2);
+}
+
+/* ✅ 토스트 기본 스타일 */
+.app-toast__container {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+  border-radius: 12px !important;
+  padding: 20px 24px !important;
+  font-weight: 400 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 2px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.app-toast__body {
+  font-size: 0.90rem !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+.app-toast__progress {
+  height: 4px !important;
+  border-radius: 4px !important;
+}
+
+/* ✅ 토스트 타입별 진행바 색상 */
+.Toastify__progress-bar--success {
+  background: var(--icon-blue) !important;
+}
+
+.Toastify__progress-bar--error {
+  background: var(--red-alert) !important;
+}
+
+.Toastify__progress-bar--warning {
+  background: var(--yellow) !important;
+}
+
+.Toastify__progress-bar--info {
+  background: var(--icon-blue) !important;
+}
+
+/* ——— 전역 스크롤바 스타일 (light-gray thumb) ——— */
+* {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--light-gray) transparent;
+}
+
+/* WebKit */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--light-gray);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}

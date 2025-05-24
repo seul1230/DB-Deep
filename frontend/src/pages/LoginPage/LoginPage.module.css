@@ -1,0 +1,236 @@
+/* src/pages/LoginPage/LoginPage.module.css */
+.LoginPage-wrapper {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px;
+    box-sizing: border-box;
+    transition: padding 0.4s ease;
+  }
+  
+  .LoginPage-container {
+    max-width: 1200px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background-color: var(--background-color);
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+  
+  .LoginPage-left {
+    flex: 1 1 50%;
+    position: relative;
+    background-color: var(--background-color);
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+  
+  .LoginPage-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+  }
+  
+  .LoginPage-right {
+    flex: 1 1 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-color);
+    transition: all 0.4s ease;
+  }
+  
+  .LoginPage-box {
+    width: 100%;
+    max-width: 360px;
+    padding: 40px;
+    transition: all 0.4s ease;
+  }
+  
+  .LoginPage-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--icon-blue);
+    text-align: left;
+    margin-bottom: 10px;
+    transition: color 0.3s;
+  }
+  
+  .LoginPage-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .LoginPage-inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .LoginPage-label {
+    font-size: 14px;
+    color: var(--icon-blue);
+  }
+  
+  .LoginPage-inputWrapper {
+    background-color: var(--background-color);
+    border: 1px solid var(--icon-blue);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    transition: border 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .LoginPage-icon {
+    color: var(--gray-text);
+    margin-right: 8px;
+    transition: color 0.3s;
+  }
+  
+  .LoginPage-input {
+    flex: 1;
+    font-size: 14px;
+    border: none;
+    outline: none;
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+
+  .LoginPage-input::placeholder {
+    color: var(--gray-text);
+    opacity: 1;
+  }
+  
+  .LoginPage-eyeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.3s ease;
+  }
+  
+  .LoginPage-eyeButton:hover {
+    transform: scale(1.1);
+  }
+  
+  .LoginPage-button {
+    background-color: var(--icon-blue);
+    color: var(--background-color);
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  .LoginPage-button:hover {
+    background-color: var(--icon-blue-hover);
+    transform: scale(1.02);
+  }
+  
+  .LoginPage-forgot {
+    margin-top: 8px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray-text);
+    transition: color 0.3s;
+  }
+  
+  .LoginPage-modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--modal-overlay-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .LoginPage-forgotLink {
+    cursor: pointer;
+    transition: color 0.3s, text-decoration 0.3s;
+  }
+  
+  .LoginPage-forgotLink:hover {
+    color: var(--icon-blue);
+    text-decoration: underline;
+  }  
+  
+  @media (max-width: 960px) {
+    .LoginPage-left {
+      display: none;
+    }
+  
+    .LoginPage-right {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      background-color: var(--background-color);
+    }
+  }
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes modalFadeOut {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+  
+  .fadeIn {
+    animation: modalFadeIn 0.3s forwards;
+  }
+  
+  .fadeOut {
+    animation: modalFadeOut 0.3s forwards;
+  }
+  
+  .LoginPage-modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--modal-overlay-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .LoginPage-modalContent {
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  
+  /* ✅ 모바일 전용 로고 스타일 */
+.LoginPage-mobileLogo {
+  display: none;
+  width: 250px;
+  margin: 0 auto 50px;
+}
+
+@media (max-width: 960px) {
+  .LoginPage-mobileLogo {
+    display: block;
+  }
+}

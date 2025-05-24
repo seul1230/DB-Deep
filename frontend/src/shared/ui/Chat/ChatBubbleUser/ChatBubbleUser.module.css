@@ -1,0 +1,32 @@
+.chatBubbleUser-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+
+.chatBubbleUser-bubble {
+  max-width: 70%;
+  background-color: var(--light-gray);
+  color: var(--text-color);
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  border-top-right-radius: 0.2rem;
+  word-break: break-word;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.chatBubbleUser-retryButton {
+  background: none;
+  border: none;
+  color: var(--gray-text);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.chatBubbleUser-retryButton:hover {
+  color: var(--text-color);
+}

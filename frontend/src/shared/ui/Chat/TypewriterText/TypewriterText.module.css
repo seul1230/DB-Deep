@@ -1,0 +1,8 @@
+.typewriterText-wrapper {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin: 4px 0; 
+  white-space: pre-line;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
