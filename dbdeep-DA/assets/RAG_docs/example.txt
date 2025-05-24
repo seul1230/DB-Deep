@@ -1,0 +1,52 @@
+- **질문**: VIP 등급이 높은 고객 중 최근 3개월간 쇼핑에 가장 많이 쓴 사람은?
+    - 테이블: `card_members`, `card_sales`
+    - 컬럼: `code_vip`, `amt_shop_r3m`
+    - JOIN 키: `member_no`
+    - 설명: VIP 등급이 낮은 숫자일수록 높으며, 쇼핑 이용금액 상위 기준으로 정렬
+
+---
+
+- **질문**: 연체가 있는 고객이 최근 카드 사용을 얼마나 줄였는지 알고 싶어
+    - 테이블: `card_members`, `card_sales`
+    - 컬럼: `yn_member_dlq`, `cnt_crsl_b2m`, `cnt_crsl_b0m`
+    - JOIN 키: `member_no`
+    - 설명: 연체 여부가 있는 고객의 2개월 전 대비 당월 신용카드 사용건수 비교
+
+---
+
+- **질문**: 카드론 한도가 높은데 실제 이용이 없는 사람 알려줘
+    - 테이블: `card_credit`, `card_sales`
+    - 컬럼: `amt_cl_limit_fpbl`, `amt_cl_b0m`, `amt_cl_r3m`
+    - JOIN 키: `member_no`
+    - 설명: 카드론 한도가 존재하면서 최근 이용금액이 0인 고객 필터링
+
+---
+
+- **질문**: 신용카드 여러 장을 가지고 있지만, 한도 증액을 요청한 적 없는 사람
+    - 테이블: `card_members`, `card_credit`
+    - 컬럼: `cnt_credit_vl_card`, `cndt_limit_inc_r12m`
+    - JOIN 키: `member_no`
+    - 설명: 신용카드 수 ≥ 2이고 최근 1년간 한도 증액 요청이 없는 고객
+
+---
+
+- **질문**: 최근 해외에서 카드 사용한 VIP 고객 리스트
+    - 테이블: `card_members`, `card_sales`
+    - 컬럼: `code_vip`, `amt_abro`
+    - JOIN 키: `member_no`
+    - 설명: VIP 고객 중 `amt_abro` (해외 사용금액)가 0보다 큰 고객
+
+---
+
+- **질문**: 일시불과 할부를 가장 많이 이용한 고객
+    - 테이블: `card_sales`
+    - 컬럼: `amt_pif_r3m`, `amt_int_r3m`
+    - 설명: 최근 3개월 기준 일시불+할부 이용금액 합산 기준 상위 고객
+
+---
+
+- **질문**: 최근 리볼빙 신청한 고객의 총 카드 사용 금액은?
+    - 테이블: `card_credit`, `card_sales`
+    - 컬럼: `yn_rv_ps`, `amt_ccd_r3m`
+    - JOIN 키: `member_no`
+    - 설명: 리볼빙 전환 가능 여부가 True이고, 최근 3개월 총 사용금액 집계

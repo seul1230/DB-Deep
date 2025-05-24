@@ -1,0 +1,116 @@
+### ✅ 기본 작성 규칙
+
+1. **dataset.table** 형태로 명시할 것
+    예: `FROM card_dataset.card_sales`
+    
+2. **테이블과 컬럼 이름은 영문 기준**
+    - 스키마에 명시된 이름을 그대로 사용할 것
+    - 별명(alias)을 사용할 경우 혼란 없는 범위에서만
+3. **SQL 쿼리는 BigQuery 기준으로 작성**
+    - 일부 함수/문법은 PostgreSQL 등과 다름
+
+---
+
+### ❌ BigQuery에서 사용 불가능하거나 주의할 문법
+
+| 잘못된 문법 / 함수                                        | 설명 및 제한사항                              | 대응 방법                                              |
+| -------------------------------------------------- | -------------------------------------- | -------------------------------------------------- |
+| `PERCENTILE_CONT`, `MEDIAN`, `NTILE`               | BigQuery에서는 미지원                        | `APPROX_QUANTILES(...)[OFFSET(n)]` 사용              |
+| `OVER (...)` + `GROUP BY` 병행                       | 오류 발생 (SELECT 수준에서만 `OVER` 사용 가능)      | `OVER` 또는 `GROUP BY` 중 하나만 사용                      |
+| 상관 서브쿼리 (correlated subquery)                      | 대부분 지원되지 않음                            | CTE 또는 JOIN으로 변환                                   |
+| `HAVING` 절 내 서브쿼리                                  | 복잡한 조건식이 오류 유발                         | 먼저 CTE에서 조건 계산 후 `WHERE`/`JOIN`                    |
+| `SELECT AVG(COUNT(...))`                           | 집계 위에 집계는 불가능                          | CTE나 서브쿼리로 분리 후 처리                                 |
+| `LIMIT` 없는 `ORDER BY`                              | 실행 가능하나 비효율적                           | `LIMIT` 또는 `AGGREGATE`와 병행 권장                      |
+| `ROW_NUMBER()` 등 윈도우 함수                            | `SELECT` 내에서는 사용 가능, `GROUP BY`와 병행 금지 | `GROUP BY` 없이 윈도우 함수만 사용                           |
+| `FROM table_name`                                  | dataset 없이 테이블만 작성                     | `FROM dataset.table` 형식 사용                         |
+| `PARTITION BY` 컬럼이 `GROUP BY` 또는 `AGGREGATE` 안에 없음 | 오류 발생                                  | 해당 컬럼을 `GROUP BY`하거나, `PARTITION BY` 제거 또는 CTE로 분리 |
+
+
+---
+
+### ✅ BigQuery 특화 함수 및 문법
+
+| 함수/문법 | 설명 |
+| --- | --- |
+| `APPROX_QUANTILES(column, 100)[OFFSET(n)]` | 백분위 계산. 예: 하위 10%는 OFFSET(10) |
+| `SAFE_DIVIDE(a, b)` | b가 0일 때 NULL이 아닌 0 반환 |
+| `ARRAY_AGG(x ORDER BY y)` | 정렬된 값 집계 |
+| `STRUCT(...)`, `UNNEST(...)` | 구조화된 값과 배열 처리 |
+| `FORMAT('%d%%', value)` | 문자열 포맷팅 |
+| `EXTRACT(YEAR FROM date_column)` | 날짜에서 연도 추출 |
+
+---
+
+### 🔧 예제 패턴
+
+**CTE + 조건 로직 포함**
+
+```sql
+WITH PoorPerformer AS (
+  SELECT
+    e.employee_id,
+    d.department_name,
+    AVG(p.score) AS avg_score
+  FROM hr_dataset.fact_performance p
+  JOIN hr_dataset.dim_employee e ON p.employee_id = e.employee_id
+  JOIN hr_dataset.dim_department d ON e.department_id = d.department_id
+  GROUP BY 1, 2
+  HAVING avg_score < (
+    SELECT APPROX_QUANTILES(score, 100)[OFFSET(10)]
+    FROM hr_dataset.fact_performance
+  )
+)
+SELECT
+  department_name,
+  COUNT(*) AS num_poor_performers
+FROM PoorPerformer
+GROUP BY 1
+
+```
+
+### 🔧 예제: APPROX_QUANTILES 기준 분류 쿼리 (정상 사용 예시)
+```sql
+WITH score_threshold AS (
+  SELECT
+    APPROX_QUANTILES(score, 100)[OFFSET(10)] AS threshold
+  FROM hr_dataset.fact_performance
+),
+tagged_employee AS (
+  SELECT
+    e.employee_id,
+    p.score,
+    CASE
+      WHEN p.score <= t.threshold THEN '하위 10%'
+      ELSE '정상'
+    END AS performance_tag
+  FROM hr_dataset.fact_performance p
+  JOIN hr_dataset.dim_employee e ON p.employee_id = e.employee_id
+  CROSS JOIN score_threshold t
+)
+SELECT performance_tag, COUNT(*) FROM tagged_employee GROUP BY 1
+```
+
+### ⚠️ APPROX_QUANTILES(...) 사용 시 주의사항
+| 제한사항                | 설명                                              | 대응 방법                 |
+| ------------------- | ----------------------------------------------- | --------------------- |
+| 표현식 사용 금지           | `score + bonus` 등 파생 컬럼에는 사용 불가                 | CTE로 컬럼 분리 후 사용       |
+| 집계된 결과에 사용 불가       | `AVG(score)` 등에 적용하면 오류                         | 원본 컬럼에만 사용            |
+| `OVER (...)`와 병행 불가 | 윈도우 함수 내부에서는 작동 안 함                             | SELECT 단독 사용          |
+| 결과 재사용 불가           | `APPROX_QUANTILES(...)` 결과를 조건문에서 바로 사용 시 예외 가능 | 중간 결과를 CTE로 저장 후 JOIN |
+
+```sql
+SELECT
+  APPROX_QUANTILES(score + bonus, 100)[OFFSET(10)]
+FROM ...
+```
+
+---
+
+### 📘 BigQuery 사용금지 문법: 예시별 대응 방식
+
+| 잘못된 문법                              | 이유             | 대안                                       |
+| ----------------------------------- | -------------- | ---------------------------------------- |
+| `SELECT AVG(COUNT(...))`            | 집계 위에 집계는 금지   | CTE 또는 서브쿼리로 분리                          |
+| `SELECT ..., NTILE(4) OVER(...)`    | `NTILE`은 미지원   | 직접 분위수 계산하거나 `APPROX_QUANTILES`로 대체      |
+| `HAVING AVG(score) <= (SELECT ...)` | 상관 서브쿼리 사용 불가  | CTE + JOIN으로 변환                          |
+| `FROM dim_department`               | dataset 지정 안 됨 | `FROM hr_dataset.dim_department`로 작성해야 함 |

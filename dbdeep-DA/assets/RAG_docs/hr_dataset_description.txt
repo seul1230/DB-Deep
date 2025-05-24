@@ -1,0 +1,150 @@
+이 데이터베이스(hr_dataset)는 스타 스키마(Star Schema)로 구성되어 있으며, 중심에는 측정 데이터를 저장하는 fact 테이블이 있고, 이를 설명하는 여러 dimension 테이블과 연결되어 있습니다.
+
+- Fact Tables: fact_salary, fact_bonus, fact_attendance, fact_performance, fact_department_performance, fact_survey_response
+- Dimension Tables: dim_employee, dim_department, dim_position, dim_date, dim_survey_question
+
+### [테이블명: dim_employee]
+
+dim_employee 테이블은 직원 기본 정보 및 조직 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '직원ID'(employee_id): 직원 고유 ID (코드 여부: N)
+- 필드명 '이름'(name): 직원 이름 (코드 여부: N)
+- 필드명 '성별'(gender): 성별 (코드 여부: Y) => 유효값: "남", "여"
+- 필드명 '생년월일'(birth_date): 생년월일 (코드 여부: N)
+- 필드명 '고용상태'(employment_status): 재직 상태 (코드 여부: Y) => 유효값: "재직", "퇴사"
+- 필드명 '입사일'(hire_date): 입사 날짜 (코드 여부: N)
+- 필드명 '퇴사일'(resignation_date): 퇴사 날짜 (코드 여부: N)
+- 필드명 '퇴사여부'(is_resigned): 퇴사 여부 (코드 여부: Y) => 0: 재직, 1: 퇴사
+- 필드명 '결혼여부'(is_married): 결혼 여부 (코드 여부: Y) => 0: 미혼, 1: 기혼
+- 필드명 '부서ID'(department_id): 소속 부서 (코드 여부: Y) => 외래키, `dim_department.department_id`
+- 필드명 '직급ID'(position_id): 직급 (코드 여부: Y) => 외래키, `dim_position.position_id`
+- 필드명 '매니저ID'(manager_id): 상위 매니저 ID (코드 여부: N)
+- 필드명 '주소'(address): 주소 (코드 여부: N)
+- 필드명 '채용경로'(recruitment_source): 채용 출처 (코드 여부: Y) => 유효값 예: "추천", "공채", "경력"
+
+---
+
+### [테이블명: dim_position]
+
+dim_position 테이블은 직급 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '직급ID'(position_id): 직급 ID (코드 여부: Y)
+- 필드명 '직급명'(position_name): 직급명 (코드 여부: N)
+    => 유효값: '사원', '주임', '대리', '과장', '차장', '부장'
+    
+---
+
+### [테이블명: dim_department]
+
+dim_department 테이블은 부서 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '부서ID'(department_id): 부서 고유 ID (코드 여부: Y)
+- 필드명 '부서명'(department_name): 부서 이름 (코드 여부: N)
+    
+    => 예시: "카드상품 개발", "IT 기획" 등 45개
+    
+- 필드명 '위치'(location): 부서 위치 (코드 여부: N)
+
+---
+
+### [테이블명: dim_date]
+
+dim_date 테이블은 날짜 차원 테이블로 시간 정보와의 조인을 위해 사용됩니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '날짜ID'(date_id): 날짜 고유 ID (코드 여부: Y)
+- 필드명 '전체날짜'(full_date): 실제 날짜 (코드 여부: N)
+- 필드명 '연도'(year): 연도 (코드 여부: N)
+- 필드명 '월'(month): 월 (코드 여부: N)
+- 필드명 '분기'(quarter): 분기 (코드 여부: N)
+- 필드명 '요일'(day_of_week): 요일 (코드 여부: Y) => 유효값: "월요일" ~ "일요일"
+
+---
+
+### [테이블명: fact_salary]
+
+fact_salary 테이블은 직원의 연봉 데이터를 저장합니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '연봉ID'(salary_id): 연봉 기록 고유 ID (코드 여부: N)
+- 필드명 '직원ID'(employee_id): 직원 ID (코드 여부: Y)
+- 필드명 '날짜ID'(date_id): 기록 날짜 (코드 여부: Y)
+- 필드명 '연봉'(salary_amount): 연봉 금액 (코드 여부: N)
+
+---
+
+### [테이블명: fact_bonus]
+
+fact_bonus 테이블은 직원에게 지급된 상여금 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '직원ID'(employee_id): 직원 ID (코드 여부: Y)
+- 필드명 '날짜ID'(date_id): 지급일 (코드 여부: Y)
+- 필드명 '상여금'(bonus_amount): 지급된 상여금 (코드 여부: N)
+- 필드명 '상여금ID'(bonus_id): 보너스 레코드 ID (코드 여부: N)
+- 필드명 '비고'(remark): 특이사항 또는 설명 (코드 여부: N)
+
+---
+
+### [테이블명: fact_attendance]
+
+fact_attendance 테이블은 근태 정보를 저장합니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '출결ID'(attendance_id): 출결 레코드 ID (코드 여부: N)
+- 필드명 '직원ID'(employee_id): 직원 ID (코드 여부: Y)
+- 필드명 '날짜ID'(date_id): 날짜 ID (코드 여부: Y)
+- 필드명 '출근시간'(check_in_time): 출근 시각 (코드 여부: N)
+- 필드명 '퇴근시간'(check_out_time): 퇴근 시각 (코드 여부: N)
+- 필드명 '비고'(remark): 출결 특이사항 (코드 여부: Y)
+    
+    => 유효값 예: "정상", "지각", "조퇴", "결근", "연차", "출장"
+    
+
+---
+
+### [테이블명: fact_performance]
+
+fact_performance 테이블은 직원 개인에 대한 성과 평가 정보를 담고 있습니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '평가ID'(performance_id): 성과 평가 고유 ID (코드 여부: N)
+- 필드명 '직원ID'(employee_id): 직원 ID (코드 여부: Y)
+- 필드명 '날짜ID'(date_id): 평가일 (코드 여부: Y)
+- 필드명 '점수'(score): 평가 점수 (코드 여부: N) => 유효값: 1~5
+- 필드명 '내용'(content): 평가 코멘트 (코드 여부: N)
+
+---
+
+### [테이블명: fact_department_performance]
+
+fact_department_performance 테이블은 부서 단위의 분기별 평가 결과를 저장합니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '평가ID'(id): 부서 평가 레코드 ID (코드 여부: N)
+- 필드명 '부서ID'(department_id): 부서 ID (코드 여부: Y)
+- 필드명 '날짜ID'(date_id): 평가일 (코드 여부: Y)
+- 필드명 '점수'(score): 평가 점수 (코드 여부: N)
+- 필드명 '내용'(content): 평가 형태 (코드 여부: Y)
+    
+    => 유효값: "상승 곡선", "하향 곡선", "유지", "V", "^"
+    
+
+---
+
+### [테이블명: dim_survey_question]
+
+dim_survey_question 테이블은 직원 만족도 조사 항목 정의 테이블입니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '문항ID'(question_id): 설문 문항 고유 ID (코드 여부: Y)
+- 필드명 '문항내용'(question_text): 질문 텍스트 (코드 여부: N)
+    
+    => 유효값: "복지/급여", "워라밸", "사내문화", "승진 기회", "경영진"
+    
+
+---
+
+### [테이블명: fact_survey_response]
+
+fact_survey_response 테이블은 만족도 설문 응답 결과를 담고 있습니다. 주요 필드는 다음과 같습니다:
+
+- 필드명 '응답ID'(response_id): 응답 고유 ID (코드 여부: N)
+- 필드명 '직원ID'(employee_id): 응답한 직원 ID (코드 여부: Y)
+- 필드명 '날짜ID'(date_id): 설문일 (코드 여부: Y)
+- 필드명 '문항ID'(question_id): 문항 ID (코드 여부: Y)
+- 필드명 '점수'(score): 응답 점수 (코드 여부: N) => 유효값: 1~5
+- 필드명 '의견'(comment): 주관식 응답 내용 (코드 여부: N)

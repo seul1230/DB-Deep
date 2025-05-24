@@ -1,0 +1,77 @@
+pipeline {
+  agent any
+  environment {
+    GCP_PROJECT        = 'dbdeep-458113'
+    REGION             = 'us-central1'
+    SERVICE            = 'dbdeep-da'
+    REPO               = 'dbdeep-da-repo'
+    IMAGE              = "asia-northeast3-docker.pkg.dev/${GCP_PROJECT}/${REPO}/${SERVICE}"
+    PORT               = '8080'
+    CLOUDRUN_SA        = 'dbdeep-cloudrun-deployer@dbdeep-458113.iam.gserviceaccount.com'
+    CLOUDSQL_INSTANCE  = 'dbdeep-458113:asia-northeast3:dbdeep-app'
+  }
+  stages {
+    stage('Checkout') {
+      steps {
+        git branch: 'DA-dev',
+            url: 'https://lab.ssafy.com/s12-final/S12P31S104',
+            credentialsId: 'gitlab_api'
+      }
+    }
+    stage('Build Docker Image') {
+      steps {
+        withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
+          script {
+            def hfToken = sh(
+              script: "echo \"$ENV_VARS\" | tr ',' '\\n' | grep '^HUGGINGFACE_HUB_TOKEN=' | cut -d'=' -f2-",
+              returnStdout: true
+            ).trim()
+            sh """
+              docker build \
+                --build-arg HUGGINGFACE_HUB_TOKEN=${hfToken} \
+                -t ${IMAGE} \
+                dbdeep-DA/
+            """
+          }
+        }
+      }
+    }
+    stage('Authenticate with GCP') {
+      steps {
+        withCredentials([file(credentialsId: 'gcp-service-account-json', variable: 'GCP_KEY')]) {
+          sh '''
+            gcloud auth activate-service-account --key-file=$GCP_KEY
+            gcloud config set project $GCP_PROJECT
+            gcloud auth configure-docker asia-northeast3-docker.pkg.dev
+          '''
+        }
+      }
+    }
+    stage('Push Docker Image') {
+      steps {
+        sh "docker push ${IMAGE}"
+      }
+    }
+    stage('Deploy to Cloud Run') {
+      steps {
+        withCredentials([string(credentialsId: 'env-vars', variable: 'ENV_VARS')]) {
+          sh '''
+            gcloud run deploy $SERVICE \
+              --image ${IMAGE} \
+              --platform managed \
+              --region ${REGION} \
+              --service-account ${CLOUDRUN_SA} \
+              --allow-unauthenticated \
+              --cpu 4 \
+              --memory 16Gi \
+              --max-instances 1 \
+              --timeout=3600s \
+              --port ${PORT} \
+              --add-cloudsql-instances ${CLOUDSQL_INSTANCE} \
+              --set-env-vars ${ENV_VARS}
+          '''
+        }
+      }
+    }
+  }
+}
