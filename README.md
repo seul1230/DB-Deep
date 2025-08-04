@@ -1,4 +1,4 @@
-# 📊 DBDeep
+# 📊 LLM 기반 사내 데이터 분석 엔진, DBDeep
 ![logo](./frontend/src/assets/logo.png)
 
 **구글 기업 연계 프로젝트**로 개발된 DBDeep은 자연어로 데이터에 질문하고, SQL 쿼리를 자동 생성·실행하여 인사이트와 시각화를 즉시 제공하는 차세대 데이터 분석 플랫폼입니다.
@@ -35,7 +35,7 @@ DBDeep은 "데이터 민주화"를 목표로 비전문가도 직관적으로 사
 |---|---|
 | **Frontend** | React 19, TypeScript 5, Vite 6, Zustand, Redux Toolkit, React Query, Plotly.js |
 | **Backend** | Spring Boot 3, Java 17, MySQL 8, Redis, Elasticsearch 7, FastAPI |
-| **AI/LLM** | Gemini API, HuggingFace 모델 |
+| **AI/LLM** | Gemini API, HuggingFace |
 | **Infra** | Docker Compose, Nginx, Jenkins, AWS EC2, CloudSQL, Firestore |
 | **DevOps** | GitLab, Jira, MatterMost |
 | **Design** | Figma |
@@ -81,7 +81,7 @@ DBDeep은 "데이터 민주화"를 목표로 비전문가도 직관적으로 사
 | <img src="https://avatars.githubusercontent.com/DDuMandoo" width="60"/> | **오준수** | 실시간 채팅, LLM 통합 | [@DDuMandoo](https://github.com/DDuMandoo) |
 | <img src="https://avatars.githubusercontent.com/imewuzin" width="60"/> | **임유진** | 프론트엔드, UI/UX, 채팅/아카이빙 화면 | [@imewuzin](https://github.com/imewuzin) |
 | <img src="https://avatars.githubusercontent.com/cup-wan" width="60"/> | **박경완** | 마이데이터, 백엔드 | [@cup-wan](https://github.com/cup-wan) |
-| <img src="https://avatars.githubusercontent.com/seul1230" width="60"/> | **조예슬** | 인프라, Elastic/Kibana, SMTP | [@seul1230](https://github.com/seul1230) |
+| <img src="https://avatars.githubusercontent.com/seul1230" width="60"/> | **조예슬** | AI 파이프라인 설계 및 구현(LLM, RAG, CoT), BigQuery DB | [@seul1230](https://github.com/seul1230) |
 
 ---
 
