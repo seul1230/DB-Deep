@@ -120,7 +120,7 @@ DBDeep은 "데이터 민주화"를 목표로 비전문가도 직관적으로 사
 | <img src="https://avatars.githubusercontent.com/DDuMandoo" width="60"/> | **오준수** | 실시간 채팅, LLM 통합 | [@DDuMandoo](https://github.com/DDuMandoo) |
 | <img src="https://avatars.githubusercontent.com/imewuzin" width="60"/> | **임유진** | 프론트엔드, UI/UX, 채팅/아카이빙 화면 | [@imewuzin](https://github.com/imewuzin) |
 | <img src="https://avatars.githubusercontent.com/cup-wan" width="60"/> | **박경완** | 마이데이터, 백엔드 | [@cup-wan](https://github.com/cup-wan) |
-| <img src="https://avatars.githubusercontent.com/seul1230" width="60"/> | **조예슬** | AI 파이프라인 설계 및 메인 알고리즘 구현, BigQuery 관리 | [@seul1230](https://github.com/seul1230) |
+| <img src="https://avatars.githubusercontent.com/seul1230" width="60"/> | **조예슬** | AI 파이프라인 설계 및 메인 알고리즘 구현 | [@seul1230](https://github.com/seul1230) |
 
 <br>
 
