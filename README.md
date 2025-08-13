@@ -72,12 +72,22 @@ DBDeep은 "데이터 민주화"를 목표로 비전문가도 직관적으로 사
 
 <br>
 
+## 🗂️ 데이터
+
+- 추가 예정
+
+<br>
+
+---
+
+<br>
+
 ## 🏛️ 아키텍처
 
 아래 이미지는 DBDeep의 전체 시스템 구성입니다.
 
 <p align="center"><img src="./architecture.png"/><figcaption>^ DBDeep 아키텍처</figcaption></p>
-<p align="center"><img src="./architecture.png"/><figcaption>^ DBDeep LLM 파이프라인</figcaption></p>
+<p align="center"><img src="./architecture2.png"/><figcaption>^ DBDeep LLM 파이프라인</figcaption></p>
 
 - **Frontend**: React + Vite SPA
 - **API Gateway**: Spring Boot
